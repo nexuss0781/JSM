@@ -1,0 +1,77 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    name: test (${{ matrix.os }})
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install pinned Rust toolchain
+        run: rustup toolchain install 1.95.0 --profile minimal --component rustfmt --component clippy
+      - name: Verify workspace dependency policy
+        run: python scripts/check_workspace.py
+      - name: Format
+        run: cargo +1.95.0 fmt --all -- --check
+      - name: Build
+        run: cargo +1.95.0 build --workspace --all-targets --locked
+      - name: Clippy
+        run: cargo +1.95.0 clippy --workspace --all-targets --all-features --locked -- -D warnings
+      - name: Test
+        run: cargo +1.95.0 test --workspace --all-features --locked
+      - name: Documentation
+        env:
+          RUSTDOCFLAGS: -D warnings
+        run: cargo +1.95.0 doc --workspace --no-deps --all-features --locked
+
+  linux-quality:
+    name: Linux coverage and dependency policy
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install pinned Rust toolchain
+        run: rustup toolchain install 1.95.0 --profile minimal --component llvm-tools-preview
+      - name: Install nextest, llvm-cov, deny, and audit
+        run: |
+          cargo +1.95.0 install cargo-nextest --locked
+          cargo +1.95.0 install cargo-llvm-cov --locked
+          cargo +1.95.0 install cargo-deny --locked
+          cargo +1.95.0 install cargo-audit --locked
+      - name: Run nextest
+        run: cargo +1.95.0 nextest run --workspace --all-features --locked
+      - name: Run coverage
+        run: |
+          mkdir -p coverage
+          cargo +1.95.0 llvm-cov nextest --workspace --all-features --locked --lcov --output-path coverage/lcov.info
+      - name: Dependency license and advisory checks
+        run: cargo +1.95.0 deny check
+      - name: RustSec audit
+        run: cargo +1.95.0 audit
+
+  benchmark-smoke:
+    name: Benchmark harness smoke
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run deterministic benchmark smoke
+        run: python3 benches/run.py --smoke --container-runtime docker --output-dir /tmp/jsm-bench
+      - name: Verify report files
+        run: test -s /tmp/jsm-bench/report.json && test -s /tmp/jsm-bench/report.md
