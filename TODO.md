@@ -1,6 +1,6 @@
 # JSM Implementation Backlog
 
-> **Status:** Backlog initialized from draft v0.1 specifications; all implementation items are open.
+> **Status:** Phase 0 foundations and gate are complete on `main` (merged PR #2); Phases 1–7 remain open.
 > **Companion:** [`PHASE.md`](PHASE.md) defines sequencing, phase gates, and cross-phase invariants.
 > **Requirement source:** [`SPECS.md`](SPECS.md) is authoritative for detailed behavior and exit criteria; [`PROJECT.md`](PROJECT.md) is authoritative for product goals and scope.
 
@@ -8,7 +8,7 @@
 
 - Keep the source sub-phase ID in each issue/PR/test reference. Split checklist items into reviewable tasks as needed; do not change the phase gate to accommodate an incomplete implementation.
 - Check an item only after its implementation, tests, docs, and applicable security/platform evidence are merged. Link evidence from the related issue or PR.
-- All unchecked items mean **not yet verified**, not necessarily unstarted. This repository baseline has no implementation code yet.
+- All unchecked items mean **not yet verified**, not necessarily unstarted. Phase 0 was merged and its gate passed in PR #2; later phases remain open.
 - Resolve applicable open design questions in `PROJECT.md` through reviewed ADRs before freezing persisted data, external contracts, security defaults, or distribution behavior. See [Design decisions](#design-decisions-to-record).
 - Phase 0–5 are the v1.0 delivery path. Phase 6–7 work is post-v1.0 and must remain opt-in as specified in `PHASE.md`.
 
@@ -16,43 +16,45 @@
 
 ### 0.1 Repository and tooling
 
-- [ ] Create the Rust Cargo workspace and the specified crates: `jsm-cli`, `jsm-core`, `jsm-registry`, `jsm-resolver`, `jsm-store`, `jsm-fetch`, `jsm-linker`, `jsm-build`, `jsm-lockfile`, `jsm-workspace`, `jsm-security`, `jsm-daemon`, and `jsm-testkit`.
-- [ ] Pin the Rust toolchain and document the MSRV policy; enforce crate dependency boundaries, no cycles, and one CLI binary.
-- [ ] Add CI for Linux, macOS, and Windows with formatting, Clippy, tests, dependency/license/advisory checks, coverage, and documented required checks.
-- [ ] Add `justfile` or `xtask` for build, test, benchmark, lint, and release tasks; configure nextest and coverage tooling.
-- [ ] Add `CONTRIBUTING.md`, `CODE_OF_CONDUCT.md`, issue/PR templates, and `docs/adr/` with an ADR template.
+- [x] Create the Rust Cargo workspace and the specified crates: `jsm-cli`, `jsm-core`, `jsm-registry`, `jsm-resolver`, `jsm-store`, `jsm-fetch`, `jsm-linker`, `jsm-build`, `jsm-lockfile`, `jsm-workspace`, `jsm-security`, `jsm-daemon`, and `jsm-testkit`.
+- [x] Pin the Rust toolchain and document the MSRV policy; enforce crate dependency boundaries, no cycles, and one CLI binary.
+- [x] Add CI for Linux, macOS, and Windows with formatting, Clippy, tests, dependency/license/advisory checks, coverage, and documented required checks.
+- [x] Add `justfile` or `xtask` for build, test, benchmark, lint, and release tasks; configure nextest and coverage tooling.
+- [x] Add `CONTRIBUTING.md`, `CODE_OF_CONDUCT.md`, issue/PR templates, and `docs/adr/` with an ADR template.
 
 ### 0.2 Core types and error model
 
-- [ ] Implement and validate shared types for package names, versions, ranges, integrity, package IDs, dist-tags, dependency specs, platforms, and Node ABI.
-- [ ] Define library errors and CLI diagnostics, stable error codes, process exit-code mapping, cause chains, and optional help text.
-- [ ] Add serialization round-trip tests for persisted types and snapshot tests for the error taxonomy.
+- [x] Implement and validate shared types for package names, versions, ranges, integrity, package IDs, dist-tags, dependency specs, platforms, and Node ABI.
+- [x] Define library errors and CLI diagnostics, stable error codes, process exit-code mapping, cause chains, and optional help text.
+- [x] Add serialization round-trip tests for persisted types and snapshot tests for the error taxonomy.
 
 ### 0.3 Observability
 
-- [ ] Add structured `tracing` spans for resolve, fetch, extract, write, link, and build stages; support `JSM_LOG`, `--verbose`, and `--quiet`.
-- [ ] Implement Chrome-trace-compatible export and the metrics interface used by benchmarks and later concurrency control.
-- [ ] Redact credentials and tokens at the logging boundary; add tests that attempt to emit secrets through errors, spans, and HTTP diagnostics.
+- [x] Add structured `tracing` spans for resolve, fetch, extract, write, link, and build stages; support `JSM_LOG`, `--verbose`, and `--quiet`.
+- [x] Implement Chrome-trace-compatible export and the metrics interface used by benchmarks and later concurrency control.
+- [x] Redact credentials and tokens at the logging boundary; add tests that attempt to emit secrets through errors, spans, and HTTP diagnostics.
 
 ### 0.4 Test infrastructure
 
-- [ ] Build the in-process fake registry with controllable latency, bandwidth, status failures, truncation, and authentication.
-- [ ] Build a fixture-package generator for tarballs, manifests, dependencies, lifecycle scripts, integrity values, and malicious archive cases.
-- [ ] Add temporary project/store helpers, filesystem snapshots, and a CLI end-to-end harness.
-- [ ] Add deterministic clock/RNG injection, property-test scaffolding, and fuzz targets for parsers and archive handling.
-- [ ] Prove a fixture package can be installed end-to-end without public network access.
+- [x] Build the in-process fake registry with controllable latency, bandwidth, status failures, truncation, and authentication.
+- [x] Build a fixture-package generator for tarballs, manifests, dependencies, lifecycle scripts, integrity values, and malicious archive cases.
+- [x] Add temporary project/store helpers, filesystem snapshots, and a CLI end-to-end harness.
+- [x] Add deterministic clock/RNG injection, property-test scaffolding, and fuzz targets for parsers and archive handling.
+- [x] Prove a fixture package can be installed end-to-end without public network access.
 
 ### 0.5 Benchmark skeleton
 
-- [ ] Define and pin small, medium, large, monorepo, and native-package fixtures plus cold, warm-store, warm-lockfile, reinstall, offline, branch-switch, and CI scenarios.
-- [ ] Implement isolated competitor runs for npm, pnpm, Yarn, Bun, and a stub `jsm`; capture exact versions and environment metadata.
-- [ ] Add repeatable network shaping and machine-readable JSON plus Markdown benchmark reports with history/trend comparison.
-- [ ] Run the harness end-to-end and save the initial baseline; record the method and any targets that need calibration before becoming CI gates.
+- [x] Define and pin small, medium, large, monorepo, and native-package fixtures plus cold, warm-store, warm-lockfile, reinstall, offline, branch-switch, and CI scenarios.
+- [x] Implement isolated competitor runs for npm, pnpm, Yarn, Bun, and a stub `jsm`; capture exact versions and environment metadata.
+- [x] Add repeatable network shaping and machine-readable JSON plus Markdown benchmark reports with history/trend comparison.
+- [x] Run the harness end-to-end and save the initial baseline; record the method and any targets that need calibration before becoming CI gates.
 
 **Phase 0 gate**
 
-- [ ] Clean checkout builds, tests, and passes required CI checks on Linux, macOS, and Windows.
-- [ ] Hermetic fake-registry install and benchmark report work; benchmark inputs and tool versions are reproducible.
+- [x] Clean checkout builds, tests, and passes required CI checks on Linux, macOS, and Windows.
+- [x] Hermetic fake-registry install and benchmark report work; benchmark inputs and tool versions are reproducible.
+
+> Evidence: [PR #2](https://github.com/nexuss0781/JSM/pull/2), merged at `16cefcac425954094e135fe89b4b4e9cc7542715`; [CI run 37509059359](https://github.com/nexuss0781/JSM/actions/runs/37509059359) passed all five required jobs.
 
 ## Phase 1 — Core Engine
 
