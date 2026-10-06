@@ -251,6 +251,8 @@ def container_command(
     args = runtime_prefix(runtime) + ["run"]
     if Path(runtime).name == "podman":
         args.append("--cgroups=disabled")
+    else:
+        args.extend(["--user", f"{os.getuid()}:{os.getgid()}"])
     args.extend([
         "--rm",
         "--network=host",
@@ -335,6 +337,8 @@ def start_container_session(
     args = runtime_prefix(runtime) + ["run"]
     if Path(runtime).name == "podman":
         args.append("--cgroups=disabled")
+    else:
+        args.extend(["--user", f"{os.getuid()}:{os.getgid()}"])
     args.extend([
         "--detach",
         "--network=host",

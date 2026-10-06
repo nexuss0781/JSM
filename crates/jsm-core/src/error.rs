@@ -184,7 +184,7 @@ mod tests {
             + "\n";
         assert_eq!(
             actual,
-            include_str!("../tests/snapshots/error_taxonomy.snap")
+            include_str!("../tests/snapshots/error_taxonomy.snap").replace("\r\n", "\n")
         );
     }
 
