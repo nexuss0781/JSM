@@ -1,0 +1,33 @@
+name: Bug report
+description: Report a reproducible defect in JSM
+labels: [bug]
+body:
+  - type: input
+    id: phase
+    attributes:
+      label: Phase / sub-phase
+      description: Include a PHASE.md or SPECS.md identifier if known.
+      placeholder: "0.4"
+  - type: textarea
+    id: summary
+    attributes:
+      label: What happened?
+      description: Include the expected and actual behavior.
+    validations:
+      required: true
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: Steps to reproduce
+    validations:
+      required: true
+  - type: input
+    id: platform
+    attributes:
+      label: OS, architecture, and filesystem
+      placeholder: "Linux x86_64, ext4"
+  - type: textarea
+    id: logs
+    attributes:
+      label: Redacted logs
+      description: Remove credentials, tokens, and private package information before posting.
