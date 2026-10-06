@@ -20,6 +20,7 @@ audit:
 
 # Produce coverage using llvm-cov and nextest.
 coverage:
+    python3 -c "from pathlib import Path; Path('coverage').mkdir(parents=True, exist_ok=True)"
     cargo llvm-cov nextest --workspace --all-features --locked --lcov --output-path coverage/lcov.info
 
 # Run the quick npm + stub-jSM baseline harness.

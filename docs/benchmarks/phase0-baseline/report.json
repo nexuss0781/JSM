@@ -44,8 +44,8 @@
   },
   "fixture_revision": 1,
   "fixture_sha256": "52892d27d75d527d4bb57353f1c9fec0fc9d9f6979ed673ea3eadf81a25e625b",
-  "generated_at": "2026-10-06T17:55:13.270275+00:00",
-  "git_revision": "fbbd8c58e0badd0381faab3c3306ecc478669488",
+  "generated_at": "2026-10-06T18:05:57.308144+00:00",
+  "git_revision": "13a81c5c42c7d852d97dfc675faf0ae3eaa53939",
   "network": {
     "bandwidth_bytes_per_second": 0,
     "latency_ms": 0.0,
@@ -55,7 +55,7 @@
     {
       "execution_isolation": "isolated container using docker.io/library/node:24.19.0-bookworm-slim@sha256:a9f5f7c91a432850b2a8a7797adf5eadb6c733ceed61167806cee7ea7fbc29df; separate temporary project/cache; loopback registry via host network",
       "fixture": "small",
-      "median_seconds": 0.710466,
+      "median_seconds": 0.718682,
       "samples": [
         {
           "command": [
@@ -66,8 +66,8 @@
             "--no-fund",
             "--no-progress"
           ],
-          "diagnostic_tail": "stdout:\n\nadded 10 packages in 504ms\n",
-          "elapsed_seconds": 0.710466,
+          "diagnostic_tail": "stdout:\n\nadded 10 packages in 534ms\n",
+          "elapsed_seconds": 0.718682,
           "fixture": "small",
           "return_code": 0,
           "sample": 1,
@@ -84,8 +84,8 @@
             "--no-fund",
             "--no-progress"
           ],
-          "diagnostic_tail": "stdout:\n\nadded 10 packages in 481ms\n",
-          "elapsed_seconds": 0.685049,
+          "diagnostic_tail": "stdout:\n\nadded 10 packages in 511ms\n",
+          "elapsed_seconds": 0.73788,
           "fixture": "small",
           "return_code": 0,
           "sample": 2,
@@ -102,8 +102,8 @@
             "--no-fund",
             "--no-progress"
           ],
-          "diagnostic_tail": "stdout:\n\nadded 10 packages in 520ms\n",
-          "elapsed_seconds": 0.742349,
+          "diagnostic_tail": "stdout:\n\nadded 10 packages in 504ms\n",
+          "elapsed_seconds": 0.710135,
           "fixture": "small",
           "return_code": 0,
           "sample": 3,
@@ -119,7 +119,7 @@
     {
       "execution_isolation": "isolated container using docker.io/library/node:24.19.0-bookworm-slim@sha256:a9f5f7c91a432850b2a8a7797adf5eadb6c733ceed61167806cee7ea7fbc29df; separate temporary project/cache; loopback registry via host network",
       "fixture": "small",
-      "median_seconds": 0.430913,
+      "median_seconds": 0.472073,
       "samples": [
         {
           "command": [
@@ -130,8 +130,8 @@
             "--no-fund",
             "--no-progress"
           ],
-          "diagnostic_tail": "stdout:\n\nup to date in 266ms\n",
-          "elapsed_seconds": 0.430913,
+          "diagnostic_tail": "stdout:\n\nup to date in 289ms\n",
+          "elapsed_seconds": 0.504733,
           "fixture": "small",
           "return_code": 0,
           "sample": 1,
@@ -148,8 +148,8 @@
             "--no-fund",
             "--no-progress"
           ],
-          "diagnostic_tail": "stdout:\n\nup to date in 262ms\n",
-          "elapsed_seconds": 0.447765,
+          "diagnostic_tail": "stdout:\n\nup to date in 266ms\n",
+          "elapsed_seconds": 0.450698,
           "fixture": "small",
           "return_code": 0,
           "sample": 2,
@@ -166,8 +166,8 @@
             "--no-fund",
             "--no-progress"
           ],
-          "diagnostic_tail": "stdout:\n\nup to date in 248ms\n",
-          "elapsed_seconds": 0.408077,
+          "diagnostic_tail": "stdout:\n\nup to date in 268ms\n",
+          "elapsed_seconds": 0.472073,
           "fixture": "small",
           "return_code": 0,
           "sample": 3,
@@ -183,7 +183,7 @@
     {
       "execution_isolation": "isolated container using docker.io/library/node:24.19.0-bookworm-slim@sha256:a9f5f7c91a432850b2a8a7797adf5eadb6c733ceed61167806cee7ea7fbc29df; separate temporary project/cache; loopback registry via host network",
       "fixture": "small",
-      "median_seconds": 0.42773,
+      "median_seconds": 0.443829,
       "samples": [
         {
           "command": [
@@ -194,8 +194,8 @@
             "--no-fund",
             "--no-progress"
           ],
-          "diagnostic_tail": "stdout:\n\nup to date in 240ms\n",
-          "elapsed_seconds": 0.397441,
+          "diagnostic_tail": "stdout:\n\nup to date in 269ms\n",
+          "elapsed_seconds": 0.467657,
           "fixture": "small",
           "return_code": 0,
           "sample": 1,
@@ -212,8 +212,8 @@
             "--no-fund",
             "--no-progress"
           ],
-          "diagnostic_tail": "stdout:\n\nup to date in 257ms\n",
-          "elapsed_seconds": 0.432294,
+          "diagnostic_tail": "stdout:\n\nup to date in 263ms\n",
+          "elapsed_seconds": 0.443829,
           "fixture": "small",
           "return_code": 0,
           "sample": 2,
@@ -230,8 +230,8 @@
             "--no-fund",
             "--no-progress"
           ],
-          "diagnostic_tail": "stdout:\n\nup to date in 247ms\n",
-          "elapsed_seconds": 0.42773,
+          "diagnostic_tail": "stdout:\n\nup to date in 253ms\n",
+          "elapsed_seconds": 0.426519,
           "fixture": "small",
           "return_code": 0,
           "sample": 3,
@@ -247,7 +247,7 @@
     {
       "execution_isolation": "isolated container using docker.io/library/node:24.19.0-bookworm-slim@sha256:a9f5f7c91a432850b2a8a7797adf5eadb6c733ceed61167806cee7ea7fbc29df; separate temporary project/cache; loopback registry via host network",
       "fixture": "small",
-      "median_seconds": 0.444092,
+      "median_seconds": 0.431036,
       "samples": [
         {
           "command": [
@@ -258,8 +258,8 @@
             "--no-fund",
             "--no-progress"
           ],
-          "diagnostic_tail": "stdout:\n\nup to date in 287ms\n",
-          "elapsed_seconds": 0.470883,
+          "diagnostic_tail": "stdout:\n\nup to date in 264ms\n",
+          "elapsed_seconds": 0.431036,
           "fixture": "small",
           "return_code": 0,
           "sample": 1,
@@ -276,8 +276,8 @@
             "--no-fund",
             "--no-progress"
           ],
-          "diagnostic_tail": "stdout:\n\nup to date in 264ms\n",
-          "elapsed_seconds": 0.444092,
+          "diagnostic_tail": "stdout:\n\nup to date in 319ms\n",
+          "elapsed_seconds": 0.519534,
           "fixture": "small",
           "return_code": 0,
           "sample": 2,
@@ -294,8 +294,8 @@
             "--no-fund",
             "--no-progress"
           ],
-          "diagnostic_tail": "stdout:\n\nup to date in 257ms\n",
-          "elapsed_seconds": 0.443986,
+          "diagnostic_tail": "stdout:\n\nup to date in 251ms\n",
+          "elapsed_seconds": 0.413274,
           "fixture": "small",
           "return_code": 0,
           "sample": 3,
@@ -311,7 +311,7 @@
     {
       "execution_isolation": "isolated container using docker.io/library/node:24.19.0-bookworm-slim@sha256:a9f5f7c91a432850b2a8a7797adf5eadb6c733ceed61167806cee7ea7fbc29df; separate temporary project/cache; loopback registry via host network",
       "fixture": "small",
-      "median_seconds": 0.439098,
+      "median_seconds": 0.451648,
       "samples": [
         {
           "command": [
@@ -323,8 +323,8 @@
             "--no-progress",
             "--offline"
           ],
-          "diagnostic_tail": "stdout:\n\nup to date in 266ms\n",
-          "elapsed_seconds": 0.443635,
+          "diagnostic_tail": "stdout:\n\nup to date in 252ms\n",
+          "elapsed_seconds": 0.426787,
           "fixture": "small",
           "return_code": 0,
           "sample": 1,
@@ -342,8 +342,8 @@
             "--no-progress",
             "--offline"
           ],
-          "diagnostic_tail": "stdout:\n\nup to date in 266ms\n",
-          "elapsed_seconds": 0.439098,
+          "diagnostic_tail": "stdout:\n\nup to date in 271ms\n",
+          "elapsed_seconds": 0.451648,
           "fixture": "small",
           "return_code": 0,
           "sample": 2,
@@ -361,8 +361,8 @@
             "--no-progress",
             "--offline"
           ],
-          "diagnostic_tail": "stdout:\n\nup to date in 254ms\n",
-          "elapsed_seconds": 0.431318,
+          "diagnostic_tail": "stdout:\n\nup to date in 303ms\n",
+          "elapsed_seconds": 0.48924,
           "fixture": "small",
           "return_code": 0,
           "sample": 3,
@@ -378,7 +378,7 @@
     {
       "execution_isolation": "isolated container using docker.io/library/node:24.19.0-bookworm-slim@sha256:a9f5f7c91a432850b2a8a7797adf5eadb6c733ceed61167806cee7ea7fbc29df; separate temporary project/cache; loopback registry via host network",
       "fixture": "small",
-      "median_seconds": 0.520909,
+      "median_seconds": 0.512242,
       "samples": [
         {
           "command": [
@@ -389,8 +389,8 @@
             "--no-fund",
             "--no-progress"
           ],
-          "diagnostic_tail": "stdout:\n\nremoved 5 packages in 291ms\n",
-          "elapsed_seconds": 0.46009,
+          "diagnostic_tail": "stdout:\n\nremoved 5 packages in 281ms\n",
+          "elapsed_seconds": 0.474139,
           "fixture": "small",
           "return_code": 0,
           "sample": 1,
@@ -407,8 +407,8 @@
             "--no-fund",
             "--no-progress"
           ],
-          "diagnostic_tail": "stdout:\n\nadded 5 packages, and removed 5 packages in 340ms\n",
-          "elapsed_seconds": 0.520909,
+          "diagnostic_tail": "stdout:\n\nadded 5 packages, and removed 5 packages in 329ms\n",
+          "elapsed_seconds": 0.512242,
           "fixture": "small",
           "return_code": 0,
           "sample": 2,
@@ -425,8 +425,8 @@
             "--no-fund",
             "--no-progress"
           ],
-          "diagnostic_tail": "stdout:\n\nadded 5 packages, and removed 5 packages in 355ms\n",
-          "elapsed_seconds": 0.541773,
+          "diagnostic_tail": "stdout:\n\nadded 5 packages, and removed 5 packages in 353ms\n",
+          "elapsed_seconds": 0.539937,
           "fixture": "small",
           "return_code": 0,
           "sample": 3,
@@ -442,7 +442,7 @@
     {
       "execution_isolation": "isolated container using docker.io/library/node:24.19.0-bookworm-slim@sha256:a9f5f7c91a432850b2a8a7797adf5eadb6c733ceed61167806cee7ea7fbc29df; separate temporary project/cache; loopback registry via host network",
       "fixture": "small",
-      "median_seconds": 0.65996,
+      "median_seconds": 0.667206,
       "samples": [
         {
           "command": [
@@ -453,8 +453,8 @@
             "--no-fund",
             "--no-progress"
           ],
-          "diagnostic_tail": "stdout:\n\nadded 10 packages in 449ms\n",
-          "elapsed_seconds": 0.658668,
+          "diagnostic_tail": "stdout:\n\nadded 10 packages in 432ms\n",
+          "elapsed_seconds": 0.662479,
           "fixture": "small",
           "return_code": 0,
           "sample": 1,
@@ -471,8 +471,8 @@
             "--no-fund",
             "--no-progress"
           ],
-          "diagnostic_tail": "stdout:\n\nadded 10 packages in 449ms\n",
-          "elapsed_seconds": 0.667846,
+          "diagnostic_tail": "stdout:\n\nadded 10 packages in 439ms\n",
+          "elapsed_seconds": 0.667738,
           "fixture": "small",
           "return_code": 0,
           "sample": 2,
@@ -489,8 +489,8 @@
             "--no-fund",
             "--no-progress"
           ],
-          "diagnostic_tail": "stdout:\n\nadded 10 packages in 438ms\n",
-          "elapsed_seconds": 0.65996,
+          "diagnostic_tail": "stdout:\n\nadded 10 packages in 451ms\n",
+          "elapsed_seconds": 0.667206,
           "fixture": "small",
           "return_code": 0,
           "sample": 3,
@@ -506,7 +506,7 @@
     {
       "execution_isolation": "isolated container using docker.io/library/node:24.19.0-bookworm-slim@sha256:a9f5f7c91a432850b2a8a7797adf5eadb6c733ceed61167806cee7ea7fbc29df; separate temporary project/cache; loopback registry via host network",
       "fixture": "small",
-      "median_seconds": 0.913068,
+      "median_seconds": 0.90192,
       "samples": [
         {
           "command": [
@@ -516,8 +516,8 @@
             "--ignore-scripts",
             "--no-frozen-lockfile"
           ],
-          "diagnostic_tail": "stdout:\nProgress: resolved 1, reused 0, downloaded 0, added 0\nPackages: +10\n++++++++++\nProgress: resolved 10, reused 0, downloaded 10, added 10, done\n\ndependencies:\n+ jsm-bench-dep-0000 1.0.0\n+ jsm-bench-dep-0001 1.0.0\n+ jsm-bench-dep-0002 1.0.0\n+ jsm-bench-dep-0003 1.0.0\n+ jsm-bench-dep-0004 1.0.0\n+ jsm-bench-dep-0005 1.0.0\n+ jsm-bench-dep-0006 1.0.0\n+ jsm-bench-dep-0007 1.0.0\n+ jsm-bench-dep-0008 1.0.0\n+ jsm-bench-dep-0009 1.0.0\n\nDone in 728ms using pnpm v9.15.9\n\nstderr:\n(node:3) [DEP0169] DeprecationWarning: `url.parse()` behavior is not standardized and prone to errors that have security implications. Use the WHATWG URL API instead. CVEs are not issued for `url.parse()` vulnerabilities.\n(Use `node --trace-deprecation ...` to show where the warning was created)\n",
-          "elapsed_seconds": 0.921529,
+          "diagnostic_tail": "stdout:\nProgress: resolved 1, reused 0, downloaded 0, added 0\nPackages: +10\n++++++++++\nProgress: resolved 10, reused 0, downloaded 10, added 10, done\n\ndependencies:\n+ jsm-bench-dep-0000 1.0.0\n+ jsm-bench-dep-0001 1.0.0\n+ jsm-bench-dep-0002 1.0.0\n+ jsm-bench-dep-0003 1.0.0\n+ jsm-bench-dep-0004 1.0.0\n+ jsm-bench-dep-0005 1.0.0\n+ jsm-bench-dep-0006 1.0.0\n+ jsm-bench-dep-0007 1.0.0\n+ jsm-bench-dep-0008 1.0.0\n+ jsm-bench-dep-0009 1.0.0\n\nDone in 696ms using pnpm v9.15.9\n\nstderr:\n(node:3) [DEP0169] DeprecationWarning: `url.parse()` behavior is not standardized and prone to errors that have security implications. Use the WHATWG URL API instead. CVEs are not issued for `url.parse()` vulnerabilities.\n(Use `node --trace-deprecation ...` to show where the warning was created)\n",
+          "elapsed_seconds": 0.90192,
           "fixture": "small",
           "return_code": 0,
           "sample": 1,
@@ -533,8 +533,8 @@
             "--ignore-scripts",
             "--no-frozen-lockfile"
           ],
-          "diagnostic_tail": "stdout:\nProgress: resolved 1, reused 0, downloaded 0, added 0\nPackages: +10\n++++++++++\nProgress: resolved 10, reused 0, downloaded 10, added 10, done\n\ndependencies:\n+ jsm-bench-dep-0000 1.0.0\n+ jsm-bench-dep-0001 1.0.0\n+ jsm-bench-dep-0002 1.0.0\n+ jsm-bench-dep-0003 1.0.0\n+ jsm-bench-dep-0004 1.0.0\n+ jsm-bench-dep-0005 1.0.0\n+ jsm-bench-dep-0006 1.0.0\n+ jsm-bench-dep-0007 1.0.0\n+ jsm-bench-dep-0008 1.0.0\n+ jsm-bench-dep-0009 1.0.0\n\nDone in 708ms using pnpm v9.15.9\n\nstderr:\n(node:22) [DEP0169] DeprecationWarning: `url.parse()` behavior is not standardized and prone to errors that have security implications. Use the WHATWG URL API instead. CVEs are not issued for `url.parse()` vulnerabilities.\n(Use `node --trace-deprecation ...` to show where the warning was created)\n",
-          "elapsed_seconds": 0.913068,
+          "diagnostic_tail": "stdout:\nProgress: resolved 1, reused 0, downloaded 0, added 0\nPackages: +10\n++++++++++\nProgress: resolved 10, reused 0, downloaded 10, added 10, done\n\ndependencies:\n+ jsm-bench-dep-0000 1.0.0\n+ jsm-bench-dep-0001 1.0.0\n+ jsm-bench-dep-0002 1.0.0\n+ jsm-bench-dep-0003 1.0.0\n+ jsm-bench-dep-0004 1.0.0\n+ jsm-bench-dep-0005 1.0.0\n+ jsm-bench-dep-0006 1.0.0\n+ jsm-bench-dep-0007 1.0.0\n+ jsm-bench-dep-0008 1.0.0\n+ jsm-bench-dep-0009 1.0.0\n\nDone in 753ms using pnpm v9.15.9\n\nstderr:\n(node:22) [DEP0169] DeprecationWarning: `url.parse()` behavior is not standardized and prone to errors that have security implications. Use the WHATWG URL API instead. CVEs are not issued for `url.parse()` vulnerabilities.\n(Use `node --trace-deprecation ...` to show where the warning was created)\n",
+          "elapsed_seconds": 0.952573,
           "fixture": "small",
           "return_code": 0,
           "sample": 2,
@@ -550,8 +550,8 @@
             "--ignore-scripts",
             "--no-frozen-lockfile"
           ],
-          "diagnostic_tail": "stdout:\nProgress: resolved 1, reused 0, downloaded 0, added 0\nPackages: +10\n++++++++++\nProgress: resolved 10, reused 0, downloaded 10, added 10, done\n\ndependencies:\n+ jsm-bench-dep-0000 1.0.0\n+ jsm-bench-dep-0001 1.0.0\n+ jsm-bench-dep-0002 1.0.0\n+ jsm-bench-dep-0003 1.0.0\n+ jsm-bench-dep-0004 1.0.0\n+ jsm-bench-dep-0005 1.0.0\n+ jsm-bench-dep-0006 1.0.0\n+ jsm-bench-dep-0007 1.0.0\n+ jsm-bench-dep-0008 1.0.0\n+ jsm-bench-dep-0009 1.0.0\n\nDone in 707ms using pnpm v9.15.9\n\nstderr:\n(node:41) [DEP0169] DeprecationWarning: `url.parse()` behavior is not standardized and prone to errors that have security implications. Use the WHATWG URL API instead. CVEs are not issued for `url.parse()` vulnerabilities.\n(Use `node --trace-deprecation ...` to show where the warning was created)\n",
-          "elapsed_seconds": 0.909113,
+          "diagnostic_tail": "stdout:\nProgress: resolved 1, reused 0, downloaded 0, added 0\nPackages: +10\n++++++++++\nProgress: resolved 10, reused 0, downloaded 10, added 10, done\n\ndependencies:\n+ jsm-bench-dep-0000 1.0.0\n+ jsm-bench-dep-0001 1.0.0\n+ jsm-bench-dep-0002 1.0.0\n+ jsm-bench-dep-0003 1.0.0\n+ jsm-bench-dep-0004 1.0.0\n+ jsm-bench-dep-0005 1.0.0\n+ jsm-bench-dep-0006 1.0.0\n+ jsm-bench-dep-0007 1.0.0\n+ jsm-bench-dep-0008 1.0.0\n+ jsm-bench-dep-0009 1.0.0\n\nDone in 688ms using pnpm v9.15.9\n\nstderr:\n(node:41) [DEP0169] DeprecationWarning: `url.parse()` behavior is not standardized and prone to errors that have security implications. Use the WHATWG URL API instead. CVEs are not issued for `url.parse()` vulnerabilities.\n(Use `node --trace-deprecation ...` to show where the warning was created)\n",
+          "elapsed_seconds": 0.89004,
           "fixture": "small",
           "return_code": 0,
           "sample": 3,
@@ -567,7 +567,7 @@
     {
       "execution_isolation": "isolated container using docker.io/library/node:24.19.0-bookworm-slim@sha256:a9f5f7c91a432850b2a8a7797adf5eadb6c733ceed61167806cee7ea7fbc29df; separate temporary project/cache; loopback registry via host network",
       "fixture": "small",
-      "median_seconds": 0.66383,
+      "median_seconds": 0.692059,
       "samples": [
         {
           "command": [
@@ -577,8 +577,8 @@
             "--ignore-scripts",
             "--no-frozen-lockfile"
           ],
-          "diagnostic_tail": "stdout:\nLockfile is up to date, resolution step is skipped\nAlready up to date\n\nDone in 495ms using pnpm v9.15.9\n\nstderr:\n(node:22) [DEP0169] DeprecationWarning: `url.parse()` behavior is not standardized and prone to errors that have security implications. Use the WHATWG URL API instead. CVEs are not issued for `url.parse()` vulnerabilities.\n(Use `node --trace-deprecation ...` to show where the warning was created)\n",
-          "elapsed_seconds": 0.66383,
+          "diagnostic_tail": "stdout:\nLockfile is up to date, resolution step is skipped\nAlready up to date\n\nDone in 521ms using pnpm v9.15.9\n\nstderr:\n(node:22) [DEP0169] DeprecationWarning: `url.parse()` behavior is not standardized and prone to errors that have security implications. Use the WHATWG URL API instead. CVEs are not issued for `url.parse()` vulnerabilities.\n(Use `node --trace-deprecation ...` to show where the warning was created)\n",
+          "elapsed_seconds": 0.708499,
           "fixture": "small",
           "return_code": 0,
           "sample": 1,
@@ -594,8 +594,8 @@
             "--ignore-scripts",
             "--no-frozen-lockfile"
           ],
-          "diagnostic_tail": "stdout:\nLockfile is up to date, resolution step is skipped\nAlready up to date\n\nDone in 485ms using pnpm v9.15.9\n\nstderr:\n(node:35) [DEP0169] DeprecationWarning: `url.parse()` behavior is not standardized and prone to errors that have security implications. Use the WHATWG URL API instead. CVEs are not issued for `url.parse()` vulnerabilities.\n(Use `node --trace-deprecation ...` to show where the warning was created)\n",
-          "elapsed_seconds": 0.652605,
+          "diagnostic_tail": "stdout:\nLockfile is up to date, resolution step is skipped\nAlready up to date\n\nDone in 513ms using pnpm v9.15.9\n\nstderr:\n(node:35) [DEP0169] DeprecationWarning: `url.parse()` behavior is not standardized and prone to errors that have security implications. Use the WHATWG URL API instead. CVEs are not issued for `url.parse()` vulnerabilities.\n(Use `node --trace-deprecation ...` to show where the warning was created)\n",
+          "elapsed_seconds": 0.678425,
           "fixture": "small",
           "return_code": 0,
           "sample": 2,
@@ -611,8 +611,8 @@
             "--ignore-scripts",
             "--no-frozen-lockfile"
           ],
-          "diagnostic_tail": "stdout:\nLockfile is up to date, resolution step is skipped\nAlready up to date\n\nDone in 490ms using pnpm v9.15.9\n\nstderr:\n(node:48) [DEP0169] DeprecationWarning: `url.parse()` behavior is not standardized and prone to errors that have security implications. Use the WHATWG URL API instead. CVEs are not issued for `url.parse()` vulnerabilities.\n(Use `node --trace-deprecation ...` to show where the warning was created)\n",
-          "elapsed_seconds": 0.677416,
+          "diagnostic_tail": "stdout:\nLockfile is up to date, resolution step is skipped\nAlready up to date\n\nDone in 488ms using pnpm v9.15.9\n\nstderr:\n(node:48) [DEP0169] DeprecationWarning: `url.parse()` behavior is not standardized and prone to errors that have security implications. Use the WHATWG URL API instead. CVEs are not issued for `url.parse()` vulnerabilities.\n(Use `node --trace-deprecation ...` to show where the warning was created)\n",
+          "elapsed_seconds": 0.692059,
           "fixture": "small",
           "return_code": 0,
           "sample": 3,
@@ -628,7 +628,7 @@
     {
       "execution_isolation": "isolated container using docker.io/library/node:24.19.0-bookworm-slim@sha256:a9f5f7c91a432850b2a8a7797adf5eadb6c733ceed61167806cee7ea7fbc29df; separate temporary project/cache; loopback registry via host network",
       "fixture": "small",
-      "median_seconds": 0.671908,
+      "median_seconds": 0.675562,
       "samples": [
         {
           "command": [
@@ -638,8 +638,8 @@
             "--ignore-scripts",
             "--no-frozen-lockfile"
           ],
-          "diagnostic_tail": "stdout:\nLockfile is up to date, resolution step is skipped\nAlready up to date\n\nDone in 495ms using pnpm v9.15.9\n\nstderr:\n(node:22) [DEP0169] DeprecationWarning: `url.parse()` behavior is not standardized and prone to errors that have security implications. Use the WHATWG URL API instead. CVEs are not issued for `url.parse()` vulnerabilities.\n(Use `node --trace-deprecation ...` to show where the warning was created)\n",
-          "elapsed_seconds": 0.653924,
+          "diagnostic_tail": "stdout:\nLockfile is up to date, resolution step is skipped\nAlready up to date\n\nDone in 456ms using pnpm v9.15.9\n\nstderr:\n(node:22) [DEP0169] DeprecationWarning: `url.parse()` behavior is not standardized and prone to errors that have security implications. Use the WHATWG URL API instead. CVEs are not issued for `url.parse()` vulnerabilities.\n(Use `node --trace-deprecation ...` to show where the warning was created)\n",
+          "elapsed_seconds": 0.620066,
           "fixture": "small",
           "return_code": 0,
           "sample": 1,
@@ -655,8 +655,8 @@
             "--ignore-scripts",
             "--no-frozen-lockfile"
           ],
-          "diagnostic_tail": "stdout:\nLockfile is up to date, resolution step is skipped\nAlready up to date\n\nDone in 503ms using pnpm v9.15.9\n\nstderr:\n(node:35) [DEP0169] DeprecationWarning: `url.parse()` behavior is not standardized and prone to errors that have security implications. Use the WHATWG URL API instead. CVEs are not issued for `url.parse()` vulnerabilities.\n(Use `node --trace-deprecation ...` to show where the warning was created)\n",
-          "elapsed_seconds": 0.683358,
+          "diagnostic_tail": "stdout:\nLockfile is up to date, resolution step is skipped\nAlready up to date\n\nDone in 512ms using pnpm v9.15.9\n\nstderr:\n(node:35) [DEP0169] DeprecationWarning: `url.parse()` behavior is not standardized and prone to errors that have security implications. Use the WHATWG URL API instead. CVEs are not issued for `url.parse()` vulnerabilities.\n(Use `node --trace-deprecation ...` to show where the warning was created)\n",
+          "elapsed_seconds": 0.6953,
           "fixture": "small",
           "return_code": 0,
           "sample": 2,
@@ -673,7 +673,7 @@
             "--no-frozen-lockfile"
           ],
           "diagnostic_tail": "stdout:\nLockfile is up to date, resolution step is skipped\nAlready up to date\n\nDone in 491ms using pnpm v9.15.9\n\nstderr:\n(node:48) [DEP0169] DeprecationWarning: `url.parse()` behavior is not standardized and prone to errors that have security implications. Use the WHATWG URL API instead. CVEs are not issued for `url.parse()` vulnerabilities.\n(Use `node --trace-deprecation ...` to show where the warning was created)\n",
-          "elapsed_seconds": 0.671908,
+          "elapsed_seconds": 0.675562,
           "fixture": "small",
           "return_code": 0,
           "sample": 3,
@@ -689,7 +689,7 @@
     {
       "execution_isolation": "isolated container using docker.io/library/node:24.19.0-bookworm-slim@sha256:a9f5f7c91a432850b2a8a7797adf5eadb6c733ceed61167806cee7ea7fbc29df; separate temporary project/cache; loopback registry via host network",
       "fixture": "small",
-      "median_seconds": 0.677651,
+      "median_seconds": 0.656196,
       "samples": [
         {
           "command": [
@@ -699,8 +699,8 @@
             "--ignore-scripts",
             "--no-frozen-lockfile"
           ],
-          "diagnostic_tail": "stdout:\nLockfile is up to date, resolution step is skipped\nAlready up to date\n\nDone in 494ms using pnpm v9.15.9\n\nstderr:\n(node:22) [DEP0169] DeprecationWarning: `url.parse()` behavior is not standardized and prone to errors that have security implications. Use the WHATWG URL API instead. CVEs are not issued for `url.parse()` vulnerabilities.\n(Use `node --trace-deprecation ...` to show where the warning was created)\n",
-          "elapsed_seconds": 0.677651,
+          "diagnostic_tail": "stdout:\nLockfile is up to date, resolution step is skipped\nAlready up to date\n\nDone in 476ms using pnpm v9.15.9\n\nstderr:\n(node:22) [DEP0169] DeprecationWarning: `url.parse()` behavior is not standardized and prone to errors that have security implications. Use the WHATWG URL API instead. CVEs are not issued for `url.parse()` vulnerabilities.\n(Use `node --trace-deprecation ...` to show where the warning was created)\n",
+          "elapsed_seconds": 0.656196,
           "fixture": "small",
           "return_code": 0,
           "sample": 1,
@@ -716,8 +716,8 @@
             "--ignore-scripts",
             "--no-frozen-lockfile"
           ],
-          "diagnostic_tail": "stdout:\nLockfile is up to date, resolution step is skipped\nAlready up to date\n\nDone in 487ms using pnpm v9.15.9\n\nstderr:\n(node:35) [DEP0169] DeprecationWarning: `url.parse()` behavior is not standardized and prone to errors that have security implications. Use the WHATWG URL API instead. CVEs are not issued for `url.parse()` vulnerabilities.\n(Use `node --trace-deprecation ...` to show where the warning was created)\n",
-          "elapsed_seconds": 0.665607,
+          "diagnostic_tail": "stdout:\nLockfile is up to date, resolution step is skipped\nAlready up to date\n\nDone in 460ms using pnpm v9.15.9\n\nstderr:\n(node:35) [DEP0169] DeprecationWarning: `url.parse()` behavior is not standardized and prone to errors that have security implications. Use the WHATWG URL API instead. CVEs are not issued for `url.parse()` vulnerabilities.\n(Use `node --trace-deprecation ...` to show where the warning was created)\n",
+          "elapsed_seconds": 0.644397,
           "fixture": "small",
           "return_code": 0,
           "sample": 2,
@@ -733,8 +733,8 @@
             "--ignore-scripts",
             "--no-frozen-lockfile"
           ],
-          "diagnostic_tail": "stdout:\nLockfile is up to date, resolution step is skipped\nAlready up to date\n\nDone in 492ms using pnpm v9.15.9\n\nstderr:\n(node:48) [DEP0169] DeprecationWarning: `url.parse()` behavior is not standardized and prone to errors that have security implications. Use the WHATWG URL API instead. CVEs are not issued for `url.parse()` vulnerabilities.\n(Use `node --trace-deprecation ...` to show where the warning was created)\n",
-          "elapsed_seconds": 0.679911,
+          "diagnostic_tail": "stdout:\nLockfile is up to date, resolution step is skipped\nAlready up to date\n\nDone in 500ms using pnpm v9.15.9\n\nstderr:\n(node:48) [DEP0169] DeprecationWarning: `url.parse()` behavior is not standardized and prone to errors that have security implications. Use the WHATWG URL API instead. CVEs are not issued for `url.parse()` vulnerabilities.\n(Use `node --trace-deprecation ...` to show where the warning was created)\n",
+          "elapsed_seconds": 0.670674,
           "fixture": "small",
           "return_code": 0,
           "sample": 3,
@@ -750,7 +750,7 @@
     {
       "execution_isolation": "isolated container using docker.io/library/node:24.19.0-bookworm-slim@sha256:a9f5f7c91a432850b2a8a7797adf5eadb6c733ceed61167806cee7ea7fbc29df; separate temporary project/cache; loopback registry via host network",
       "fixture": "small",
-      "median_seconds": 0.677361,
+      "median_seconds": 0.635373,
       "samples": [
         {
           "command": [
@@ -761,8 +761,8 @@
             "--no-frozen-lockfile",
             "--offline"
           ],
-          "diagnostic_tail": "stdout:\nLockfile is up to date, resolution step is skipped\nAlready up to date\n\nDone in 489ms using pnpm v9.15.9\n\nstderr:\n(node:22) [DEP0169] DeprecationWarning: `url.parse()` behavior is not standardized and prone to errors that have security implications. Use the WHATWG URL API instead. CVEs are not issued for `url.parse()` vulnerabilities.\n(Use `node --trace-deprecation ...` to show where the warning was created)\n",
-          "elapsed_seconds": 0.675697,
+          "diagnostic_tail": "stdout:\nLockfile is up to date, resolution step is skipped\nAlready up to date\n\nDone in 453ms using pnpm v9.15.9\n\nstderr:\n(node:22) [DEP0169] DeprecationWarning: `url.parse()` behavior is not standardized and prone to errors that have security implications. Use the WHATWG URL API instead. CVEs are not issued for `url.parse()` vulnerabilities.\n(Use `node --trace-deprecation ...` to show where the warning was created)\n",
+          "elapsed_seconds": 0.635373,
           "fixture": "small",
           "return_code": 0,
           "sample": 1,
@@ -779,8 +779,8 @@
             "--no-frozen-lockfile",
             "--offline"
           ],
-          "diagnostic_tail": "stdout:\nLockfile is up to date, resolution step is skipped\nAlready up to date\n\nDone in 474ms using pnpm v9.15.9\n\nstderr:\n(node:35) [DEP0169] DeprecationWarning: `url.parse()` behavior is not standardized and prone to errors that have security implications. Use the WHATWG URL API instead. CVEs are not issued for `url.parse()` vulnerabilities.\n(Use `node --trace-deprecation ...` to show where the warning was created)\n",
-          "elapsed_seconds": 0.677361,
+          "diagnostic_tail": "stdout:\nLockfile is up to date, resolution step is skipped\nAlready up to date\n\nDone in 451ms using pnpm v9.15.9\n\nstderr:\n(node:35) [DEP0169] DeprecationWarning: `url.parse()` behavior is not standardized and prone to errors that have security implications. Use the WHATWG URL API instead. CVEs are not issued for `url.parse()` vulnerabilities.\n(Use `node --trace-deprecation ...` to show where the warning was created)\n",
+          "elapsed_seconds": 0.62742,
           "fixture": "small",
           "return_code": 0,
           "sample": 2,
@@ -797,8 +797,8 @@
             "--no-frozen-lockfile",
             "--offline"
           ],
-          "diagnostic_tail": "stdout:\nLockfile is up to date, resolution step is skipped\nAlready up to date\n\nDone in 501ms using pnpm v9.15.9\n\nstderr:\n(node:48) [DEP0169] DeprecationWarning: `url.parse()` behavior is not standardized and prone to errors that have security implications. Use the WHATWG URL API instead. CVEs are not issued for `url.parse()` vulnerabilities.\n(Use `node --trace-deprecation ...` to show where the warning was created)\n",
-          "elapsed_seconds": 0.691258,
+          "diagnostic_tail": "stdout:\nLockfile is up to date, resolution step is skipped\nAlready up to date\n\nDone in 482ms using pnpm v9.15.9\n\nstderr:\n(node:48) [DEP0169] DeprecationWarning: `url.parse()` behavior is not standardized and prone to errors that have security implications. Use the WHATWG URL API instead. CVEs are not issued for `url.parse()` vulnerabilities.\n(Use `node --trace-deprecation ...` to show where the warning was created)\n",
+          "elapsed_seconds": 0.64752,
           "fixture": "small",
           "return_code": 0,
           "sample": 3,
@@ -814,7 +814,7 @@
     {
       "execution_isolation": "isolated container using docker.io/library/node:24.19.0-bookworm-slim@sha256:a9f5f7c91a432850b2a8a7797adf5eadb6c733ceed61167806cee7ea7fbc29df; separate temporary project/cache; loopback registry via host network",
       "fixture": "small",
-      "median_seconds": 0.776976,
+      "median_seconds": 0.697347,
       "samples": [
         {
           "command": [
@@ -824,8 +824,8 @@
             "--ignore-scripts",
             "--no-frozen-lockfile"
           ],
-          "diagnostic_tail": "stdout:\nProgress: resolved 0, reused 1, downloaded 0, added 0\nPackages: -5\n-----\nProgress: resolved 5, reused 5, downloaded 0, added 0, done\n\ndependencies:\n- jsm-bench-dep-0001 1.0.0\n- jsm-bench-dep-0003 1.0.0\n- jsm-bench-dep-0005 1.0.0\n- jsm-bench-dep-0007 1.0.0\n- jsm-bench-dep-0009 1.0.0\n\nDone in 596ms using pnpm v9.15.9\n\nstderr:\n(node:22) [DEP0169] DeprecationWarning: `url.parse()` behavior is not standardized and prone to errors that have security implications. Use the WHATWG URL API instead. CVEs are not issued for `url.parse()` vulnerabilities.\n(Use `node --trace-deprecation ...` to show where the warning was created)\n",
-          "elapsed_seconds": 0.799652,
+          "diagnostic_tail": "stdout:\nProgress: resolved 0, reused 1, downloaded 0, added 0\nPackages: -5\n-----\nProgress: resolved 5, reused 5, downloaded 0, added 0, done\n\ndependencies:\n- jsm-bench-dep-0001 1.0.0\n- jsm-bench-dep-0003 1.0.0\n- jsm-bench-dep-0005 1.0.0\n- jsm-bench-dep-0007 1.0.0\n- jsm-bench-dep-0009 1.0.0\n\nDone in 519ms using pnpm v9.15.9\n\nstderr:\n(node:22) [DEP0169] DeprecationWarning: `url.parse()` behavior is not standardized and prone to errors that have security implications. Use the WHATWG URL API instead. CVEs are not issued for `url.parse()` vulnerabilities.\n(Use `node --trace-deprecation ...` to show where the warning was created)\n",
+          "elapsed_seconds": 0.697347,
           "fixture": "small",
           "return_code": 0,
           "sample": 1,
@@ -841,8 +841,8 @@
             "--ignore-scripts",
             "--no-frozen-lockfile"
           ],
-          "diagnostic_tail": "stdout:\nProgress: resolved 1, reused 0, downloaded 0, added 0\nPackages: +5 -5\n+++++-----\nProgress: resolved 5, reused 5, downloaded 0, added 0, done\n\ndependencies:\n- jsm-bench-dep-0000 1.0.0\n+ jsm-bench-dep-0001 1.0.0\n- jsm-bench-dep-0002 1.0.0\n+ jsm-bench-dep-0003 1.0.0\n- jsm-bench-dep-0004 1.0.0\n+ jsm-bench-dep-0005 1.0.0\n- jsm-bench-dep-0006 1.0.0\n+ jsm-bench-dep-0007 1.0.0\n- jsm-bench-dep-0008 1.0.0\n+ jsm-bench-dep-0009 1.0.0\n\nDone in 550ms using pnpm v9.15.9\n\nstderr:\n(node:39) [DEP0169] DeprecationWarning: `url.parse()` behavior is not standardized and prone to errors that have security implications. Use the WHATWG URL API instead. CVEs are not issued for `url.parse()` vulnerabilities.\n(Use `node --trace-deprecation ...` to show where the warning was created)\n",
-          "elapsed_seconds": 0.749864,
+          "diagnostic_tail": "stdout:\nProgress: resolved 1, reused 0, downloaded 0, added 0\nPackages: +5 -5\n+++++-----\nProgress: resolved 5, reused 5, downloaded 0, added 0, done\n\ndependencies:\n- jsm-bench-dep-0000 1.0.0\n+ jsm-bench-dep-0001 1.0.0\n- jsm-bench-dep-0002 1.0.0\n+ jsm-bench-dep-0003 1.0.0\n- jsm-bench-dep-0004 1.0.0\n+ jsm-bench-dep-0005 1.0.0\n- jsm-bench-dep-0006 1.0.0\n+ jsm-bench-dep-0007 1.0.0\n- jsm-bench-dep-0008 1.0.0\n+ jsm-bench-dep-0009 1.0.0\n\nDone in 508ms using pnpm v9.15.9\n\nstderr:\n(node:39) [DEP0169] DeprecationWarning: `url.parse()` behavior is not standardized and prone to errors that have security implications. Use the WHATWG URL API instead. CVEs are not issued for `url.parse()` vulnerabilities.\n(Use `node --trace-deprecation ...` to show where the warning was created)\n",
+          "elapsed_seconds": 0.690012,
           "fixture": "small",
           "return_code": 0,
           "sample": 2,
@@ -858,8 +858,8 @@
             "--ignore-scripts",
             "--no-frozen-lockfile"
           ],
-          "diagnostic_tail": "stdout:\nProgress: resolved 1, reused 0, downloaded 0, added 0\nPackages: +5 -5\n+++++-----\nProgress: resolved 5, reused 5, downloaded 0, added 0, done\n\ndependencies:\n+ jsm-bench-dep-0000 1.0.0\n- jsm-bench-dep-0001 1.0.0\n+ jsm-bench-dep-0002 1.0.0\n- jsm-bench-dep-0003 1.0.0\n+ jsm-bench-dep-0004 1.0.0\n- jsm-bench-dep-0005 1.0.0\n+ jsm-bench-dep-0006 1.0.0\n- jsm-bench-dep-0007 1.0.0\n+ jsm-bench-dep-0008 1.0.0\n- jsm-bench-dep-0009 1.0.0\n\nDone in 564ms using pnpm v9.15.9\n\nstderr:\n(node:57) [DEP0169] DeprecationWarning: `url.parse()` behavior is not standardized and prone to errors that have security implications. Use the WHATWG URL API instead. CVEs are not issued for `url.parse()` vulnerabilities.\n(Use `node --trace-deprecation ...` to show where the warning was created)\n",
-          "elapsed_seconds": 0.776976,
+          "diagnostic_tail": "stdout:\nProgress: resolved 1, reused 0, downloaded 0, added 0\nPackages: +5 -5\n+++++-----\nProgress: resolved 5, reused 5, downloaded 0, added 0, done\n\ndependencies:\n+ jsm-bench-dep-0000 1.0.0\n- jsm-bench-dep-0001 1.0.0\n+ jsm-bench-dep-0002 1.0.0\n- jsm-bench-dep-0003 1.0.0\n+ jsm-bench-dep-0004 1.0.0\n- jsm-bench-dep-0005 1.0.0\n+ jsm-bench-dep-0006 1.0.0\n- jsm-bench-dep-0007 1.0.0\n+ jsm-bench-dep-0008 1.0.0\n- jsm-bench-dep-0009 1.0.0\n\nDone in 519ms using pnpm v9.15.9\n\nstderr:\n(node:57) [DEP0169] DeprecationWarning: `url.parse()` behavior is not standardized and prone to errors that have security implications. Use the WHATWG URL API instead. CVEs are not issued for `url.parse()` vulnerabilities.\n(Use `node --trace-deprecation ...` to show where the warning was created)\n",
+          "elapsed_seconds": 0.712035,
           "fixture": "small",
           "return_code": 0,
           "sample": 3,
@@ -875,7 +875,7 @@
     {
       "execution_isolation": "isolated container using docker.io/library/node:24.19.0-bookworm-slim@sha256:a9f5f7c91a432850b2a8a7797adf5eadb6c733ceed61167806cee7ea7fbc29df; separate temporary project/cache; loopback registry via host network",
       "fixture": "small",
-      "median_seconds": 0.902148,
+      "median_seconds": 0.844886,
       "samples": [
         {
           "command": [
@@ -885,8 +885,8 @@
             "--frozen-lockfile",
             "--ignore-scripts"
           ],
-          "diagnostic_tail": "stdout:\nLockfile is up to date, resolution step is skipped\nProgress: resolved 1, reused 0, downloaded 0, added 0\nPackages: +10\n++++++++++\nProgress: resolved 10, reused 0, downloaded 10, added 10, done\n\ndependencies:\n+ jsm-bench-dep-0000 1.0.0\n+ jsm-bench-dep-0001 1.0.0\n+ jsm-bench-dep-0002 1.0.0\n+ jsm-bench-dep-0003 1.0.0\n+ jsm-bench-dep-0004 1.0.0\n+ jsm-bench-dep-0005 1.0.0\n+ jsm-bench-dep-0006 1.0.0\n+ jsm-bench-dep-0007 1.0.0\n+ jsm-bench-dep-0008 1.0.0\n+ jsm-bench-dep-0009 1.0.0\n\nDone in 684ms using pnpm v9.15.9\n\nstderr:\n(node:22) [DEP0169] DeprecationWarning: `url.parse()` behavior is not standardized and prone to errors that have security implications. Use the WHATWG URL API instead. CVEs are not issued for `url.parse()` vulnerabilities.\n(Use `node --trace-deprecation ...` to show where the warning was created)\n",
-          "elapsed_seconds": 0.888248,
+          "diagnostic_tail": "stdout:\nLockfile is up to date, resolution step is skipped\nProgress: resolved 1, reused 0, downloaded 0, added 0\nPackages: +10\n++++++++++\nProgress: resolved 10, reused 0, downloaded 10, added 10, done\n\ndependencies:\n+ jsm-bench-dep-0000 1.0.0\n+ jsm-bench-dep-0001 1.0.0\n+ jsm-bench-dep-0002 1.0.0\n+ jsm-bench-dep-0003 1.0.0\n+ jsm-bench-dep-0004 1.0.0\n+ jsm-bench-dep-0005 1.0.0\n+ jsm-bench-dep-0006 1.0.0\n+ jsm-bench-dep-0007 1.0.0\n+ jsm-bench-dep-0008 1.0.0\n+ jsm-bench-dep-0009 1.0.0\n\nDone in 657ms using pnpm v9.15.9\n\nstderr:\n(node:22) [DEP0169] DeprecationWarning: `url.parse()` behavior is not standardized and prone to errors that have security implications. Use the WHATWG URL API instead. CVEs are not issued for `url.parse()` vulnerabilities.\n(Use `node --trace-deprecation ...` to show where the warning was created)\n",
+          "elapsed_seconds": 0.844886,
           "fixture": "small",
           "return_code": 0,
           "sample": 1,
@@ -902,8 +902,8 @@
             "--frozen-lockfile",
             "--ignore-scripts"
           ],
-          "diagnostic_tail": "stdout:\nLockfile is up to date, resolution step is skipped\nProgress: resolved 1, reused 0, downloaded 0, added 0\nPackages: +10\n++++++++++\nProgress: resolved 10, reused 0, downloaded 10, added 10, done\n\ndependencies:\n+ jsm-bench-dep-0000 1.0.0\n+ jsm-bench-dep-0001 1.0.0\n+ jsm-bench-dep-0002 1.0.0\n+ jsm-bench-dep-0003 1.0.0\n+ jsm-bench-dep-0004 1.0.0\n+ jsm-bench-dep-0005 1.0.0\n+ jsm-bench-dep-0006 1.0.0\n+ jsm-bench-dep-0007 1.0.0\n+ jsm-bench-dep-0008 1.0.0\n+ jsm-bench-dep-0009 1.0.0\n\nDone in 688ms using pnpm v9.15.9\n\nstderr:\n(node:41) [DEP0169] DeprecationWarning: `url.parse()` behavior is not standardized and prone to errors that have security implications. Use the WHATWG URL API instead. CVEs are not issued for `url.parse()` vulnerabilities.\n(Use `node --trace-deprecation ...` to show where the warning was created)\n",
-          "elapsed_seconds": 0.902148,
+          "diagnostic_tail": "stdout:\nLockfile is up to date, resolution step is skipped\nProgress: resolved 1, reused 0, downloaded 0, added 0\nPackages: +10\n++++++++++\nProgress: resolved 10, reused 0, downloaded 10, added 10, done\n\ndependencies:\n+ jsm-bench-dep-0000 1.0.0\n+ jsm-bench-dep-0001 1.0.0\n+ jsm-bench-dep-0002 1.0.0\n+ jsm-bench-dep-0003 1.0.0\n+ jsm-bench-dep-0004 1.0.0\n+ jsm-bench-dep-0005 1.0.0\n+ jsm-bench-dep-0006 1.0.0\n+ jsm-bench-dep-0007 1.0.0\n+ jsm-bench-dep-0008 1.0.0\n+ jsm-bench-dep-0009 1.0.0\n\nDone in 633ms using pnpm v9.15.9\n\nstderr:\n(node:41) [DEP0169] DeprecationWarning: `url.parse()` behavior is not standardized and prone to errors that have security implications. Use the WHATWG URL API instead. CVEs are not issued for `url.parse()` vulnerabilities.\n(Use `node --trace-deprecation ...` to show where the warning was created)\n",
+          "elapsed_seconds": 0.845566,
           "fixture": "small",
           "return_code": 0,
           "sample": 2,
@@ -919,8 +919,8 @@
             "--frozen-lockfile",
             "--ignore-scripts"
           ],
-          "diagnostic_tail": "stdout:\nLockfile is up to date, resolution step is skipped\nProgress: resolved 1, reused 0, downloaded 0, added 0\nPackages: +10\n++++++++++\nProgress: resolved 10, reused 0, downloaded 10, added 10, done\n\ndependencies:\n+ jsm-bench-dep-0000 1.0.0\n+ jsm-bench-dep-0001 1.0.0\n+ jsm-bench-dep-0002 1.0.0\n+ jsm-bench-dep-0003 1.0.0\n+ jsm-bench-dep-0004 1.0.0\n+ jsm-bench-dep-0005 1.0.0\n+ jsm-bench-dep-0006 1.0.0\n+ jsm-bench-dep-0007 1.0.0\n+ jsm-bench-dep-0008 1.0.0\n+ jsm-bench-dep-0009 1.0.0\n\nDone in 742ms using pnpm v9.15.9\n\nstderr:\n(node:60) [DEP0169] DeprecationWarning: `url.parse()` behavior is not standardized and prone to errors that have security implications. Use the WHATWG URL API instead. CVEs are not issued for `url.parse()` vulnerabilities.\n(Use `node --trace-deprecation ...` to show where the warning was created)\n",
-          "elapsed_seconds": 0.942479,
+          "diagnostic_tail": "stdout:\nLockfile is up to date, resolution step is skipped\nProgress: resolved 1, reused 0, downloaded 0, added 0\nPackages: +10\n++++++++++\nProgress: resolved 10, reused 0, downloaded 10, added 10, done\n\ndependencies:\n+ jsm-bench-dep-0000 1.0.0\n+ jsm-bench-dep-0001 1.0.0\n+ jsm-bench-dep-0002 1.0.0\n+ jsm-bench-dep-0003 1.0.0\n+ jsm-bench-dep-0004 1.0.0\n+ jsm-bench-dep-0005 1.0.0\n+ jsm-bench-dep-0006 1.0.0\n+ jsm-bench-dep-0007 1.0.0\n+ jsm-bench-dep-0008 1.0.0\n+ jsm-bench-dep-0009 1.0.0\n\nDone in 637ms using pnpm v9.15.9\n\nstderr:\n(node:60) [DEP0169] DeprecationWarning: `url.parse()` behavior is not standardized and prone to errors that have security implications. Use the WHATWG URL API instead. CVEs are not issued for `url.parse()` vulnerabilities.\n(Use `node --trace-deprecation ...` to show where the warning was created)\n",
+          "elapsed_seconds": 0.837064,
           "fixture": "small",
           "return_code": 0,
           "sample": 3,
@@ -936,7 +936,7 @@
     {
       "execution_isolation": "isolated container using docker.io/library/node:24.19.0-bookworm-slim@sha256:a9f5f7c91a432850b2a8a7797adf5eadb6c733ceed61167806cee7ea7fbc29df; separate temporary project/cache; loopback registry via host network",
       "fixture": "small",
-      "median_seconds": 0.661381,
+      "median_seconds": 0.594561,
       "samples": [
         {
           "command": [
@@ -946,8 +946,8 @@
             "--ignore-scripts",
             "--non-interactive"
           ],
-          "diagnostic_tail": "stdout:\nyarn install v1.22.22\ninfo No lockfile found.\n[1/4] Resolving packages...\n[2/4] Fetching packages...\n[3/4] Linking dependencies...\n[4/4] Building fresh packages...\nsuccess Saved lockfile.\nDone in 0.21s.\n\nstderr:\n(node:3) [DEP0169] DeprecationWarning: `url.parse()` behavior is not standardized and prone to errors that have security implications. Use the WHATWG URL API instead. CVEs are not issued for `url.parse()` vulnerabilities.\n(Use `node --trace-deprecation ...` to show where the warning was created)\nwarning Ignored scripts due to flag.\n",
-          "elapsed_seconds": 0.675833,
+          "diagnostic_tail": "stdout:\nyarn install v1.22.22\ninfo No lockfile found.\n[1/4] Resolving packages...\n[2/4] Fetching packages...\n[3/4] Linking dependencies...\n[4/4] Building fresh packages...\nsuccess Saved lockfile.\nDone in 0.19s.\n\nstderr:\n(node:3) [DEP0169] DeprecationWarning: `url.parse()` behavior is not standardized and prone to errors that have security implications. Use the WHATWG URL API instead. CVEs are not issued for `url.parse()` vulnerabilities.\n(Use `node --trace-deprecation ...` to show where the warning was created)\nwarning Ignored scripts due to flag.\n",
+          "elapsed_seconds": 0.590931,
           "fixture": "small",
           "return_code": 0,
           "sample": 1,
@@ -963,8 +963,8 @@
             "--ignore-scripts",
             "--non-interactive"
           ],
-          "diagnostic_tail": "stdout:\nyarn install v1.22.22\ninfo No lockfile found.\n[1/4] Resolving packages...\n[2/4] Fetching packages...\n[3/4] Linking dependencies...\n[4/4] Building fresh packages...\nsuccess Saved lockfile.\nDone in 0.20s.\n\nstderr:\n(node:15) [DEP0169] DeprecationWarning: `url.parse()` behavior is not standardized and prone to errors that have security implications. Use the WHATWG URL API instead. CVEs are not issued for `url.parse()` vulnerabilities.\n(Use `node --trace-deprecation ...` to show where the warning was created)\nwarning Ignored scripts due to flag.\n",
-          "elapsed_seconds": 0.661381,
+          "diagnostic_tail": "stdout:\nyarn install v1.22.22\ninfo No lockfile found.\n[1/4] Resolving packages...\n[2/4] Fetching packages...\n[3/4] Linking dependencies...\n[4/4] Building fresh packages...\nsuccess Saved lockfile.\nDone in 0.19s.\n\nstderr:\n(node:15) [DEP0169] DeprecationWarning: `url.parse()` behavior is not standardized and prone to errors that have security implications. Use the WHATWG URL API instead. CVEs are not issued for `url.parse()` vulnerabilities.\n(Use `node --trace-deprecation ...` to show where the warning was created)\nwarning Ignored scripts due to flag.\n",
+          "elapsed_seconds": 0.594561,
           "fixture": "small",
           "return_code": 0,
           "sample": 2,
@@ -981,7 +981,7 @@
             "--non-interactive"
           ],
           "diagnostic_tail": "stdout:\nyarn install v1.22.22\ninfo No lockfile found.\n[1/4] Resolving packages...\n[2/4] Fetching packages...\n[3/4] Linking dependencies...\n[4/4] Building fresh packages...\nsuccess Saved lockfile.\nDone in 0.20s.\n\nstderr:\n(node:27) [DEP0169] DeprecationWarning: `url.parse()` behavior is not standardized and prone to errors that have security implications. Use the WHATWG URL API instead. CVEs are not issued for `url.parse()` vulnerabilities.\n(Use `node --trace-deprecation ...` to show where the warning was created)\nwarning Ignored scripts due to flag.\n",
-          "elapsed_seconds": 0.657089,
+          "elapsed_seconds": 0.612455,
           "fixture": "small",
           "return_code": 0,
           "sample": 3,
@@ -997,7 +997,7 @@
     {
       "execution_isolation": "isolated container using docker.io/library/node:24.19.0-bookworm-slim@sha256:a9f5f7c91a432850b2a8a7797adf5eadb6c733ceed61167806cee7ea7fbc29df; separate temporary project/cache; loopback registry via host network",
       "fixture": "small",
-      "median_seconds": 0.389153,
+      "median_seconds": 0.364104,
       "samples": [
         {
           "command": [
@@ -1008,7 +1008,7 @@
             "--non-interactive"
           ],
           "diagnostic_tail": "stdout:\nyarn install v1.22.22\n[1/4] Resolving packages...\nsuccess Already up-to-date.\nDone in 0.06s.\n\nstderr:\n(node:15) [DEP0169] DeprecationWarning: `url.parse()` behavior is not standardized and prone to errors that have security implications. Use the WHATWG URL API instead. CVEs are not issued for `url.parse()` vulnerabilities.\n(Use `node --trace-deprecation ...` to show where the warning was created)\n",
-          "elapsed_seconds": 0.398682,
+          "elapsed_seconds": 0.366078,
           "fixture": "small",
           "return_code": 0,
           "sample": 1,
@@ -1025,7 +1025,7 @@
             "--non-interactive"
           ],
           "diagnostic_tail": "stdout:\nyarn install v1.22.22\n[1/4] Resolving packages...\nsuccess Already up-to-date.\nDone in 0.06s.\n\nstderr:\n(node:26) [DEP0169] DeprecationWarning: `url.parse()` behavior is not standardized and prone to errors that have security implications. Use the WHATWG URL API instead. CVEs are not issued for `url.parse()` vulnerabilities.\n(Use `node --trace-deprecation ...` to show where the warning was created)\n",
-          "elapsed_seconds": 0.389153,
+          "elapsed_seconds": 0.364104,
           "fixture": "small",
           "return_code": 0,
           "sample": 2,
@@ -1042,7 +1042,7 @@
             "--non-interactive"
           ],
           "diagnostic_tail": "stdout:\nyarn install v1.22.22\n[1/4] Resolving packages...\nsuccess Already up-to-date.\nDone in 0.06s.\n\nstderr:\n(node:37) [DEP0169] DeprecationWarning: `url.parse()` behavior is not standardized and prone to errors that have security implications. Use the WHATWG URL API instead. CVEs are not issued for `url.parse()` vulnerabilities.\n(Use `node --trace-deprecation ...` to show where the warning was created)\n",
-          "elapsed_seconds": 0.388352,
+          "elapsed_seconds": 0.35025,
           "fixture": "small",
           "return_code": 0,
           "sample": 3,
@@ -1058,7 +1058,7 @@
     {
       "execution_isolation": "isolated container using docker.io/library/node:24.19.0-bookworm-slim@sha256:a9f5f7c91a432850b2a8a7797adf5eadb6c733ceed61167806cee7ea7fbc29df; separate temporary project/cache; loopback registry via host network",
       "fixture": "small",
-      "median_seconds": 0.394645,
+      "median_seconds": 0.358784,
       "samples": [
         {
           "command": [
@@ -1069,7 +1069,7 @@
             "--non-interactive"
           ],
           "diagnostic_tail": "stdout:\nyarn install v1.22.22\n[1/4] Resolving packages...\nsuccess Already up-to-date.\nDone in 0.06s.\n\nstderr:\n(node:15) [DEP0169] DeprecationWarning: `url.parse()` behavior is not standardized and prone to errors that have security implications. Use the WHATWG URL API instead. CVEs are not issued for `url.parse()` vulnerabilities.\n(Use `node --trace-deprecation ...` to show where the warning was created)\n",
-          "elapsed_seconds": 0.394645,
+          "elapsed_seconds": 0.377703,
           "fixture": "small",
           "return_code": 0,
           "sample": 1,
@@ -1086,7 +1086,7 @@
             "--non-interactive"
           ],
           "diagnostic_tail": "stdout:\nyarn install v1.22.22\n[1/4] Resolving packages...\nsuccess Already up-to-date.\nDone in 0.06s.\n\nstderr:\n(node:26) [DEP0169] DeprecationWarning: `url.parse()` behavior is not standardized and prone to errors that have security implications. Use the WHATWG URL API instead. CVEs are not issued for `url.parse()` vulnerabilities.\n(Use `node --trace-deprecation ...` to show where the warning was created)\n",
-          "elapsed_seconds": 0.405017,
+          "elapsed_seconds": 0.348937,
           "fixture": "small",
           "return_code": 0,
           "sample": 2,
@@ -1103,7 +1103,7 @@
             "--non-interactive"
           ],
           "diagnostic_tail": "stdout:\nyarn install v1.22.22\n[1/4] Resolving packages...\nsuccess Already up-to-date.\nDone in 0.06s.\n\nstderr:\n(node:37) [DEP0169] DeprecationWarning: `url.parse()` behavior is not standardized and prone to errors that have security implications. Use the WHATWG URL API instead. CVEs are not issued for `url.parse()` vulnerabilities.\n(Use `node --trace-deprecation ...` to show where the warning was created)\n",
-          "elapsed_seconds": 0.390693,
+          "elapsed_seconds": 0.358784,
           "fixture": "small",
           "return_code": 0,
           "sample": 3,
@@ -1119,7 +1119,7 @@
     {
       "execution_isolation": "isolated container using docker.io/library/node:24.19.0-bookworm-slim@sha256:a9f5f7c91a432850b2a8a7797adf5eadb6c733ceed61167806cee7ea7fbc29df; separate temporary project/cache; loopback registry via host network",
       "fixture": "small",
-      "median_seconds": 0.399608,
+      "median_seconds": 0.384156,
       "samples": [
         {
           "command": [
@@ -1130,7 +1130,7 @@
             "--non-interactive"
           ],
           "diagnostic_tail": "stdout:\nyarn install v1.22.22\n[1/4] Resolving packages...\nsuccess Already up-to-date.\nDone in 0.06s.\n\nstderr:\n(node:15) [DEP0169] DeprecationWarning: `url.parse()` behavior is not standardized and prone to errors that have security implications. Use the WHATWG URL API instead. CVEs are not issued for `url.parse()` vulnerabilities.\n(Use `node --trace-deprecation ...` to show where the warning was created)\n",
-          "elapsed_seconds": 0.395098,
+          "elapsed_seconds": 0.384156,
           "fixture": "small",
           "return_code": 0,
           "sample": 1,
@@ -1146,8 +1146,8 @@
             "--ignore-scripts",
             "--non-interactive"
           ],
-          "diagnostic_tail": "stdout:\nyarn install v1.22.22\n[1/4] Resolving packages...\nsuccess Already up-to-date.\nDone in 0.06s.\n\nstderr:\n(node:26) [DEP0169] DeprecationWarning: `url.parse()` behavior is not standardized and prone to errors that have security implications. Use the WHATWG URL API instead. CVEs are not issued for `url.parse()` vulnerabilities.\n(Use `node --trace-deprecation ...` to show where the warning was created)\n",
-          "elapsed_seconds": 0.399608,
+          "diagnostic_tail": "stdout:\nyarn install v1.22.22\n[1/4] Resolving packages...\nsuccess Already up-to-date.\nDone in 0.07s.\n\nstderr:\n(node:26) [DEP0169] DeprecationWarning: `url.parse()` behavior is not standardized and prone to errors that have security implications. Use the WHATWG URL API instead. CVEs are not issued for `url.parse()` vulnerabilities.\n(Use `node --trace-deprecation ...` to show where the warning was created)\n",
+          "elapsed_seconds": 0.403548,
           "fixture": "small",
           "return_code": 0,
           "sample": 2,
@@ -1164,7 +1164,7 @@
             "--non-interactive"
           ],
           "diagnostic_tail": "stdout:\nyarn install v1.22.22\n[1/4] Resolving packages...\nsuccess Already up-to-date.\nDone in 0.06s.\n\nstderr:\n(node:37) [DEP0169] DeprecationWarning: `url.parse()` behavior is not standardized and prone to errors that have security implications. Use the WHATWG URL API instead. CVEs are not issued for `url.parse()` vulnerabilities.\n(Use `node --trace-deprecation ...` to show where the warning was created)\n",
-          "elapsed_seconds": 0.400636,
+          "elapsed_seconds": 0.368905,
           "fixture": "small",
           "return_code": 0,
           "sample": 3,
@@ -1180,7 +1180,7 @@
     {
       "execution_isolation": "isolated container using docker.io/library/node:24.19.0-bookworm-slim@sha256:a9f5f7c91a432850b2a8a7797adf5eadb6c733ceed61167806cee7ea7fbc29df; separate temporary project/cache; loopback registry via host network",
       "fixture": "small",
-      "median_seconds": 0.402618,
+      "median_seconds": 0.393538,
       "samples": [
         {
           "command": [
@@ -1192,7 +1192,7 @@
             "--offline"
           ],
           "diagnostic_tail": "stdout:\nyarn install v1.22.22\n[1/4] Resolving packages...\nsuccess Already up-to-date.\nDone in 0.06s.\n\nstderr:\n(node:15) [DEP0169] DeprecationWarning: `url.parse()` behavior is not standardized and prone to errors that have security implications. Use the WHATWG URL API instead. CVEs are not issued for `url.parse()` vulnerabilities.\n(Use `node --trace-deprecation ...` to show where the warning was created)\n",
-          "elapsed_seconds": 0.402618,
+          "elapsed_seconds": 0.373011,
           "fixture": "small",
           "return_code": 0,
           "sample": 1,
@@ -1210,7 +1210,7 @@
             "--offline"
           ],
           "diagnostic_tail": "stdout:\nyarn install v1.22.22\n[1/4] Resolving packages...\nsuccess Already up-to-date.\nDone in 0.06s.\n\nstderr:\n(node:26) [DEP0169] DeprecationWarning: `url.parse()` behavior is not standardized and prone to errors that have security implications. Use the WHATWG URL API instead. CVEs are not issued for `url.parse()` vulnerabilities.\n(Use `node --trace-deprecation ...` to show where the warning was created)\n",
-          "elapsed_seconds": 0.400753,
+          "elapsed_seconds": 0.393538,
           "fixture": "small",
           "return_code": 0,
           "sample": 2,
@@ -1227,8 +1227,8 @@
             "--non-interactive",
             "--offline"
           ],
-          "diagnostic_tail": "stdout:\nyarn install v1.22.22\n[1/4] Resolving packages...\nsuccess Already up-to-date.\nDone in 0.06s.\n\nstderr:\n(node:37) [DEP0169] DeprecationWarning: `url.parse()` behavior is not standardized and prone to errors that have security implications. Use the WHATWG URL API instead. CVEs are not issued for `url.parse()` vulnerabilities.\n(Use `node --trace-deprecation ...` to show where the warning was created)\n",
-          "elapsed_seconds": 0.41081,
+          "diagnostic_tail": "stdout:\nyarn install v1.22.22\n[1/4] Resolving packages...\nsuccess Already up-to-date.\nDone in 0.07s.\n\nstderr:\n(node:37) [DEP0169] DeprecationWarning: `url.parse()` behavior is not standardized and prone to errors that have security implications. Use the WHATWG URL API instead. CVEs are not issued for `url.parse()` vulnerabilities.\n(Use `node --trace-deprecation ...` to show where the warning was created)\n",
+          "elapsed_seconds": 0.406814,
           "fixture": "small",
           "return_code": 0,
           "sample": 3,
@@ -1244,7 +1244,7 @@
     {
       "execution_isolation": "isolated container using docker.io/library/node:24.19.0-bookworm-slim@sha256:a9f5f7c91a432850b2a8a7797adf5eadb6c733ceed61167806cee7ea7fbc29df; separate temporary project/cache; loopback registry via host network",
       "fixture": "small",
-      "median_seconds": 0.471481,
+      "median_seconds": 0.463053,
       "samples": [
         {
           "command": [
@@ -1255,7 +1255,7 @@
             "--non-interactive"
           ],
           "diagnostic_tail": "stdout:\nyarn install v1.22.22\n[1/4] Resolving packages...\n[2/4] Fetching packages...\n[3/4] Linking dependencies...\n[4/4] Building fresh packages...\nsuccess Saved lockfile.\nDone in 0.10s.\n\nstderr:\n(node:15) [DEP0169] DeprecationWarning: `url.parse()` behavior is not standardized and prone to errors that have security implications. Use the WHATWG URL API instead. CVEs are not issued for `url.parse()` vulnerabilities.\n(Use `node --trace-deprecation ...` to show where the warning was created)\nwarning Ignored scripts due to flag.\n",
-          "elapsed_seconds": 0.436919,
+          "elapsed_seconds": 0.443346,
           "fixture": "small",
           "return_code": 0,
           "sample": 1,
@@ -1271,8 +1271,8 @@
             "--ignore-scripts",
             "--non-interactive"
           ],
-          "diagnostic_tail": "stdout:\nyarn install v1.22.22\n[1/4] Resolving packages...\n[2/4] Fetching packages...\n[3/4] Linking dependencies...\n[4/4] Building fresh packages...\nsuccess Saved lockfile.\nDone in 0.14s.\n\nstderr:\n(node:26) [DEP0169] DeprecationWarning: `url.parse()` behavior is not standardized and prone to errors that have security implications. Use the WHATWG URL API instead. CVEs are not issued for `url.parse()` vulnerabilities.\n(Use `node --trace-deprecation ...` to show where the warning was created)\nwarning Ignored scripts due to flag.\n",
-          "elapsed_seconds": 0.493555,
+          "diagnostic_tail": "stdout:\nyarn install v1.22.22\n[1/4] Resolving packages...\n[2/4] Fetching packages...\n[3/4] Linking dependencies...\n[4/4] Building fresh packages...\nsuccess Saved lockfile.\nDone in 0.13s.\n\nstderr:\n(node:26) [DEP0169] DeprecationWarning: `url.parse()` behavior is not standardized and prone to errors that have security implications. Use the WHATWG URL API instead. CVEs are not issued for `url.parse()` vulnerabilities.\n(Use `node --trace-deprecation ...` to show where the warning was created)\nwarning Ignored scripts due to flag.\n",
+          "elapsed_seconds": 0.463053,
           "fixture": "small",
           "return_code": 0,
           "sample": 2,
@@ -1288,8 +1288,8 @@
             "--ignore-scripts",
             "--non-interactive"
           ],
-          "diagnostic_tail": "stdout:\nyarn install v1.22.22\n[1/4] Resolving packages...\n[2/4] Fetching packages...\n[3/4] Linking dependencies...\n[4/4] Building fresh packages...\nsuccess Saved lockfile.\nDone in 0.14s.\n\nstderr:\n(node:38) [DEP0169] DeprecationWarning: `url.parse()` behavior is not standardized and prone to errors that have security implications. Use the WHATWG URL API instead. CVEs are not issued for `url.parse()` vulnerabilities.\n(Use `node --trace-deprecation ...` to show where the warning was created)\nwarning Ignored scripts due to flag.\n",
-          "elapsed_seconds": 0.471481,
+          "diagnostic_tail": "stdout:\nyarn install v1.22.22\n[1/4] Resolving packages...\n[2/4] Fetching packages...\n[3/4] Linking dependencies...\n[4/4] Building fresh packages...\nsuccess Saved lockfile.\nDone in 0.18s.\n\nstderr:\n(node:38) [DEP0169] DeprecationWarning: `url.parse()` behavior is not standardized and prone to errors that have security implications. Use the WHATWG URL API instead. CVEs are not issued for `url.parse()` vulnerabilities.\n(Use `node --trace-deprecation ...` to show where the warning was created)\nwarning Ignored scripts due to flag.\n",
+          "elapsed_seconds": 0.519062,
           "fixture": "small",
           "return_code": 0,
           "sample": 3,
@@ -1305,7 +1305,7 @@
     {
       "execution_isolation": "isolated container using docker.io/library/node:24.19.0-bookworm-slim@sha256:a9f5f7c91a432850b2a8a7797adf5eadb6c733ceed61167806cee7ea7fbc29df; separate temporary project/cache; loopback registry via host network",
       "fixture": "small",
-      "median_seconds": 0.644304,
+      "median_seconds": 0.660228,
       "samples": [
         {
           "command": [
@@ -1317,7 +1317,7 @@
             "--non-interactive"
           ],
           "diagnostic_tail": "stdout:\nyarn install v1.22.22\n[1/4] Resolving packages...\n[2/4] Fetching packages...\n[3/4] Linking dependencies...\n[4/4] Building fresh packages...\nDone in 0.19s.\n\nstderr:\n(node:15) [DEP0169] DeprecationWarning: `url.parse()` behavior is not standardized and prone to errors that have security implications. Use the WHATWG URL API instead. CVEs are not issued for `url.parse()` vulnerabilities.\n(Use `node --trace-deprecation ...` to show where the warning was created)\nwarning Ignored scripts due to flag.\n",
-          "elapsed_seconds": 0.627212,
+          "elapsed_seconds": 0.627284,
           "fixture": "small",
           "return_code": 0,
           "sample": 1,
@@ -1334,8 +1334,8 @@
             "--ignore-scripts",
             "--non-interactive"
           ],
-          "diagnostic_tail": "stdout:\nyarn install v1.22.22\n[1/4] Resolving packages...\n[2/4] Fetching packages...\n[3/4] Linking dependencies...\n[4/4] Building fresh packages...\nDone in 0.21s.\n\nstderr:\n(node:27) [DEP0169] DeprecationWarning: `url.parse()` behavior is not standardized and prone to errors that have security implications. Use the WHATWG URL API instead. CVEs are not issued for `url.parse()` vulnerabilities.\n(Use `node --trace-deprecation ...` to show where the warning was created)\nwarning Ignored scripts due to flag.\n",
-          "elapsed_seconds": 0.666251,
+          "diagnostic_tail": "stdout:\nyarn install v1.22.22\n[1/4] Resolving packages...\n[2/4] Fetching packages...\n[3/4] Linking dependencies...\n[4/4] Building fresh packages...\nDone in 0.20s.\n\nstderr:\n(node:27) [DEP0169] DeprecationWarning: `url.parse()` behavior is not standardized and prone to errors that have security implications. Use the WHATWG URL API instead. CVEs are not issued for `url.parse()` vulnerabilities.\n(Use `node --trace-deprecation ...` to show where the warning was created)\nwarning Ignored scripts due to flag.\n",
+          "elapsed_seconds": 0.672709,
           "fixture": "small",
           "return_code": 0,
           "sample": 2,
@@ -1353,7 +1353,7 @@
             "--non-interactive"
           ],
           "diagnostic_tail": "stdout:\nyarn install v1.22.22\n[1/4] Resolving packages...\n[2/4] Fetching packages...\n[3/4] Linking dependencies...\n[4/4] Building fresh packages...\nDone in 0.19s.\n\nstderr:\n(node:39) [DEP0169] DeprecationWarning: `url.parse()` behavior is not standardized and prone to errors that have security implications. Use the WHATWG URL API instead. CVEs are not issued for `url.parse()` vulnerabilities.\n(Use `node --trace-deprecation ...` to show where the warning was created)\nwarning Ignored scripts due to flag.\n",
-          "elapsed_seconds": 0.644304,
+          "elapsed_seconds": 0.660228,
           "fixture": "small",
           "return_code": 0,
           "sample": 3,
@@ -1369,7 +1369,7 @@
     {
       "execution_isolation": "isolated container using docker.io/oven/bun:1.2.22@sha256:66ba69deede44e3af5dc542def218fdb3bcad2205900ea761dc5623bf973d2df; separate temporary project/cache; loopback registry via host network",
       "fixture": "small",
-      "median_seconds": 1.133328,
+      "median_seconds": 1.149343,
       "samples": [
         {
           "command": [
@@ -1377,8 +1377,8 @@
             "install",
             "--ignore-scripts"
           ],
-          "diagnostic_tail": "stdout:\nbun install v1.2.22 (6bafe260)\n\n+ jsm-bench-dep-0000@1.0.0\n+ jsm-bench-dep-0001@1.0.0\n+ jsm-bench-dep-0002@1.0.0\n+ jsm-bench-dep-0003@1.0.0\n+ jsm-bench-dep-0004@1.0.0\n+ jsm-bench-dep-0005@1.0.0\n+ jsm-bench-dep-0006@1.0.0\n+ jsm-bench-dep-0007@1.0.0\n+ jsm-bench-dep-0008@1.0.0\n+ jsm-bench-dep-0009@1.0.0\n\n10 packages installed [1038.00ms]\n\nstderr:\nResolving dependencies\nResolved, downloaded and extracted [40]\nSaved lockfile\n",
-          "elapsed_seconds": 1.142891,
+          "diagnostic_tail": "stdout:\nbun install v1.2.22 (6bafe260)\n\n+ jsm-bench-dep-0000@1.0.0\n+ jsm-bench-dep-0001@1.0.0\n+ jsm-bench-dep-0002@1.0.0\n+ jsm-bench-dep-0003@1.0.0\n+ jsm-bench-dep-0004@1.0.0\n+ jsm-bench-dep-0005@1.0.0\n+ jsm-bench-dep-0006@1.0.0\n+ jsm-bench-dep-0007@1.0.0\n+ jsm-bench-dep-0008@1.0.0\n+ jsm-bench-dep-0009@1.0.0\n\n10 packages installed [1042.00ms]\n\nstderr:\nResolving dependencies\nResolved, downloaded and extracted [40]\nSaved lockfile\n",
+          "elapsed_seconds": 1.192338,
           "fixture": "small",
           "return_code": 0,
           "sample": 1,
@@ -1392,8 +1392,8 @@
             "install",
             "--ignore-scripts"
           ],
-          "diagnostic_tail": "stdout:\nbun install v1.2.22 (6bafe260)\n\n+ jsm-bench-dep-0000@1.0.0\n+ jsm-bench-dep-0001@1.0.0\n+ jsm-bench-dep-0002@1.0.0\n+ jsm-bench-dep-0003@1.0.0\n+ jsm-bench-dep-0004@1.0.0\n+ jsm-bench-dep-0005@1.0.0\n+ jsm-bench-dep-0006@1.0.0\n+ jsm-bench-dep-0007@1.0.0\n+ jsm-bench-dep-0008@1.0.0\n+ jsm-bench-dep-0009@1.0.0\n\n10 packages installed [1016.00ms]\n\nstderr:\nResolving dependencies\nResolved, downloaded and extracted [40]\nSaved lockfile\n",
-          "elapsed_seconds": 1.102631,
+          "diagnostic_tail": "stdout:\nbun install v1.2.22 (6bafe260)\n\n+ jsm-bench-dep-0000@1.0.0\n+ jsm-bench-dep-0001@1.0.0\n+ jsm-bench-dep-0002@1.0.0\n+ jsm-bench-dep-0003@1.0.0\n+ jsm-bench-dep-0004@1.0.0\n+ jsm-bench-dep-0005@1.0.0\n+ jsm-bench-dep-0006@1.0.0\n+ jsm-bench-dep-0007@1.0.0\n+ jsm-bench-dep-0008@1.0.0\n+ jsm-bench-dep-0009@1.0.0\n\n10 packages installed [1028.00ms]\n\nstderr:\nResolving dependencies\nResolved, downloaded and extracted [40]\nSaved lockfile\n",
+          "elapsed_seconds": 1.145306,
           "fixture": "small",
           "return_code": 0,
           "sample": 2,
@@ -1407,8 +1407,8 @@
             "install",
             "--ignore-scripts"
           ],
-          "diagnostic_tail": "stdout:\nbun install v1.2.22 (6bafe260)\n\n+ jsm-bench-dep-0000@1.0.0\n+ jsm-bench-dep-0001@1.0.0\n+ jsm-bench-dep-0002@1.0.0\n+ jsm-bench-dep-0003@1.0.0\n+ jsm-bench-dep-0004@1.0.0\n+ jsm-bench-dep-0005@1.0.0\n+ jsm-bench-dep-0006@1.0.0\n+ jsm-bench-dep-0007@1.0.0\n+ jsm-bench-dep-0008@1.0.0\n+ jsm-bench-dep-0009@1.0.0\n\n10 packages installed [1024.00ms]\n\nstderr:\nResolving dependencies\nResolved, downloaded and extracted [40]\nSaved lockfile\n",
-          "elapsed_seconds": 1.133328,
+          "diagnostic_tail": "stdout:\nbun install v1.2.22 (6bafe260)\n\n+ jsm-bench-dep-0000@1.0.0\n+ jsm-bench-dep-0001@1.0.0\n+ jsm-bench-dep-0002@1.0.0\n+ jsm-bench-dep-0003@1.0.0\n+ jsm-bench-dep-0004@1.0.0\n+ jsm-bench-dep-0005@1.0.0\n+ jsm-bench-dep-0006@1.0.0\n+ jsm-bench-dep-0007@1.0.0\n+ jsm-bench-dep-0008@1.0.0\n+ jsm-bench-dep-0009@1.0.0\n\n10 packages installed [1041.00ms]\n\nstderr:\nResolving dependencies\nResolved, downloaded and extracted [40]\nSaved lockfile\n",
+          "elapsed_seconds": 1.149343,
           "fixture": "small",
           "return_code": 0,
           "sample": 3,
@@ -1424,7 +1424,7 @@
     {
       "execution_isolation": "isolated container using docker.io/oven/bun:1.2.22@sha256:66ba69deede44e3af5dc542def218fdb3bcad2205900ea761dc5623bf973d2df; separate temporary project/cache; loopback registry via host network",
       "fixture": "small",
-      "median_seconds": 0.089685,
+      "median_seconds": 0.094838,
       "samples": [
         {
           "command": [
@@ -1433,7 +1433,7 @@
             "--ignore-scripts"
           ],
           "diagnostic_tail": "stdout:\nbun install v1.2.22 (6bafe260)\n\nChecked 10 installs across 11 packages (no changes) [2.00ms]\n",
-          "elapsed_seconds": 0.108329,
+          "elapsed_seconds": 0.094838,
           "fixture": "small",
           "return_code": 0,
           "sample": 1,
@@ -1448,7 +1448,7 @@
             "--ignore-scripts"
           ],
           "diagnostic_tail": "stdout:\nbun install v1.2.22 (6bafe260)\n\nChecked 10 installs across 11 packages (no changes) [2.00ms]\n",
-          "elapsed_seconds": 0.087864,
+          "elapsed_seconds": 0.099343,
           "fixture": "small",
           "return_code": 0,
           "sample": 2,
@@ -1463,7 +1463,7 @@
             "--ignore-scripts"
           ],
           "diagnostic_tail": "stdout:\nbun install v1.2.22 (6bafe260)\n\nChecked 10 installs across 11 packages (no changes) [2.00ms]\n",
-          "elapsed_seconds": 0.089685,
+          "elapsed_seconds": 0.094228,
           "fixture": "small",
           "return_code": 0,
           "sample": 3,
@@ -1479,7 +1479,7 @@
     {
       "execution_isolation": "isolated container using docker.io/oven/bun:1.2.22@sha256:66ba69deede44e3af5dc542def218fdb3bcad2205900ea761dc5623bf973d2df; separate temporary project/cache; loopback registry via host network",
       "fixture": "small",
-      "median_seconds": 0.106221,
+      "median_seconds": 0.094195,
       "samples": [
         {
           "command": [
@@ -1488,7 +1488,7 @@
             "--ignore-scripts"
           ],
           "diagnostic_tail": "stdout:\nbun install v1.2.22 (6bafe260)\n\nChecked 10 installs across 11 packages (no changes) [2.00ms]\n",
-          "elapsed_seconds": 0.106221,
+          "elapsed_seconds": 0.094195,
           "fixture": "small",
           "return_code": 0,
           "sample": 1,
@@ -1503,7 +1503,7 @@
             "--ignore-scripts"
           ],
           "diagnostic_tail": "stdout:\nbun install v1.2.22 (6bafe260)\n\nChecked 10 installs across 11 packages (no changes) [2.00ms]\n",
-          "elapsed_seconds": 0.108421,
+          "elapsed_seconds": 0.092014,
           "fixture": "small",
           "return_code": 0,
           "sample": 2,
@@ -1518,7 +1518,7 @@
             "--ignore-scripts"
           ],
           "diagnostic_tail": "stdout:\nbun install v1.2.22 (6bafe260)\n\nChecked 10 installs across 11 packages (no changes) [2.00ms]\n",
-          "elapsed_seconds": 0.078069,
+          "elapsed_seconds": 0.111114,
           "fixture": "small",
           "return_code": 0,
           "sample": 3,
@@ -1534,7 +1534,7 @@
     {
       "execution_isolation": "isolated container using docker.io/oven/bun:1.2.22@sha256:66ba69deede44e3af5dc542def218fdb3bcad2205900ea761dc5623bf973d2df; separate temporary project/cache; loopback registry via host network",
       "fixture": "small",
-      "median_seconds": 0.115464,
+      "median_seconds": 0.110733,
       "samples": [
         {
           "command": [
@@ -1542,8 +1542,8 @@
             "install",
             "--ignore-scripts"
           ],
-          "diagnostic_tail": "stdout:\nbun install v1.2.22 (6bafe260)\n\nChecked 10 installs across 11 packages (no changes) [3.00ms]\n",
-          "elapsed_seconds": 0.116346,
+          "diagnostic_tail": "stdout:\nbun install v1.2.22 (6bafe260)\n\nChecked 10 installs across 11 packages (no changes) [2.00ms]\n",
+          "elapsed_seconds": 0.115458,
           "fixture": "small",
           "return_code": 0,
           "sample": 1,
@@ -1558,7 +1558,7 @@
             "--ignore-scripts"
           ],
           "diagnostic_tail": "stdout:\nbun install v1.2.22 (6bafe260)\n\nChecked 10 installs across 11 packages (no changes) [2.00ms]\n",
-          "elapsed_seconds": 0.115464,
+          "elapsed_seconds": 0.110733,
           "fixture": "small",
           "return_code": 0,
           "sample": 2,
@@ -1573,7 +1573,7 @@
             "--ignore-scripts"
           ],
           "diagnostic_tail": "stdout:\nbun install v1.2.22 (6bafe260)\n\nChecked 10 installs across 11 packages (no changes) [2.00ms]\n",
-          "elapsed_seconds": 0.111285,
+          "elapsed_seconds": 0.094474,
           "fixture": "small",
           "return_code": 0,
           "sample": 3,
@@ -1589,7 +1589,7 @@
     {
       "execution_isolation": "isolated container using docker.io/oven/bun:1.2.22@sha256:66ba69deede44e3af5dc542def218fdb3bcad2205900ea761dc5623bf973d2df; separate temporary project/cache; loopback registry via host network",
       "fixture": "small",
-      "median_seconds": 0.089957,
+      "median_seconds": 0.112684,
       "samples": [
         {
           "command": [
@@ -1599,7 +1599,7 @@
             "--offline"
           ],
           "diagnostic_tail": "stdout:\nbun install v1.2.22 (6bafe260)\n\nChecked 10 installs across 11 packages (no changes) [2.00ms]\n",
-          "elapsed_seconds": 0.102525,
+          "elapsed_seconds": 0.112684,
           "fixture": "small",
           "return_code": 0,
           "sample": 1,
@@ -1614,8 +1614,8 @@
             "--ignore-scripts",
             "--offline"
           ],
-          "diagnostic_tail": "stdout:\nbun install v1.2.22 (6bafe260)\n\nChecked 10 installs across 11 packages (no changes) [2.00ms]\n",
-          "elapsed_seconds": 0.089957,
+          "diagnostic_tail": "stdout:\nbun install v1.2.22 (6bafe260)\n\nChecked 10 installs across 11 packages (no changes) [3.00ms]\n",
+          "elapsed_seconds": 0.115908,
           "fixture": "small",
           "return_code": 0,
           "sample": 2,
@@ -1631,7 +1631,7 @@
             "--offline"
           ],
           "diagnostic_tail": "stdout:\nbun install v1.2.22 (6bafe260)\n\nChecked 10 installs across 11 packages (no changes) [2.00ms]\n",
-          "elapsed_seconds": 0.08158,
+          "elapsed_seconds": 0.111337,
           "fixture": "small",
           "return_code": 0,
           "sample": 3,
@@ -1647,7 +1647,7 @@
     {
       "execution_isolation": "isolated container using docker.io/oven/bun:1.2.22@sha256:66ba69deede44e3af5dc542def218fdb3bcad2205900ea761dc5623bf973d2df; separate temporary project/cache; loopback registry via host network",
       "fixture": "small",
-      "median_seconds": 0.091464,
+      "median_seconds": 0.109916,
       "samples": [
         {
           "command": [
@@ -1655,8 +1655,8 @@
             "install",
             "--ignore-scripts"
           ],
-          "diagnostic_tail": "stdout:\nbun install v1.2.22 (6bafe260)\n\n5 packages removed [10.00ms]\n\nstderr:\nSaved lockfile\n",
-          "elapsed_seconds": 0.118286,
+          "diagnostic_tail": "stdout:\nbun install v1.2.22 (6bafe260)\n\n5 packages removed [2.00ms]\n\nstderr:\nSaved lockfile\n",
+          "elapsed_seconds": 0.109916,
           "fixture": "small",
           "return_code": 0,
           "sample": 1,
@@ -1671,7 +1671,7 @@
             "--ignore-scripts"
           ],
           "diagnostic_tail": "stdout:\nbun install v1.2.22 (6bafe260)\n\n5 packages removed [2.00ms]\n\nstderr:\nSaved lockfile\n",
-          "elapsed_seconds": 0.089432,
+          "elapsed_seconds": 0.098745,
           "fixture": "small",
           "return_code": 0,
           "sample": 2,
@@ -1686,7 +1686,7 @@
             "--ignore-scripts"
           ],
           "diagnostic_tail": "stdout:\nbun install v1.2.22 (6bafe260)\n\n5 packages removed [2.00ms]\n\nstderr:\nSaved lockfile\n",
-          "elapsed_seconds": 0.091464,
+          "elapsed_seconds": 0.111797,
           "fixture": "small",
           "return_code": 0,
           "sample": 3,
@@ -1702,7 +1702,7 @@
     {
       "execution_isolation": "isolated container using docker.io/oven/bun:1.2.22@sha256:66ba69deede44e3af5dc542def218fdb3bcad2205900ea761dc5623bf973d2df; separate temporary project/cache; loopback registry via host network",
       "fixture": "small",
-      "median_seconds": 1.141896,
+      "median_seconds": 1.118385,
       "samples": [
         {
           "command": [
@@ -1711,8 +1711,8 @@
             "--frozen-lockfile",
             "--ignore-scripts"
           ],
-          "diagnostic_tail": "stdout:\nbun install v1.2.22 (6bafe260)\n\n+ jsm-bench-dep-0000@1.0.0\n+ jsm-bench-dep-0001@1.0.0\n+ jsm-bench-dep-0002@1.0.0\n+ jsm-bench-dep-0003@1.0.0\n+ jsm-bench-dep-0004@1.0.0\n+ jsm-bench-dep-0005@1.0.0\n+ jsm-bench-dep-0006@1.0.0\n+ jsm-bench-dep-0007@1.0.0\n+ jsm-bench-dep-0008@1.0.0\n+ jsm-bench-dep-0009@1.0.0\n\n10 packages installed [1039.00ms]\n",
-          "elapsed_seconds": 1.141896,
+          "diagnostic_tail": "stdout:\nbun install v1.2.22 (6bafe260)\n\n+ jsm-bench-dep-0000@1.0.0\n+ jsm-bench-dep-0001@1.0.0\n+ jsm-bench-dep-0002@1.0.0\n+ jsm-bench-dep-0003@1.0.0\n+ jsm-bench-dep-0004@1.0.0\n+ jsm-bench-dep-0005@1.0.0\n+ jsm-bench-dep-0006@1.0.0\n+ jsm-bench-dep-0007@1.0.0\n+ jsm-bench-dep-0008@1.0.0\n+ jsm-bench-dep-0009@1.0.0\n\n10 packages installed [1011.00ms]\n",
+          "elapsed_seconds": 1.113758,
           "fixture": "small",
           "return_code": 0,
           "sample": 1,
@@ -1727,8 +1727,8 @@
             "--frozen-lockfile",
             "--ignore-scripts"
           ],
-          "diagnostic_tail": "stdout:\nbun install v1.2.22 (6bafe260)\n\n+ jsm-bench-dep-0000@1.0.0\n+ jsm-bench-dep-0001@1.0.0\n+ jsm-bench-dep-0002@1.0.0\n+ jsm-bench-dep-0003@1.0.0\n+ jsm-bench-dep-0004@1.0.0\n+ jsm-bench-dep-0005@1.0.0\n+ jsm-bench-dep-0006@1.0.0\n+ jsm-bench-dep-0007@1.0.0\n+ jsm-bench-dep-0008@1.0.0\n+ jsm-bench-dep-0009@1.0.0\n\n10 packages installed [1013.00ms]\n",
-          "elapsed_seconds": 1.12827,
+          "diagnostic_tail": "stdout:\nbun install v1.2.22 (6bafe260)\n\n+ jsm-bench-dep-0000@1.0.0\n+ jsm-bench-dep-0001@1.0.0\n+ jsm-bench-dep-0002@1.0.0\n+ jsm-bench-dep-0003@1.0.0\n+ jsm-bench-dep-0004@1.0.0\n+ jsm-bench-dep-0005@1.0.0\n+ jsm-bench-dep-0006@1.0.0\n+ jsm-bench-dep-0007@1.0.0\n+ jsm-bench-dep-0008@1.0.0\n+ jsm-bench-dep-0009@1.0.0\n\n10 packages installed [1011.00ms]\n",
+          "elapsed_seconds": 1.118385,
           "fixture": "small",
           "return_code": 0,
           "sample": 2,
@@ -1743,8 +1743,8 @@
             "--frozen-lockfile",
             "--ignore-scripts"
           ],
-          "diagnostic_tail": "stdout:\nbun install v1.2.22 (6bafe260)\n\n+ jsm-bench-dep-0000@1.0.0\n+ jsm-bench-dep-0001@1.0.0\n+ jsm-bench-dep-0002@1.0.0\n+ jsm-bench-dep-0003@1.0.0\n+ jsm-bench-dep-0004@1.0.0\n+ jsm-bench-dep-0005@1.0.0\n+ jsm-bench-dep-0006@1.0.0\n+ jsm-bench-dep-0007@1.0.0\n+ jsm-bench-dep-0008@1.0.0\n+ jsm-bench-dep-0009@1.0.0\n\n10 packages installed [1041.00ms]\n",
-          "elapsed_seconds": 1.143771,
+          "diagnostic_tail": "stdout:\nbun install v1.2.22 (6bafe260)\n\n+ jsm-bench-dep-0000@1.0.0\n+ jsm-bench-dep-0001@1.0.0\n+ jsm-bench-dep-0002@1.0.0\n+ jsm-bench-dep-0003@1.0.0\n+ jsm-bench-dep-0004@1.0.0\n+ jsm-bench-dep-0005@1.0.0\n+ jsm-bench-dep-0006@1.0.0\n+ jsm-bench-dep-0007@1.0.0\n+ jsm-bench-dep-0008@1.0.0\n+ jsm-bench-dep-0009@1.0.0\n\n10 packages installed [1036.00ms]\n",
+          "elapsed_seconds": 1.15194,
           "fixture": "small",
           "return_code": 0,
           "sample": 3,
@@ -1760,7 +1760,7 @@
     {
       "execution_isolation": "isolated container using docker.io/library/python:3.12.3-slim-bookworm@sha256:afc139a0a640942491ec481ad8dda10f2c5b753f5c969393b12480155fe15a63; separate temporary project/cache; loopback registry via host network",
       "fixture": "small",
-      "median_seconds": 0.144232,
+      "median_seconds": 0.138824,
       "samples": [
         {
           "command": [
@@ -1769,7 +1769,7 @@
             "install"
           ],
           "diagnostic_tail": "stdout:\njsm-stub: benchmark smoke only; observed 10 declared dependencies\n",
-          "elapsed_seconds": 0.252618,
+          "elapsed_seconds": 0.265937,
           "fixture": "small",
           "return_code": 0,
           "sample": 1,
@@ -1784,7 +1784,7 @@
             "install"
           ],
           "diagnostic_tail": "stdout:\njsm-stub: benchmark smoke only; observed 10 declared dependencies\n",
-          "elapsed_seconds": 0.135788,
+          "elapsed_seconds": 0.138824,
           "fixture": "small",
           "return_code": 0,
           "sample": 2,
@@ -1799,7 +1799,7 @@
             "install"
           ],
           "diagnostic_tail": "stdout:\njsm-stub: benchmark smoke only; observed 10 declared dependencies\n",
-          "elapsed_seconds": 0.144232,
+          "elapsed_seconds": 0.134907,
           "fixture": "small",
           "return_code": 0,
           "sample": 3,
@@ -1815,7 +1815,7 @@
     {
       "execution_isolation": "isolated container using docker.io/library/python:3.12.3-slim-bookworm@sha256:afc139a0a640942491ec481ad8dda10f2c5b753f5c969393b12480155fe15a63; separate temporary project/cache; loopback registry via host network",
       "fixture": "small",
-      "median_seconds": 0.128617,
+      "median_seconds": 0.142466,
       "samples": [
         {
           "command": [
@@ -1824,7 +1824,7 @@
             "install"
           ],
           "diagnostic_tail": "stdout:\njsm-stub: benchmark smoke only; observed 10 declared dependencies\n",
-          "elapsed_seconds": 0.141278,
+          "elapsed_seconds": 0.144175,
           "fixture": "small",
           "return_code": 0,
           "sample": 1,
@@ -1839,7 +1839,7 @@
             "install"
           ],
           "diagnostic_tail": "stdout:\njsm-stub: benchmark smoke only; observed 10 declared dependencies\n",
-          "elapsed_seconds": 0.127088,
+          "elapsed_seconds": 0.142466,
           "fixture": "small",
           "return_code": 0,
           "sample": 2,
@@ -1854,7 +1854,7 @@
             "install"
           ],
           "diagnostic_tail": "stdout:\njsm-stub: benchmark smoke only; observed 10 declared dependencies\n",
-          "elapsed_seconds": 0.128617,
+          "elapsed_seconds": 0.123674,
           "fixture": "small",
           "return_code": 0,
           "sample": 3,
@@ -1870,7 +1870,7 @@
     {
       "execution_isolation": "isolated container using docker.io/library/python:3.12.3-slim-bookworm@sha256:afc139a0a640942491ec481ad8dda10f2c5b753f5c969393b12480155fe15a63; separate temporary project/cache; loopback registry via host network",
       "fixture": "small",
-      "median_seconds": 0.137358,
+      "median_seconds": 0.137261,
       "samples": [
         {
           "command": [
@@ -1879,7 +1879,7 @@
             "install"
           ],
           "diagnostic_tail": "stdout:\njsm-stub: benchmark smoke only; observed 10 declared dependencies\n",
-          "elapsed_seconds": 0.137358,
+          "elapsed_seconds": 0.137261,
           "fixture": "small",
           "return_code": 0,
           "sample": 1,
@@ -1894,7 +1894,7 @@
             "install"
           ],
           "diagnostic_tail": "stdout:\njsm-stub: benchmark smoke only; observed 10 declared dependencies\n",
-          "elapsed_seconds": 0.122497,
+          "elapsed_seconds": 0.134099,
           "fixture": "small",
           "return_code": 0,
           "sample": 2,
@@ -1909,7 +1909,7 @@
             "install"
           ],
           "diagnostic_tail": "stdout:\njsm-stub: benchmark smoke only; observed 10 declared dependencies\n",
-          "elapsed_seconds": 0.137927,
+          "elapsed_seconds": 0.150776,
           "fixture": "small",
           "return_code": 0,
           "sample": 3,
@@ -1925,7 +1925,7 @@
     {
       "execution_isolation": "isolated container using docker.io/library/python:3.12.3-slim-bookworm@sha256:afc139a0a640942491ec481ad8dda10f2c5b753f5c969393b12480155fe15a63; separate temporary project/cache; loopback registry via host network",
       "fixture": "small",
-      "median_seconds": 0.122061,
+      "median_seconds": 0.139326,
       "samples": [
         {
           "command": [
@@ -1934,7 +1934,7 @@
             "install"
           ],
           "diagnostic_tail": "stdout:\njsm-stub: benchmark smoke only; observed 10 declared dependencies\n",
-          "elapsed_seconds": 0.121573,
+          "elapsed_seconds": 0.136198,
           "fixture": "small",
           "return_code": 0,
           "sample": 1,
@@ -1949,7 +1949,7 @@
             "install"
           ],
           "diagnostic_tail": "stdout:\njsm-stub: benchmark smoke only; observed 10 declared dependencies\n",
-          "elapsed_seconds": 0.122061,
+          "elapsed_seconds": 0.139326,
           "fixture": "small",
           "return_code": 0,
           "sample": 2,
@@ -1964,7 +1964,7 @@
             "install"
           ],
           "diagnostic_tail": "stdout:\njsm-stub: benchmark smoke only; observed 10 declared dependencies\n",
-          "elapsed_seconds": 0.138301,
+          "elapsed_seconds": 0.151971,
           "fixture": "small",
           "return_code": 0,
           "sample": 3,
@@ -1980,7 +1980,7 @@
     {
       "execution_isolation": "isolated container using docker.io/library/python:3.12.3-slim-bookworm@sha256:afc139a0a640942491ec481ad8dda10f2c5b753f5c969393b12480155fe15a63; separate temporary project/cache; loopback registry via host network",
       "fixture": "small",
-      "median_seconds": 0.131399,
+      "median_seconds": 0.12653,
       "samples": [
         {
           "command": [
@@ -1989,7 +1989,7 @@
             "install"
           ],
           "diagnostic_tail": "stdout:\njsm-stub: benchmark smoke only; observed 10 declared dependencies\n",
-          "elapsed_seconds": 0.141864,
+          "elapsed_seconds": 0.12653,
           "fixture": "small",
           "return_code": 0,
           "sample": 1,
@@ -2004,7 +2004,7 @@
             "install"
           ],
           "diagnostic_tail": "stdout:\njsm-stub: benchmark smoke only; observed 10 declared dependencies\n",
-          "elapsed_seconds": 0.131399,
+          "elapsed_seconds": 0.150605,
           "fixture": "small",
           "return_code": 0,
           "sample": 2,
@@ -2019,7 +2019,7 @@
             "install"
           ],
           "diagnostic_tail": "stdout:\njsm-stub: benchmark smoke only; observed 10 declared dependencies\n",
-          "elapsed_seconds": 0.127733,
+          "elapsed_seconds": 0.12037,
           "fixture": "small",
           "return_code": 0,
           "sample": 3,
@@ -2035,7 +2035,7 @@
     {
       "execution_isolation": "isolated container using docker.io/library/python:3.12.3-slim-bookworm@sha256:afc139a0a640942491ec481ad8dda10f2c5b753f5c969393b12480155fe15a63; separate temporary project/cache; loopback registry via host network",
       "fixture": "small",
-      "median_seconds": 0.135707,
+      "median_seconds": 0.137878,
       "samples": [
         {
           "command": [
@@ -2044,7 +2044,7 @@
             "install"
           ],
           "diagnostic_tail": "stdout:\njsm-stub: benchmark smoke only; observed 5 declared dependencies\n",
-          "elapsed_seconds": 0.138526,
+          "elapsed_seconds": 0.138318,
           "fixture": "small",
           "return_code": 0,
           "sample": 1,
@@ -2059,7 +2059,7 @@
             "install"
           ],
           "diagnostic_tail": "stdout:\njsm-stub: benchmark smoke only; observed 5 declared dependencies\n",
-          "elapsed_seconds": 0.135707,
+          "elapsed_seconds": 0.137878,
           "fixture": "small",
           "return_code": 0,
           "sample": 2,
@@ -2074,7 +2074,7 @@
             "install"
           ],
           "diagnostic_tail": "stdout:\njsm-stub: benchmark smoke only; observed 5 declared dependencies\n",
-          "elapsed_seconds": 0.134592,
+          "elapsed_seconds": 0.129078,
           "fixture": "small",
           "return_code": 0,
           "sample": 3,
@@ -2090,7 +2090,7 @@
     {
       "execution_isolation": "isolated container using docker.io/library/python:3.12.3-slim-bookworm@sha256:afc139a0a640942491ec481ad8dda10f2c5b753f5c969393b12480155fe15a63; separate temporary project/cache; loopback registry via host network",
       "fixture": "small",
-      "median_seconds": 0.140218,
+      "median_seconds": 0.1423,
       "samples": [
         {
           "command": [
@@ -2099,7 +2099,7 @@
             "install"
           ],
           "diagnostic_tail": "stdout:\njsm-stub: benchmark smoke only; observed 10 declared dependencies\n",
-          "elapsed_seconds": 0.242011,
+          "elapsed_seconds": 0.23906,
           "fixture": "small",
           "return_code": 0,
           "sample": 1,
@@ -2114,7 +2114,7 @@
             "install"
           ],
           "diagnostic_tail": "stdout:\njsm-stub: benchmark smoke only; observed 10 declared dependencies\n",
-          "elapsed_seconds": 0.140218,
+          "elapsed_seconds": 0.124766,
           "fixture": "small",
           "return_code": 0,
           "sample": 2,
@@ -2129,7 +2129,7 @@
             "install"
           ],
           "diagnostic_tail": "stdout:\njsm-stub: benchmark smoke only; observed 10 declared dependencies\n",
-          "elapsed_seconds": 0.135185,
+          "elapsed_seconds": 0.1423,
           "fixture": "small",
           "return_code": 0,
           "sample": 3,

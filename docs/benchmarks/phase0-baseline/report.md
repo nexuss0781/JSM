@@ -1,8 +1,8 @@
 # JSM Phase 0 Benchmark Baseline
 
-Generated: `2026-10-06T17:55:13.270275+00:00`\
+Generated: `2026-10-06T18:05:57.308144+00:00`\
 Fixture: `small` (revision 1, seed 20261007)\
-Git revision: `fbbd8c58e0badd0381faab3c3306ecc478669488` (working tree clean: `True`)\
+Git revision: `13a81c5c42c7d852d97dfc675faf0ae3eaa53939` (working tree clean: `True`)\
 Network shape: latency `0.0 ms/request`, bandwidth `0 B/s`\
 Container runtime: `podman` (`podman version 4.9.3`)\
 Isolation: each tool/scenario run uses one fresh container across its samples, with a separate project and cache; container startup and teardown are outside sample timing; the local registry is reached over Linux host networking.
@@ -11,41 +11,41 @@ Isolation: each tool/scenario run uses one fresh container across its samples, w
 
 | Tool | Version | Fixture | Scenario | Status | Median (s) | Prior median (s) |
 |---|---|---|---|---|---:|---:|
-| npm | 11.17.0 | small | cold | passed | 0.710466 | — |
-| npm | 11.17.0 | small | warm-store | passed | 0.430913 | — |
-| npm | 11.17.0 | small | warm-lockfile | passed | 0.427730 | — |
-| npm | 11.17.0 | small | reinstall | passed | 0.444092 | — |
-| npm | 11.17.0 | small | offline | passed | 0.439098 | — |
-| npm | 11.17.0 | small | branch-switch | passed | 0.520909 | — |
-| npm | 11.17.0 | small | ci | passed | 0.659960 | — |
-| pnpm | 9.15.9 | small | cold | passed | 0.913068 | — |
-| pnpm | 9.15.9 | small | warm-store | passed | 0.663830 | — |
-| pnpm | 9.15.9 | small | warm-lockfile | passed | 0.671908 | — |
-| pnpm | 9.15.9 | small | reinstall | passed | 0.677651 | — |
-| pnpm | 9.15.9 | small | offline | passed | 0.677361 | — |
-| pnpm | 9.15.9 | small | branch-switch | passed | 0.776976 | — |
-| pnpm | 9.15.9 | small | ci | passed | 0.902148 | — |
-| yarn | 1.22.22 | small | cold | passed | 0.661381 | — |
-| yarn | 1.22.22 | small | warm-store | passed | 0.389153 | — |
-| yarn | 1.22.22 | small | warm-lockfile | passed | 0.394645 | — |
-| yarn | 1.22.22 | small | reinstall | passed | 0.399608 | — |
-| yarn | 1.22.22 | small | offline | passed | 0.402618 | — |
-| yarn | 1.22.22 | small | branch-switch | passed | 0.471481 | — |
-| yarn | 1.22.22 | small | ci | passed | 0.644304 | — |
-| bun | 1.2.22 | small | cold | passed | 1.133328 | — |
-| bun | 1.2.22 | small | warm-store | passed | 0.089685 | — |
-| bun | 1.2.22 | small | warm-lockfile | passed | 0.106221 | — |
-| bun | 1.2.22 | small | reinstall | passed | 0.115464 | — |
-| bun | 1.2.22 | small | offline | passed | 0.089957 | — |
-| bun | 1.2.22 | small | branch-switch | passed | 0.091464 | — |
-| bun | 1.2.22 | small | ci | passed | 1.141896 | — |
-| jsm-stub | jsm-stub 0.1.0 (Phase 0; not an installer) | small | cold | passed | 0.144232 | — |
-| jsm-stub | jsm-stub 0.1.0 (Phase 0; not an installer) | small | warm-store | passed | 0.128617 | — |
-| jsm-stub | jsm-stub 0.1.0 (Phase 0; not an installer) | small | warm-lockfile | passed | 0.137358 | — |
-| jsm-stub | jsm-stub 0.1.0 (Phase 0; not an installer) | small | reinstall | passed | 0.122061 | — |
-| jsm-stub | jsm-stub 0.1.0 (Phase 0; not an installer) | small | offline | passed | 0.131399 | — |
-| jsm-stub | jsm-stub 0.1.0 (Phase 0; not an installer) | small | branch-switch | passed | 0.135707 | — |
-| jsm-stub | jsm-stub 0.1.0 (Phase 0; not an installer) | small | ci | passed | 0.140218 | — |
+| npm | 11.17.0 | small | cold | passed | 0.718682 | — |
+| npm | 11.17.0 | small | warm-store | passed | 0.472073 | — |
+| npm | 11.17.0 | small | warm-lockfile | passed | 0.443829 | — |
+| npm | 11.17.0 | small | reinstall | passed | 0.431036 | — |
+| npm | 11.17.0 | small | offline | passed | 0.451648 | — |
+| npm | 11.17.0 | small | branch-switch | passed | 0.512242 | — |
+| npm | 11.17.0 | small | ci | passed | 0.667206 | — |
+| pnpm | 9.15.9 | small | cold | passed | 0.901920 | — |
+| pnpm | 9.15.9 | small | warm-store | passed | 0.692059 | — |
+| pnpm | 9.15.9 | small | warm-lockfile | passed | 0.675562 | — |
+| pnpm | 9.15.9 | small | reinstall | passed | 0.656196 | — |
+| pnpm | 9.15.9 | small | offline | passed | 0.635373 | — |
+| pnpm | 9.15.9 | small | branch-switch | passed | 0.697347 | — |
+| pnpm | 9.15.9 | small | ci | passed | 0.844886 | — |
+| yarn | 1.22.22 | small | cold | passed | 0.594561 | — |
+| yarn | 1.22.22 | small | warm-store | passed | 0.364104 | — |
+| yarn | 1.22.22 | small | warm-lockfile | passed | 0.358784 | — |
+| yarn | 1.22.22 | small | reinstall | passed | 0.384156 | — |
+| yarn | 1.22.22 | small | offline | passed | 0.393538 | — |
+| yarn | 1.22.22 | small | branch-switch | passed | 0.463053 | — |
+| yarn | 1.22.22 | small | ci | passed | 0.660228 | — |
+| bun | 1.2.22 | small | cold | passed | 1.149343 | — |
+| bun | 1.2.22 | small | warm-store | passed | 0.094838 | — |
+| bun | 1.2.22 | small | warm-lockfile | passed | 0.094195 | — |
+| bun | 1.2.22 | small | reinstall | passed | 0.110733 | — |
+| bun | 1.2.22 | small | offline | passed | 0.112684 | — |
+| bun | 1.2.22 | small | branch-switch | passed | 0.109916 | — |
+| bun | 1.2.22 | small | ci | passed | 1.118385 | — |
+| jsm-stub | jsm-stub 0.1.0 (Phase 0; not an installer) | small | cold | passed | 0.138824 | — |
+| jsm-stub | jsm-stub 0.1.0 (Phase 0; not an installer) | small | warm-store | passed | 0.142466 | — |
+| jsm-stub | jsm-stub 0.1.0 (Phase 0; not an installer) | small | warm-lockfile | passed | 0.137261 | — |
+| jsm-stub | jsm-stub 0.1.0 (Phase 0; not an installer) | small | reinstall | passed | 0.139326 | — |
+| jsm-stub | jsm-stub 0.1.0 (Phase 0; not an installer) | small | offline | passed | 0.126530 | — |
+| jsm-stub | jsm-stub 0.1.0 (Phase 0; not an installer) | small | branch-switch | passed | 0.137878 | — |
+| jsm-stub | jsm-stub 0.1.0 (Phase 0; not an installer) | small | ci | passed | 0.142300 | — |
 
 ## Machine and method
 

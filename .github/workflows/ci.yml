@@ -58,7 +58,9 @@ jobs:
       - name: Run nextest
         run: cargo +1.95.0 nextest run --workspace --all-features --locked
       - name: Run coverage
-        run: cargo +1.95.0 llvm-cov nextest --workspace --all-features --locked --lcov --output-path coverage/lcov.info
+        run: |
+          mkdir -p coverage
+          cargo +1.95.0 llvm-cov nextest --workspace --all-features --locked --lcov --output-path coverage/lcov.info
       - name: Dependency license and advisory checks
         run: cargo +1.95.0 deny check
       - name: RustSec audit
