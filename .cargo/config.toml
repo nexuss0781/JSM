@@ -1,0 +1,6 @@
+[alias]
+xtest = "nextest run --workspace --all-features --locked"
+xtest-ci = "nextest run --workspace --all-features --locked --failure-output immediate-final"
+
+[net]
+retry = 3

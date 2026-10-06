@@ -1,0 +1,29 @@
+[package]
+name = "jsm-fuzz"
+version = "0.0.0"
+edition = "2024"
+publish = false
+
+[package.metadata]
+cargo-fuzz = true
+
+[workspace]
+
+[dependencies]
+libfuzzer-sys = "0.4"
+jsm-core = { path = "../crates/jsm-core" }
+jsm-testkit = { path = "../crates/jsm-testkit" }
+
+[[bin]]
+name = "package_name"
+path = "fuzz_targets/package_name.rs"
+test = false
+doc = false
+bench = false
+
+[[bin]]
+name = "archive_path"
+path = "fuzz_targets/archive_path.rs"
+test = false
+doc = false
+bench = false

@@ -1,0 +1,27 @@
+[package]
+name = "jsm-cli"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+publish.workspace = true
+
+[[bin]]
+name = "jsm"
+path = "src/main.rs"
+
+[dependencies]
+clap.workspace = true
+jsm-core = { path = "../jsm-core" }
+miette.workspace = true
+tracing.workspace = true
+tracing-chrome.workspace = true
+tracing-subscriber.workspace = true
+
+[dev-dependencies]
+assert_cmd = "2.0"
+jsm-testkit = { path = "../jsm-testkit" }
+serde_json.workspace = true
+tempfile.workspace = true
+
+[lints]
+workspace = true

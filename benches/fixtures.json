@@ -1,0 +1,24 @@
+{
+  "schema": "jsm.phase0.fixtures.v1",
+  "fixture_revision": 1,
+  "seed": 20261007,
+  "dependency_sizes": {
+    "small": 10,
+    "medium": 300,
+    "large": 1500
+  },
+  "monorepo_workspaces": 50,
+  "native_package_count": 1,
+  "scenarios": [
+    "cold",
+    "warm-store",
+    "warm-lockfile",
+    "reinstall",
+    "offline",
+    "branch-switch",
+    "ci",
+    "monorepo",
+    "native"
+  ],
+  "package_prefix": "jsm-bench-dep"
+}
