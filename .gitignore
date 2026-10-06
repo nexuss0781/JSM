@@ -1,0 +1,11 @@
+/target/
+/fuzz/target/
+/coverage/
+/benches/results/*.json
+/benches/results/*.md
+!/benches/results/.gitkeep
+__pycache__/
+*.py[cod]
+*.profraw
+*.lcov
+.DS_Store

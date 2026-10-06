@@ -1,0 +1,5 @@
+[toolchain]
+# Policy: pin the latest stable release minus two releases (see docs/adr/0001-phase-0-foundations.md).
+channel = "1.95.0"
+profile = "minimal"
+components = ["clippy", "rustfmt"]

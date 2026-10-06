@@ -1,0 +1,26 @@
+name: Feature request
+description: Propose a capability or improvement
+labels: [enhancement]
+body:
+  - type: input
+    id: phase
+    attributes:
+      label: Phase / sub-phase
+      placeholder: "3.7"
+  - type: textarea
+    id: problem
+    attributes:
+      label: User problem
+      description: What problem should JSM solve?
+    validations:
+      required: true
+  - type: textarea
+    id: requirements
+    attributes:
+      label: Requirements and acceptance criteria
+    validations:
+      required: true
+  - type: textarea
+    id: tradeoffs
+    attributes:
+      label: Compatibility, security, and platform considerations
