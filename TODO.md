@@ -1,6 +1,6 @@
 # JSM Implementation Backlog
 
-> **Status:** Phase 0 foundations and gate are complete on `main` (merged PR #2); Phases 1–7 remain open.
+> **Status:** Phase 0 foundations and gate are complete on `main` (merged PR #2); the Phase 1 gate is verified on `phase1/core-engine` with its 24-hour SemVer fuzz campaign explicitly deferred as a non-gating follow-up; Phases 2–7 remain open.
 > **Companion:** [`PHASE.md`](PHASE.md) defines sequencing, phase gates, and cross-phase invariants.
 > **Requirement source:** [`SPECS.md`](SPECS.md) is authoritative for detailed behavior and exit criteria; [`PROJECT.md`](PROJECT.md) is authoritative for product goals and scope.
 
@@ -136,7 +136,8 @@
 
 - [x] Support string/map `bin` and `directories.bin`; create Unix executables and Windows `.cmd`/PowerShell shims.
 - [x] Define deterministic conflict resolution and warnings; document when shebangs are rewritten.
-- [ ] Test executable invocation and conflict behavior on all supported CI operating systems.
+- [x] Test executable invocation and conflict behavior on all supported CI operating systems.
+  - Evidence: [Actions run 37607206152](https://github.com/nexuss0781/JSM/actions/runs/37607206152) passed Ubuntu, macOS, and Windows test jobs, including the executable-bin conflict regression.
 
 ### 1.13 Baseline commands
 
@@ -152,9 +153,11 @@
 
 **Phase 1 gate**
 
-- [ ] All baseline commands pass fake-registry end-to-end tests and all in-scope sub-phase criteria are met; follow-ups explicitly marked non-gating are recorded separately.
+- [x] All baseline commands pass fake-registry end-to-end tests and all in-scope sub-phase criteria are met; follow-ups explicitly marked non-gating are recorded separately.
 - [x] Exercise the real-registry top-100 package acceptance set and publish a benchmark against npm and pnpm.
 - [x] Confirm no implicit dependency script execution and no project-visible unverified bytes.
+
+> Phase 1 closeout: The 24-hour SemVer fuzz campaign was started and then stopped at the user's direction. It is explicitly deferred and non-gating for this closeout; it remains unchecked, is not reported as passed, and no 24-hour evidence file is claimed. Actions run 37607206152 passed all three OS test jobs and the benchmark job; its coverage/dependency-policy job was still running at closeout. That job passed in run 37605711269, and `cargo deny check` also passed locally on the finalized branch.
 
 ## Phase 2 — Store Management and Safety
 
