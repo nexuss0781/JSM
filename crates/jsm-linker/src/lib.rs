@@ -837,13 +837,27 @@ fn validate_bin_name(name: &str) -> Result<(), LinkError> {
 
 #[cfg(windows)]
 fn is_junction(path: &Path) -> Result<bool, LinkError> {
-    match junction::exists(path) {
-        Ok(is_junction) => Ok(is_junction),
-        // The crate's FSCTL probe returns ERROR_NOT_A_REPARSE_POINT (4390)
-        // for ordinary directories instead of returning `Ok(false)`.
+    match junction::get_target(path) {
+        Ok(_) => Ok(true),
+        // Unlike junction::exists, get_target opens the reparse point itself.
+        // It therefore still recognizes a managed junction when a transaction
+        // has temporarily renamed its target tree out of the way.
         Err(error) if error.raw_os_error() == Some(4390) => Ok(false),
         Err(error) if error.kind() == io::ErrorKind::NotFound => Ok(false),
-        Err(error) => Err(LinkError::Io(error)),
+        // A different reparse-point kind (for example a directory symlink) is
+        // not a junction. Use the crate's tag probe for that case.
+        Err(error) if error.kind() == io::ErrorKind::Other => {
+            junction::exists(path).map_err(|error| {
+                LinkError::Io(io::Error::new(
+                    error.kind(),
+                    format!("inspect junction {}: {error}", path.display()),
+                ))
+            })
+        }
+        Err(error) => Err(LinkError::Io(io::Error::new(
+            error.kind(),
+            format!("inspect junction {}: {error}", path.display()),
+        ))),
     }
 }
 #[cfg(not(windows))]
@@ -860,9 +874,19 @@ fn is_symlink_or_junction(path: &Path, metadata: &fs::Metadata) -> Result<bool, 
 fn read_link_target(path: &Path) -> Result<PathBuf, LinkError> {
     if is_junction(path)? {
         #[cfg(windows)]
-        return junction::get_target(path).map_err(LinkError::Io);
+        return junction::get_target(path).map_err(|error| {
+            LinkError::Io(io::Error::new(
+                error.kind(),
+                format!("read junction target {}: {error}", path.display()),
+            ))
+        });
     }
-    fs::read_link(path).map_err(LinkError::Io)
+    fs::read_link(path).map_err(|error| {
+        LinkError::Io(io::Error::new(
+            error.kind(),
+            format!("read symbolic-link target {}: {error}", path.display()),
+        ))
+    })
 }
 
 fn ensure_safe_dir(p: &Path) -> Result<(), LinkError> {
@@ -1616,8 +1640,20 @@ mod tests {
         assert_eq!(fs::read(link.join("sentinel")).unwrap(), b"target survives");
         assert_eq!(read_link_target(&link).unwrap(), target);
 
+        let moved_target = root.join("moved-target");
+        fs::rename(&target, &moved_target).unwrap();
+        assert!(
+            !link.exists(),
+            "junction target should now be temporarily absent"
+        );
+        assert!(
+            is_junction(&link).unwrap(),
+            "dangling junction lost its tag"
+        );
+        assert_eq!(read_link_target(&link).unwrap(), target);
+
         remove_existing(&link).unwrap();
-        assert!(target.join("sentinel").is_file());
+        assert!(moved_target.join("sentinel").is_file());
         assert!(fs::symlink_metadata(&link).is_err());
         fs::remove_dir_all(root).unwrap();
     }
