@@ -1165,6 +1165,9 @@ fn create_bin_shims(dir: &Path, name: &str, target: &Path) -> Result<(), LinkErr
 }
 #[cfg(windows)]
 fn create_bin_shims(dir: &Path, name: &str, target: &Path) -> Result<(), LinkError> {
+    use std::os::windows::ffi::OsStrExt;
+
+    let target_wide = target.as_os_str().encode_wide().collect::<Vec<_>>();
     let target = target.display().to_string();
     let powershell_target = target.replace("'", "''");
     fs::write(
@@ -1176,6 +1179,10 @@ fn create_bin_shims(dir: &Path, name: &str, target: &Path) -> Result<(), LinkErr
         format!(
             "$target = '{powershell_target}'\r\n& node -- $target @args\r\nexit $LASTEXITCODE\r\n"
         ),
+    )?;
+    fs::write(
+        dir.join(format!("{name}.jsm-bin.json")),
+        serde_json::to_vec(&target_wide)?,
     )?;
     Ok(())
 }
@@ -1614,6 +1621,13 @@ mod tests {
         assert!(ps1.contains("node "));
         assert!(ps1.contains("@args"));
         assert!(ps1.contains("exit $LASTEXITCODE"));
+        let target_wide: Vec<u16> =
+            serde_json::from_slice(&fs::read(root.join("tool.jsm-bin.json")).unwrap()).unwrap();
+        use std::os::windows::ffi::OsStringExt;
+        assert_eq!(
+            PathBuf::from(std::ffi::OsString::from_wide(&target_wide)),
+            target
+        );
         fs::remove_dir_all(root).unwrap();
     }
 

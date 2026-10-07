@@ -1291,9 +1291,40 @@ fn run_exec(
     }
     let bin_dir = cwd.join("node_modules").join(".bin");
     #[cfg(windows)]
+    {
+        use std::os::windows::ffi::OsStringExt;
+
+        let target_file = bin_dir.join(format!("{name}.jsm-bin.json"));
+        if target_file.is_file() {
+            let encoded_target: Vec<u16> =
+                serde_json::from_slice(&fs::read(&target_file).into_diagnostic()?)
+                    .into_diagnostic()?;
+            let target = PathBuf::from(std::ffi::OsString::from_wide(&encoded_target));
+            if !target.is_absolute() {
+                return Err(miette!(
+                    "generated bin target must be absolute: {}",
+                    target.display()
+                ));
+            }
+            if !target.is_file() {
+                return Err(miette!(
+                    "generated bin target does not exist: {}",
+                    target.display()
+                ));
+            }
+            let mut command = ProcessCommand::new("node");
+            command
+                .arg(&target)
+                .args(args)
+                .current_dir(cwd)
+                .env("PATH", project_path(cwd)?);
+            return finish_child(command, out_json, "exec", Some(name), cancellation);
+        }
+    }
+    #[cfg(windows)]
     let candidates = [
-        bin_dir.join(format!("{name}.cmd")),
         bin_dir.join(format!("{name}.ps1")),
+        bin_dir.join(format!("{name}.cmd")),
         bin_dir.join(format!("{name}.exe")),
         bin_dir.join(name),
     ];
@@ -1305,16 +1336,6 @@ fn run_exec(
         .ok_or_else(|| miette!("executable not found in node_modules/.bin: {name}"))?;
     #[cfg(windows)]
     let mut command = if executable
-        .extension()
-        .is_some_and(|extension| extension == "cmd")
-    {
-        // Windows PowerShell 5.1 can split a native command's drive-letter
-        // script path into `C:`; the generated CMD shim preserves it as one
-        // quoted Node argument and is also the conventional Windows entrypoint.
-        let mut command = ProcessCommand::new("cmd.exe");
-        command.args(["/D", "/C", "call"]).arg(&executable);
-        command
-    } else if executable
         .extension()
         .is_some_and(|extension| extension == "ps1")
     {
@@ -1328,6 +1349,13 @@ fn run_exec(
                 "-File",
             ])
             .arg(&executable);
+        command
+    } else if executable
+        .extension()
+        .is_some_and(|extension| extension == "cmd")
+    {
+        let mut command = ProcessCommand::new("cmd.exe");
+        command.args(["/D", "/C", "call"]).arg(&executable);
         command
     } else {
         ProcessCommand::new(&executable)
