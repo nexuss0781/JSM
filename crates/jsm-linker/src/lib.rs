@@ -1316,8 +1316,20 @@ mod tests {
         assert_eq!(
             bins,
             vec![
-                ("helper".to_owned(), "bin/helper".to_owned()),
-                ("runner.js".to_owned(), "bin/runner.js".to_owned()),
+                (
+                    "helper".to_owned(),
+                    std::path::Path::new("bin")
+                        .join("helper")
+                        .display()
+                        .to_string()
+                ),
+                (
+                    "runner.js".to_owned(),
+                    std::path::Path::new("bin")
+                        .join("runner.js")
+                        .display()
+                        .to_string()
+                ),
             ]
         );
         fs::remove_dir_all(root).unwrap();
