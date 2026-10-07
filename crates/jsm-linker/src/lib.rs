@@ -1163,10 +1163,46 @@ fn create_bin_shims(dir: &Path, name: &str, target: &Path) -> Result<(), LinkErr
     let out = dir.join(name);
     symlink_file(target, &out)
 }
+// Node's Windows entry-point resolver misreads the verbatim prefix returned by
+// canonicalize as a drive-relative script path, so generated shims use a normal
+// drive or UNC path while retaining the original UTF-16 code units.
+#[cfg(windows)]
+fn normalize_windows_path_for_node(path: &Path) -> PathBuf {
+    use std::os::windows::ffi::{OsStrExt, OsStringExt};
+
+    const VERBATIM_PREFIX: [u16; 4] = [92, 92, 63, 92];
+    let wide = path.as_os_str().encode_wide().collect::<Vec<_>>();
+    if !wide.starts_with(&VERBATIM_PREFIX) {
+        return path.to_path_buf();
+    }
+
+    let remainder = &wide[VERBATIM_PREFIX.len()..];
+    let is_drive_path = remainder.len() >= 3
+        && matches!(remainder[0], 65..=90 | 97..=122)
+        && remainder[1] == 58
+        && matches!(remainder[2], 47 | 92);
+    if is_drive_path {
+        return PathBuf::from(std::ffi::OsString::from_wide(remainder));
+    }
+
+    let is_unc_path = remainder.len() >= 4
+        && matches!(remainder[0], 85 | 117)
+        && matches!(remainder[1], 78 | 110)
+        && matches!(remainder[2], 67 | 99)
+        && remainder[3] == 92;
+    if is_unc_path {
+        let mut normalized = vec![92, 92];
+        normalized.extend_from_slice(&remainder[4..]);
+        return PathBuf::from(std::ffi::OsString::from_wide(&normalized));
+    }
+
+    path.to_path_buf()
+}
 #[cfg(windows)]
 fn create_bin_shims(dir: &Path, name: &str, target: &Path) -> Result<(), LinkError> {
     use std::os::windows::ffi::OsStrExt;
 
+    let target = normalize_windows_path_for_node(target);
     let target_wide = target.as_os_str().encode_wide().collect::<Vec<_>>();
     let target_units = target_wide
         .iter()
@@ -1615,18 +1651,19 @@ mod tests {
         ));
         let _ = fs::remove_dir_all(&root);
         fs::create_dir_all(&root).unwrap();
-        let target = root.join("target.js");
-        fs::write(&target, b"console.log('ok');\n").unwrap();
+        let target = std::path::PathBuf::from(r"\\?\C:\packages\日本語\bin\tool.js");
         create_bin_shims(&root, "tool", &target).unwrap();
         let cmd = fs::read_to_string(root.join("tool.cmd")).unwrap();
         let ps1 = fs::read_to_string(root.join("tool.ps1")).unwrap();
         assert!(cmd.contains("node "));
         assert!(cmd.contains("%*"));
+        assert!(cmd.contains(r"C:\packages\日本語\bin\tool.js"));
         assert!(ps1.contains("node "));
         assert!(ps1.contains("$target = -join [char[]]@("));
         assert!(ps1.contains("@args"));
         assert!(ps1.contains("exit $LASTEXITCODE"));
-        let target_units = target
+        let expected_target = normalize_windows_path_for_node(&target);
+        let target_units = expected_target
             .as_os_str()
             .encode_wide()
             .map(|unit| unit.to_string())
@@ -1635,6 +1672,25 @@ mod tests {
         assert!(ps1.contains(&format!("$target = -join [char[]]@({target_units})")));
         assert!(!root.join("tool.jsm-bin.json").exists());
         fs::remove_dir_all(root).unwrap();
+    }
+
+    #[cfg(windows)]
+    #[test]
+    fn windows_node_bin_paths_strip_verbatim_drive_and_unc_prefixes() {
+        let drive = std::path::Path::new(r"\\?\C:\packages\日本語\bin\tool.js");
+        assert_eq!(
+            normalize_windows_path_for_node(drive),
+            std::path::PathBuf::from(r"C:\packages\日本語\bin\tool.js")
+        );
+
+        let unc = std::path::Path::new(r"\\?\UNC\server\share\日本語\tool.js");
+        assert_eq!(
+            normalize_windows_path_for_node(unc),
+            std::path::PathBuf::from(r"\\server\share\日本語\tool.js")
+        );
+
+        let volume = std::path::Path::new(r"\\?\Volume{guid}\packages\tool.js");
+        assert_eq!(normalize_windows_path_for_node(volume), volume);
     }
 
     #[cfg(windows)]
