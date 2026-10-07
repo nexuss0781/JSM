@@ -27,6 +27,10 @@ cargo test -p jsm-cli --test phase1_cli --locked
 
 It verifies the CLI JSON contract and exercises project initialization, registry-backed `add`/`install`/`remove`, installed-package `exec`, project script `run`, and `list`/`why` behavior. Registry-backed cases use the in-process fake registry and assert lockfile, installed-file, frozen/offline, failure-cleanup, and lifecycle-script non-execution behavior. The full `--verify` audit records this suite as a separate validation in addition to the workspace-wide tests and Phase 0 testkit tests.
 
+## Cross-platform bin-link runtime regression
+
+The CI matrix installs Node 22 and runs `cargo test -p jsm-linker --locked` on Linux, macOS, and Windows. `phase1_bin_conflict_executes_the_direct_winner` creates two packages with the same bin name, verifies the direct dependency wins, then executes the generated launcher and checks its output. Unix runs the executable link; Windows runs both generated `.cmd` and PowerShell launchers. The Windows junction regression also verifies that ordinary directories are not mistaken for junctions and that removing a junction leaves its target intact.
+
 ## Real-registry acceptance set
 
 Create a timestamped, replayable snapshot of 100 npm search results:

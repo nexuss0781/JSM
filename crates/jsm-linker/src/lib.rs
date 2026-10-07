@@ -837,7 +837,14 @@ fn validate_bin_name(name: &str) -> Result<(), LinkError> {
 
 #[cfg(windows)]
 fn is_junction(path: &Path) -> Result<bool, LinkError> {
-    junction::exists(path).map_err(LinkError::Io)
+    match junction::exists(path) {
+        Ok(is_junction) => Ok(is_junction),
+        // The crate's FSCTL probe returns ERROR_NOT_A_REPARSE_POINT (4390)
+        // for ordinary directories instead of returning `Ok(false)`.
+        Err(error) if error.raw_os_error() == Some(4390) => Ok(false),
+        Err(error) if error.kind() == io::ErrorKind::NotFound => Ok(false),
+        Err(error) => Err(LinkError::Io(error)),
+    }
 }
 #[cfg(not(windows))]
 fn is_junction(_path: &Path) -> Result<bool, LinkError> {
@@ -1561,6 +1568,8 @@ mod tests {
         let target = root.join("target");
         let link = root.join("link");
         fs::create_dir_all(&target).unwrap();
+        assert!(!is_junction(&root).unwrap());
+        assert!(!is_junction(&target).unwrap());
         fs::write(target.join("sentinel"), b"target survives").unwrap();
 
         symlink_dir(&target, &link).unwrap();

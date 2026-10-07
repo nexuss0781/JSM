@@ -10,7 +10,7 @@ path = "src/lib.rs"
 
 [dependencies]
 jsm-core = { path = "../jsm-core" }
-pubgrub = "0.4"
+resolvo = { version = "0.12.1", default-features = false }
 thiserror.workspace = true
 
 [dev-dependencies]
