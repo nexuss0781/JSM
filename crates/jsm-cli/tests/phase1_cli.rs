@@ -123,7 +123,9 @@ fn phase_one_help_exposes_the_complete_command_surface() {
         .output()
         .unwrap();
     assert!(output.status.success());
-    let help = String::from_utf8_lossy(&output.stdout);
+    let help = String::from_utf8_lossy(&output.stdout)
+        .replace("\r\n", "\n")
+        .replace("jsm.exe", "jsm");
     let normalized_help = help
         .lines()
         .filter(|line| !line.trim().is_empty())
@@ -131,7 +133,7 @@ fn phase_one_help_exposes_the_complete_command_surface() {
         .join("\n");
     assert_eq!(
         normalized_help + "\n",
-        include_str!("fixtures/phase1-help.txt")
+        include_str!("fixtures/phase1-help.txt").replace("\r\n", "\n")
     );
     for command in [
         "init", "add", "install", "remove", "run", "exec", "list", "why", "config",
@@ -970,7 +972,10 @@ fn run_and_exec_launch_project_commands_and_forward_exit_codes() {
         fs::set_permissions(&path, fs::Permissions::from_mode(0o755)).unwrap();
     }
     #[cfg(windows)]
-    fs::write(bin_dir.join("exit-code.ps1"), "exit 19\r\n").unwrap();
+    {
+        fs::write(bin_dir.join("exit-code.ps1"), "exit 19\r\n").unwrap();
+        fs::write(bin_dir.join("exit-code.cmd"), "@exit /b 19\r\n").unwrap();
+    }
 
     cli(project.path())
         .arg("run")
