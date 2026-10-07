@@ -121,11 +121,13 @@ class BenchmarkPhaseModeTests(unittest.TestCase):
             )
 
     def test_real_jsm_command_uses_configured_binary_and_phase1_flags(self) -> None:
-        with patch.dict(os.environ, {"JSM_BINARY": "/tmp/jsm-test-binary"}):
-            self.assertEqual(tool_specs()["jsm"]["executable"], "/tmp/jsm-test-binary")
+        configured_binary = Path("/tmp/jsm-test-binary")
+        expected_binary = str(configured_binary.resolve())
+        with patch.dict(os.environ, {"JSM_BINARY": str(configured_binary)}):
+            self.assertEqual(tool_specs()["jsm"]["executable"], expected_binary)
             self.assertEqual(
                 install_command("jsm", ci=True, offline=True),
-                ["/tmp/jsm-test-binary", "--offline", "install", "--frozen-lockfile"],
+                [expected_binary, "--offline", "install", "--frozen-lockfile"],
             )
 
     def test_phase0_stub_remains_separate_from_real_jsm(self) -> None:
