@@ -8,5 +8,13 @@ publish.workspace = true
 [lib]
 path = "src/lib.rs"
 
+[dependencies]
+jsm-core = { path = "../jsm-core" }
+pubgrub = "0.4"
+thiserror.workspace = true
+
+[dev-dependencies]
+proptest.workspace = true
+
 [lints]
 workspace = true

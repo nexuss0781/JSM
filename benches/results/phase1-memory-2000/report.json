@@ -1,0 +1,20 @@
+{
+  "binary": "/workspace/JSM/target/release/jsm",
+  "elapsed_seconds": 9.595,
+  "exit_code": 0,
+  "generated_at": "2026-10-07T03:49:53Z",
+  "installed_count": 2000,
+  "log": "/workspace/JSM/benches/results/phase1-memory-2000/install.log",
+  "measurement": "resource.getrusage(RUSAGE_CHILDREN).ru_maxrss (Linux KiB)",
+  "memory_ceiling_mib": 512,
+  "package_count": 2000,
+  "peak_rss_kib": 28484,
+  "registry": {
+    "packuments": 4000,
+    "requests": 6000,
+    "tarballs": 2000
+  },
+  "schema": "jsm.phase1.memory-stress.v1",
+  "source": "synthetic loopback npm-compatible registry; two-file tarballs; sequential package extraction",
+  "status": "passed"
+}

@@ -1,5 +1,5 @@
 use std::{
-    collections::BTreeMap,
+    collections::{BTreeMap, BTreeSet},
     path::{Component, Path},
 };
 
@@ -26,7 +26,16 @@ pub struct FixturePackage {
     version: Version,
     files: BTreeMap<String, Vec<u8>>,
     dependencies: BTreeMap<String, String>,
+    optional_dependencies: BTreeMap<String, String>,
+    peer_dependencies: BTreeMap<String, String>,
+    optional_peer_dependencies: BTreeSet<String>,
     scripts: BTreeMap<String, String>,
+    bins: BTreeMap<String, String>,
+    engines: BTreeMap<String, String>,
+    deprecated: Option<String>,
+    os: Vec<String>,
+    cpu: Vec<String>,
+    libc: Vec<String>,
 }
 
 impl FixturePackage {
@@ -42,7 +51,16 @@ impl FixturePackage {
             version,
             files,
             dependencies: BTreeMap::new(),
+            optional_dependencies: BTreeMap::new(),
+            peer_dependencies: BTreeMap::new(),
+            optional_peer_dependencies: BTreeSet::new(),
             scripts: BTreeMap::new(),
+            bins: BTreeMap::new(),
+            engines: BTreeMap::new(),
+            deprecated: None,
+            os: Vec::new(),
+            cpu: Vec::new(),
+            libc: Vec::new(),
         })
     }
 
@@ -74,8 +92,75 @@ impl FixturePackage {
         Ok(self)
     }
 
+    pub fn optional_dependency(
+        mut self,
+        name: impl Into<String>,
+        spec: impl Into<String>,
+    ) -> Result<Self, FixtureError> {
+        let name = name.into();
+        PackageName::new(name.clone()).map_err(|error| FixtureError::Invalid(error.to_string()))?;
+        self.optional_dependencies.insert(name, spec.into());
+        Ok(self)
+    }
+
+    pub fn optional_peer_dependency(
+        mut self,
+        name: impl Into<String>,
+        spec: impl Into<String>,
+    ) -> Result<Self, FixtureError> {
+        let name = name.into();
+        PackageName::new(name.clone()).map_err(|error| FixtureError::Invalid(error.to_string()))?;
+        self.peer_dependencies.insert(name.clone(), spec.into());
+        self.optional_peer_dependencies.insert(name);
+        Ok(self)
+    }
+
     pub fn script(mut self, name: impl Into<String>, command: impl Into<String>) -> Self {
         self.scripts.insert(name.into(), command.into());
+        self
+    }
+
+    pub fn bin(
+        mut self,
+        name: impl Into<String>,
+        path: impl Into<String>,
+    ) -> Result<Self, FixtureError> {
+        let name = name.into();
+        if name.is_empty()
+            || !name
+                .bytes()
+                .all(|byte| byte.is_ascii_alphanumeric() || b"._-".contains(&byte))
+        {
+            return Err(FixtureError::Invalid("invalid fixture bin name".into()));
+        }
+        let path = path.into();
+        validate_relative_archive_path(Path::new(&path))?;
+        self.bins.insert(name, path);
+        Ok(self)
+    }
+
+    pub fn engine(mut self, name: impl Into<String>, value: impl Into<String>) -> Self {
+        self.engines.insert(name.into(), value.into());
+        self
+    }
+
+    pub fn deprecated(mut self, message: impl Into<String>) -> Self {
+        self.deprecated = Some(message.into());
+        self
+    }
+
+    pub fn os(mut self, value: impl Into<String>) -> Self {
+        self.os.push(value.into());
+        self
+    }
+
+    pub fn cpu(mut self, value: impl Into<String>) -> Self {
+        self.cpu.push(value.into());
+        self
+    }
+
+    pub fn libc(mut self, value: impl Into<String>) -> Self {
+        self.libc.push(value.into());
         self
     }
 
@@ -92,13 +177,49 @@ impl FixturePackage {
         manifest.insert("name".into(), json!(self.name.as_str()));
         manifest.insert("version".into(), json!(self.version.to_string()));
         manifest.insert("main".into(), json!("index.js"));
+        if let Some(message) = self.deprecated {
+            manifest.insert("deprecated".into(), json!(message));
+        }
         if !self.dependencies.is_empty() {
             manifest.insert("dependencies".into(), json!(self.dependencies));
+        }
+        if !self.optional_dependencies.is_empty() {
+            manifest.insert(
+                "optionalDependencies".into(),
+                json!(self.optional_dependencies),
+            );
+        }
+        if !self.peer_dependencies.is_empty() {
+            manifest.insert("peerDependencies".into(), json!(self.peer_dependencies));
+        }
+        if !self.optional_peer_dependencies.is_empty() {
+            let peer_metadata = self
+                .optional_peer_dependencies
+                .into_iter()
+                .map(|name| (name, json!({"optional": true})))
+                .collect::<BTreeMap<_, _>>();
+            manifest.insert("peerDependenciesMeta".into(), json!(peer_metadata));
         }
         if !self.scripts.is_empty() {
             manifest.insert("scripts".into(), json!(self.scripts));
         }
-        let manifest_bytes = serde_json::to_vec_pretty(&Value::Object(manifest))?;
+        if !self.bins.is_empty() {
+            manifest.insert("bin".into(), json!(self.bins));
+        }
+        if !self.engines.is_empty() {
+            manifest.insert("engines".into(), json!(self.engines));
+        }
+        if !self.os.is_empty() {
+            manifest.insert("os".into(), json!(self.os));
+        }
+        if !self.cpu.is_empty() {
+            manifest.insert("cpu".into(), json!(self.cpu));
+        }
+        if !self.libc.is_empty() {
+            manifest.insert("libc".into(), json!(self.libc));
+        }
+        let package_json = Value::Object(manifest);
+        let manifest_bytes = serde_json::to_vec_pretty(&package_json)?;
 
         let mut entries = self.files;
         entries.insert("package.json".into(), manifest_bytes);
@@ -136,6 +257,8 @@ impl FixturePackage {
             package_id,
             integrity,
             tarball,
+            dependencies: self.dependencies,
+            package_json,
         })
     }
 }
@@ -146,6 +269,8 @@ pub struct FixtureArtifact {
     pub package_id: PackageId,
     pub integrity: Integrity,
     pub tarball: Vec<u8>,
+    pub dependencies: BTreeMap<String, String>,
+    pub package_json: Value,
 }
 
 /// Reject absolute paths, parent traversal, prefixes, and empty paths.

@@ -1,0 +1,15 @@
+{
+  "schema": "jsm.semver.differential.v1",
+  "generated_at": "2026-10-07T03:50:21.755Z",
+  "reference": "npm semver 7.8.4",
+  "range_count": 227,
+  "version_count": 400,
+  "case_count": 90800,
+  "npm_valid_range_cases": 87200,
+  "agreement_cases": 90800,
+  "mismatch_count": 0,
+  "agreement_percent": 100,
+  "corpus_sha256": "8a248876e68e5fd34a7f1b6d94cbf571d0bd2da16cfde3bf79b396e7d2a840d5",
+  "mismatch_ranges": [],
+  "mismatches": []
+}

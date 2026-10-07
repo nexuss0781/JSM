@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Phase 0 benchmark harness. Every registry request is served from loopback."""
+"""Phase 0/1 benchmark harness; registry fixtures are served from loopback."""
 
 from __future__ import annotations
 
@@ -202,11 +202,17 @@ def generate_fixture(root: Path, kind: str, count: int, registry_url: str, seed:
 
 
 def tool_specs() -> dict[str, dict[str, Any]]:
+    jsm_binary = os.environ.get("JSM_BINARY")
+    if jsm_binary:
+        jsm_binary = str(Path(jsm_binary).expanduser().resolve())
+    else:
+        jsm_binary = str(ROOT / "target" / "release" / "jsm")
     return {
         "npm": {"executable": "npm", "version": ["npm", "--version"]},
         "pnpm": {"executable": "pnpm", "version": ["pnpm", "--version"]},
         "yarn": {"executable": "yarn", "version": ["yarn", "--version"]},
         "bun": {"executable": "bun", "version": ["bun", "--version"]},
+        "jsm": {"executable": jsm_binary, "version": [jsm_binary, "--version"]},
         "jsm-stub": {"executable": sys.executable, "version": [sys.executable, str(ROOT / "benches" / "jsm_stub.py"), "--version"]},
     }
 
@@ -268,7 +274,6 @@ def container_command(
         "/project",
     ])
     container_environment = {
-        "CI": environment.get("CI", "1"),
         "HOME": "/cache/home",
         "TMPDIR": "/cache/tmp",
         "npm_config_cache": "/cache/npm",
@@ -279,6 +284,8 @@ def container_command(
         "COREPACK_DEFAULT_TO_LATEST": "0",
         "COREPACK_ENABLE_NETWORK": "1" if allow_package_download else "0",
     }
+    if "CI" in environment:
+        container_environment["CI"] = environment["CI"]
     for name in ("npm_config_registry", "NPM_CONFIG_REGISTRY"):
         if name in environment:
             container_environment[name] = environment[name]
@@ -307,6 +314,7 @@ def install_command(
             "pnpm": [*package_manager["pnpm"], "install", "--frozen-lockfile", "--ignore-scripts"],
             "yarn": [*package_manager["yarn"], "install", "--frozen-lockfile", "--ignore-scripts", "--non-interactive"],
             "bun": ["bun", "install", "--frozen-lockfile", "--ignore-scripts"],
+            "jsm": [tool_specs()["jsm"]["executable"], "install", "--frozen-lockfile"],
             "jsm-stub": stub_command,
         }
     else:
@@ -315,12 +323,25 @@ def install_command(
             "pnpm": [*package_manager["pnpm"], "install", "--ignore-scripts", "--no-frozen-lockfile"],
             "yarn": [*package_manager["yarn"], "install", "--ignore-scripts", "--non-interactive"],
             "bun": ["bun", "install", "--ignore-scripts"],
+            "jsm": [tool_specs()["jsm"]["executable"], "install"],
             "jsm-stub": stub_command,
         }
     command = list(commands[tool])
     if offline and tool != "jsm-stub":
-        command.append("--offline")
+        if tool == "jsm":
+            command.insert(1, "--offline")
+        else:
+            command.append("--offline")
     return command
+
+
+def scenario_environment(base: dict[str, str], ci_mode: bool) -> dict[str, str]:
+    """Keep host CI variables from leaking into non-CI benchmark scenarios."""
+    environment = base.copy()
+    environment.pop("CI", None)
+    if ci_mode:
+        environment["CI"] = "1"
+    return environment
 
 
 def start_container_session(
@@ -352,7 +373,6 @@ def start_container_session(
         "/workspace-run/project",
     ])
     container_environment = {
-        "CI": environment.get("CI", "1"),
         "HOME": "/workspace-run/cache/home",
         "TMPDIR": "/workspace-run/cache/tmp",
         "npm_config_cache": "/workspace-run/cache/npm",
@@ -363,6 +383,8 @@ def start_container_session(
         "COREPACK_DEFAULT_TO_LATEST": "0",
         "COREPACK_ENABLE_NETWORK": "0",
     }
+    if "CI" in environment:
+        container_environment["CI"] = environment["CI"]
     for name in ("npm_config_registry", "NPM_CONFIG_REGISTRY"):
         if name in environment:
             container_environment[name] = environment[name]
@@ -412,11 +434,14 @@ def container_exec_command(
     project: Path,
     root: Path,
     allow_package_download: bool = False,
+    environment: dict[str, str] | None = None,
 ) -> list[str]:
     workdir = "/workspace-run" + ("/" + project.resolve().relative_to(root.resolve()).as_posix())
     args = runtime_prefix(runtime) + ["exec", "--workdir", workdir]
     if allow_package_download:
         args.extend(["--env", "COREPACK_ENABLE_NETWORK=1"])
+    if environment is not None and "CI" in environment:
+        args.extend(["--env", f"CI={environment['CI']}"])
     args.extend([container_id, *command])
     return args
 
@@ -534,7 +559,9 @@ def run_tool_command(
         return run_one(command, project, environment, timeout_seconds)
     if container_id is None:
         raise RuntimeError("container session was not started")
-    wrapped = container_exec_command(container_runtime, container_id, command, project, root)
+    wrapped = container_exec_command(
+        container_runtime, container_id, command, project, root, environment=environment
+    )
     return run_one(wrapped, ROOT, os.environ.copy(), timeout_seconds)
 
 
@@ -573,6 +600,8 @@ def benchmark_tool(
     executable = tool_specs()[tool]["executable"]
     if container_runtime is None and tool != "jsm-stub" and shutil.which(executable) is None:
         return {"tool": tool, "fixture": fixture, "scenario": scenario, "status": "skipped", "reason": f"{executable} not installed", "samples": []}
+    if tool == "jsm" and container_runtime is not None:
+        raise RuntimeError("the Phase 1 JSM binary comparison is host-only; use --container-runtime none")
     samples: list[dict[str, Any]] = []
     project: Path | None = None
     cache_dir: Path | None = None
@@ -584,9 +613,8 @@ def benchmark_tool(
             shutil.copytree(source, project)
         cache_dir = root / "cache"
         cache_dir.mkdir()
-        environment = os.environ.copy()
+        environment = scenario_environment(os.environ, ci_mode=False)
         environment.update({
-            "CI": "1",
             "npm_config_registry": registry_url + "/",
             "NPM_CONFIG_REGISTRY": registry_url + "/",
             "npm_config_cache": str(cache_dir / "npm"),
@@ -617,6 +645,7 @@ def benchmark_tool(
         if scenario == "branch-switch" and fixture != "monorepo":
             prepare_branch_switch(project, 0, package_prefix, dependency_count)
 
+        sample_environment = scenario_environment(environment, ci_mode=(scenario == "ci"))
         for index in range(repeat):
             if scenario == "cold":
                 clear_directory(cache_dir)
@@ -631,7 +660,7 @@ def benchmark_tool(
             command = install_command(tool, offline=(scenario == "offline"), ci=(scenario == "ci"), containerized=container_runtime is not None)
             if scenario == "branch-switch" and fixture != "monorepo" and index > 0:
                 prepare_branch_switch(target, index, package_prefix, dependency_count)
-            result = run_tool_command(command, target, environment, timeout_seconds, container_runtime, container_id, root)
+            result = run_tool_command(command, target, sample_environment, timeout_seconds, container_runtime, container_id, root)
             result.update({"tool": tool, "fixture": fixture, "scenario": scenario, "sample": index + 1, "command": command})
             samples.append(result)
         if container_runtime is not None and container_id is not None:
@@ -655,7 +684,7 @@ def benchmark_tool(
 
 def render_markdown(report: dict[str, Any], previous: dict[str, float]) -> str:
     lines = [
-        "# JSM Phase 0 Benchmark Baseline",
+        "# JSM Phase 1 Benchmark Comparison" if report.get("benchmark_scope") == "phase1" else "# JSM Phase 0 Benchmark Baseline",
         "",
         f"Generated: `{report['generated_at']}`\\",
         f"Fixture: `{report['fixture']}` (revision {report['fixture_revision']}, seed {report['seed']})\\",
@@ -664,7 +693,11 @@ def render_markdown(report: dict[str, Any], previous: dict[str, float]) -> str:
         f"Container runtime: `{report['container']['runtime']}` (`{report['container']['version']}`)\\",
         f"Isolation: {report['container']['isolation_summary']}",
         "",
-        "> This is a Phase 0 harness baseline, not a JSM performance claim. `jsm-stub` is deliberately not an installer; local registry fixtures and tool versions are captured. Compare results only when fixture, tools, flags, OS, and network profile match.",
+        (
+            "> This run measures the actual configured JSM executable against npm and pnpm on a deterministic loopback fixture. It is host-mode evidence only; compare only reports with matching fixture, tool versions, flags, OS, and network profile."
+            if report.get("benchmark_scope") == "phase1"
+            else "> This is a Phase 0 harness baseline, not a JSM performance claim. `jsm-stub` is deliberately not an installer; local registry fixtures and tool versions are captured. Compare results only when fixture, tools, flags, OS, and network profile match."
+        ),
         "",
         "| Tool | Version | Fixture | Scenario | Status | Median (s) | Prior median (s) |",
         "|---|---|---|---|---|---:|---:|",
@@ -681,30 +714,69 @@ def render_markdown(report: dict[str, Any], previous: dict[str, float]) -> str:
     return "\n".join(lines)
 
 
+def load_prior_medians(history_path: Path) -> dict[str, float]:
+    previous: dict[str, float] = {}
+    if history_path.exists():
+        for line in history_path.read_text(encoding="utf-8").splitlines():
+            try:
+                prior_report = json.loads(line)
+            except json.JSONDecodeError:
+                continue
+            for result in prior_report.get("results", []):
+                if result.get("status") != "passed" or result.get("median_seconds") is None:
+                    continue
+                previous[f"{result['tool']}|{result['fixture']}|{result['scenario']}"] = result[
+                    "median_seconds"
+                ]
+    return previous
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--smoke", action="store_true", help="Run npm and the jsm stub on the small local-registry fixture")
+    parser.add_argument("--phase1", action="store_true", help="Compare the real JSM executable with npm and pnpm on the small local-registry fixture (host mode)")
+    parser.add_argument("--jsm-binary", type=Path, help="JSM executable for --phase1 (defaults to target/release/jsm)")
     parser.add_argument("--fixture", choices=["small", "medium", "large", "monorepo", "native"], default="small")
     parser.add_argument("--scenario", action="append", choices=["cold", "warm-store", "warm-lockfile", "reinstall", "offline", "branch-switch", "ci", "monorepo", "native"])
-    parser.add_argument("--tools", help="Comma-separated subset of npm,pnpm,yarn,bun,jsm-stub")
+    parser.add_argument("--tools", help="Comma-separated subset of npm,pnpm,yarn,bun,jsm,jsm-stub")
     parser.add_argument("--repeat", type=int, default=1)
     parser.add_argument("--latency-ms", type=float, default=0.0, help="Fixed delay per local fake-registry request")
     parser.add_argument("--bandwidth-bytes-per-second", type=int, default=0, help="Throttle each local fake-registry response; zero is unshaped")
     parser.add_argument("--timeout-seconds", type=int, default=180)
     parser.add_argument("--container-runtime", choices=["auto", "none", "podman", "docker"], default="auto", help="Run each tool in a pinned Linux container; auto-detect, or explicitly use host mode")
-    parser.add_argument("--output-dir", type=Path, default=ROOT / "benches" / "results")
+    parser.add_argument("--output-dir", type=Path, help="Report directory (Phase 1 defaults to docs/benchmarks/phase1-baseline)")
     args = parser.parse_args()
     if args.repeat < 1 or args.latency_ms < 0 or args.bandwidth_bytes_per_second < 0:
         parser.error("repeat must be positive and shaping values cannot be negative")
-    try:
-        container_runtime = resolve_container_runtime(args.container_runtime)
-    except RuntimeError as error:
-        parser.error(str(error))
+    if args.phase1 and args.smoke:
+        parser.error("--phase1 and --smoke are separate benchmark modes")
+    if args.phase1 and args.container_runtime not in {"auto", "none"}:
+        parser.error("--phase1 is host-only; select --container-runtime none")
+    if args.phase1 and args.tools and set(args.tools.split(",")) != {"npm", "pnpm", "jsm"}:
+        parser.error("--phase1 requires all three comparison tools: npm,pnpm,jsm")
+    if args.jsm_binary:
+        os.environ["JSM_BINARY"] = str(args.jsm_binary.expanduser().resolve())
+    if args.phase1:
+        configured_binary = Path(tool_specs()["jsm"]["executable"])
+        if not configured_binary.is_file() or not os.access(configured_binary, os.X_OK):
+            parser.error(f"JSM executable is missing or not executable: {configured_binary}; build it or pass --jsm-binary")
+        missing_competitors = [tool for tool in ("npm", "pnpm") if shutil.which(tool) is None]
+        if missing_competitors:
+            parser.error("Phase 1 comparison requires both npm and pnpm; missing: " + ", ".join(missing_competitors))
+        container_runtime = None
+    else:
+        try:
+            container_runtime = resolve_container_runtime(args.container_runtime)
+        except RuntimeError as error:
+            parser.error(str(error))
     if container_runtime is None and args.container_runtime == "auto":
-        print("No container runtime is available; benchmark is using host mode.", file=sys.stderr)
+        if not args.phase1:
+            print("No container runtime is available; benchmark is using host mode.", file=sys.stderr)
 
     config = json.loads(CONFIG_PATH.read_text(encoding="utf-8"))
-    if args.smoke:
+    if args.phase1:
+        fixture, scenarios, tools = args.fixture, args.scenario or ["cold", "ci"], ["npm", "pnpm", "jsm"]
+    elif args.smoke:
         fixture, scenarios, tools = "small", ["cold", "reinstall", "ci"], ["npm", "jsm-stub"]
     else:
         fixture = args.fixture
@@ -717,6 +789,8 @@ def main() -> int:
     unknown_tools = set(tools) - set(tool_specs())
     if unknown_tools:
         parser.error(f"unknown tools: {sorted(unknown_tools)}")
+    if "jsm" in tools and container_runtime is not None:
+        parser.error("the real JSM comparison is host-only; use --container-runtime none")
     count = config["dependency_sizes"].get(fixture, config["monorepo_workspaces"] if fixture == "monorepo" else 1)
     prefix = config["package_prefix"]
     artifacts = {}
@@ -796,7 +870,8 @@ def main() -> int:
             "isolation_summary": "each tool/scenario run uses one fresh container across its samples, with a separate project and cache; container startup and teardown are outside sample timing; the local registry is reached over Linux host networking.",
         }
     report = {
-        "schema": "jsm.phase0.benchmark.v1",
+        "schema": "jsm.phase1.benchmark.v1" if args.phase1 else "jsm.phase0.benchmark.v1",
+        "benchmark_scope": "phase1" if args.phase1 else "phase0",
         "generated_at": datetime.now(timezone.utc).isoformat(),
         "git_revision": git_revision,
         "working_tree_clean": working_tree_clean,
@@ -820,20 +895,13 @@ def main() -> int:
         },
         "results": results,
     }
+    if args.output_dir is None:
+        args.output_dir = ROOT / "docs" / "benchmarks" / "phase1-baseline" if args.phase1 else ROOT / "benches" / "results"
     args.output_dir.mkdir(parents=True, exist_ok=True)
     json_path = args.output_dir / "report.json"
     markdown_path = args.output_dir / "report.md"
     history_path = args.output_dir / "history.jsonl"
-    previous: dict[str, float] = {}
-    if history_path.exists():
-        for line in history_path.read_text(encoding="utf-8").splitlines():
-            try:
-                prior_report = json.loads(line)
-            except json.JSONDecodeError:
-                continue
-            for result in prior_report.get("results", []):
-                if result.get("median_seconds") is not None:
-                    previous[f"{result['tool']}|{result['fixture']}|{result['scenario']}"] = result["median_seconds"]
+    previous = load_prior_medians(history_path)
     markdown = render_markdown(report, previous)
     json_path.write_text(json.dumps(report, indent=2, sort_keys=True) + "\n", encoding="utf-8")
     markdown_path.write_text(markdown, encoding="utf-8")
@@ -841,7 +909,11 @@ def main() -> int:
         stream.write(json.dumps({"generated_at": report["generated_at"], "git_revision": git_revision, "results": results}, sort_keys=True) + "\n")
     print(f"Benchmark report: {json_path}")
     print(f"Markdown report: {markdown_path}")
-    failed = [result for result in results if result["status"] == "failed"]
+    failed = (
+        [result for result in results if result["status"] != "passed"]
+        if args.phase1
+        else [result for result in results if result["status"] == "failed"]
+    )
     if failed:
         print(f"{len(failed)} benchmark(s) failed; see {markdown_path}", file=sys.stderr)
         return 1

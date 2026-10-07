@@ -1,0 +1,109 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://jsm.dev/schemas/phase1-cli-output.schema.json",
+  "title": "JSM Phase 1 CLI JSON output",
+  "description": "Versioned JSON contracts for the Phase 1 baseline CLI commands.",
+  "oneOf": [
+    {
+      "type": "object",
+      "properties": {
+        "schema": { "const": "jsm.v1.init" },
+        "command": { "const": "init" },
+        "created": { "type": "boolean" }
+      },
+      "required": ["schema", "command", "created"],
+      "additionalProperties": false
+    },
+    {
+      "type": "object",
+      "properties": {
+        "schema": { "const": "jsm.v1.add" },
+        "command": { "const": "add" },
+        "field": { "type": "string" },
+        "packages": { "type": "array", "items": { "type": "string" } }
+      },
+      "required": ["schema", "command", "field", "packages"],
+      "additionalProperties": false
+    },
+    {
+      "type": "object",
+      "properties": {
+        "schema": { "const": "jsm.v1.install" },
+        "command": { "const": "install" },
+        "packages": { "type": "integer", "minimum": 0 },
+        "lockfile": { "type": "boolean" }
+      },
+      "required": ["schema", "command", "packages", "lockfile"],
+      "additionalProperties": false
+    },
+    {
+      "type": "object",
+      "properties": {
+        "schema": { "const": "jsm.v1.remove" },
+        "command": { "const": "remove" },
+        "packages": { "type": "array", "items": { "type": "string" } }
+      },
+      "required": ["schema", "command", "packages"],
+      "additionalProperties": false
+    },
+    {
+      "type": "object",
+      "properties": {
+        "schema": { "const": "jsm.v1.run" },
+        "command": { "const": "run" },
+        "name": { "type": ["string", "null"] },
+        "exitCode": { "type": ["integer", "null"] },
+        "stdout": { "type": ["string", "null"] },
+        "stderr": { "type": ["string", "null"] }
+      },
+      "required": ["schema", "command", "name", "exitCode", "stdout", "stderr"],
+      "additionalProperties": false
+    },
+    {
+      "type": "object",
+      "properties": {
+        "schema": { "const": "jsm.v1.exec" },
+        "command": { "const": "exec" },
+        "name": { "type": ["string", "null"] },
+        "exitCode": { "type": ["integer", "null"] },
+        "stdout": { "type": ["string", "null"] },
+        "stderr": { "type": ["string", "null"] }
+      },
+      "required": ["schema", "command", "name", "exitCode", "stdout", "stderr"],
+      "additionalProperties": false
+    },
+    {
+      "type": "object",
+      "properties": {
+        "schema": { "const": "jsm.v1.list" },
+        "command": { "const": "list" },
+        "packages": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "name": { "type": "string" },
+              "spec": {},
+              "type": { "type": "string" }
+            },
+            "required": ["name", "spec", "type"],
+            "additionalProperties": false
+          }
+        }
+      },
+      "required": ["schema", "command", "packages"],
+      "additionalProperties": false
+    },
+    {
+      "type": "object",
+      "properties": {
+        "schema": { "const": "jsm.v1.why" },
+        "command": { "const": "why" },
+        "package": { "type": "string" },
+        "direct": { "type": "boolean" }
+      },
+      "required": ["schema", "command", "package", "direct"],
+      "additionalProperties": false
+    }
+  ]
+}
