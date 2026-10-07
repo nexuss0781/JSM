@@ -319,6 +319,10 @@ impl Store {
                     break;
                 }
                 f.write_all(&buf[..n])?;
+                #[cfg(test)]
+                if let Some(marker) = std::env::var_os("JSM_TEST_KILLED_WRITER_MARKER") {
+                    fs::write(marker, b"written")?;
+                }
                 hasher.update(&buf[..n]);
                 size = size
                     .checked_add(n as u64)
@@ -845,28 +849,21 @@ mod tests {
 
         let root = std::env::temp_dir().join(format!("jsm-store-killed-{}", unique_suffix()));
         let store = Store::new(&root).unwrap();
+        let marker = root.join("partial-write.marker");
         let mut child = Command::new(std::env::current_exe().unwrap())
             .args(["--exact", "tests::killed_writer_child"])
             .env("JSM_TEST_KILLED_WRITER_ROOT", &root)
+            .env("JSM_TEST_KILLED_WRITER_MARKER", &marker)
             .stdout(Stdio::null())
             .stderr(Stdio::null())
             .spawn()
             .unwrap();
 
         let deadline = Instant::now() + Duration::from_secs(10);
-        let mut partial_temp_seen = false;
+        let mut partial_write_seen = false;
         while Instant::now() < deadline {
-            partial_temp_seen = fs::read_dir(root.join("tmp"))
-                .unwrap()
-                .filter_map(Result::ok)
-                .any(|entry| {
-                    entry.file_name().to_string_lossy().starts_with("blob-")
-                        && entry
-                            .metadata()
-                            .map(|metadata| metadata.len() > 0)
-                            .unwrap_or(false)
-                });
-            if partial_temp_seen {
+            partial_write_seen = marker.is_file();
+            if partial_write_seen {
                 break;
             }
             if let Some(status) = child.try_wait().unwrap() {
@@ -874,11 +871,12 @@ mod tests {
             }
             std::thread::sleep(Duration::from_millis(10));
         }
-        if !partial_temp_seen {
+        if !partial_write_seen {
             let _ = child.kill();
             let _ = child.wait();
-            panic!("child writer did not create a partial temporary blob");
+            panic!("child writer did not signal after writing its partial temp blob");
         }
+        assert_eq!(fs::read(&marker).unwrap(), b"written");
         child.kill().unwrap();
         let _ = child.wait().unwrap();
 
