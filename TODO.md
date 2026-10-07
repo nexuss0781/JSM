@@ -1,6 +1,6 @@
 # JSM Implementation Backlog
 
-> **Status:** Phase 0 foundations and gate are complete on `main` (merged PR #2); the Phase 1 gate is verified on `phase1/core-engine` with its 24-hour SemVer fuzz campaign explicitly deferred as a non-gating follow-up; Phases 2–7 remain open.
+> **Status:** Phase 0 foundations and gate are complete on `main` (merged PR #2); the Phase 1 gate is verified on `main` (merged PR #3), with its 24-hour SemVer fuzz campaign explicitly deferred and non-gating; Phases 2–7 remain open.
 > **Companion:** [`PHASE.md`](PHASE.md) defines sequencing, phase gates, and cross-phase invariants.
 > **Requirement source:** [`SPECS.md`](SPECS.md) is authoritative for detailed behavior and exit criteria; [`PROJECT.md`](PROJECT.md) is authoritative for product goals and scope.
 
