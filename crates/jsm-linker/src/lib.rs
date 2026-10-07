@@ -1100,6 +1100,16 @@ fn try_reflink(src: &Path, dst: &Path) -> bool {
     success
 }
 
+/// Probe whether the platform can reflink `src` to `dst`, removing the
+/// temporary destination after a successful probe.
+pub fn probe_reflink(src: &Path, dst: &Path) -> bool {
+    let success = try_reflink(src, dst);
+    if success {
+        let _ = fs::remove_file(dst);
+    }
+    success
+}
+
 fn reflink_key(src: &Path, dst: &Path) -> Option<(String, String)> {
     let source_volume = volume_key(src)?;
     let target_volume = volume_key(dst.parent()?)?;

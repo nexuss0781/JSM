@@ -1,0 +1,75 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://jsm.dev/schemas/phase2-cli-output.schema.json",
+  "title": "JSM Phase 2 CLI JSON output",
+  "description": "Stable v1 JSON envelopes for Phase 2 store, doctor, lock, remote-version, and NDJSON progress commands. Phase 1 command envelopes remain in cli-output.schema.json.",
+  "oneOf": [
+    {"$ref":"#/$defs/storePath"},
+    {"$ref":"#/$defs/storeStatus"},
+    {"$ref":"#/$defs/storeList"},
+    {"$ref":"#/$defs/storeVersions"},
+    {"$ref":"#/$defs/storeInfo"},
+    {"$ref":"#/$defs/storeUsage"},
+    {"$ref":"#/$defs/storeAdd"},
+    {"$ref":"#/$defs/storeRemoveDry"},
+    {"$ref":"#/$defs/storeRemoveDone"},
+    {"$ref":"#/$defs/storeForgetProject"},
+    {"$ref":"#/$defs/storePruneDry"},
+    {"$ref":"#/$defs/storePruneDone"},
+    {"$ref":"#/$defs/storeGcDry"},
+    {"$ref":"#/$defs/storeGcDone"},
+    {"$ref":"#/$defs/storePin"},
+    {"$ref":"#/$defs/storeUnpin"},
+    {"$ref":"#/$defs/storePinned"},
+    {"$ref":"#/$defs/storeVerify"},
+    {"$ref":"#/$defs/versions"},
+    {"$ref":"#/$defs/doctor"},
+    {"$ref":"#/$defs/lockVerify"},
+    {"$ref":"#/$defs/lockMerge"},
+    {"$ref":"#/$defs/mergeDriver"},
+    {"$ref":"#/$defs/progress"}
+  ],
+  "$defs": {
+    "storedPackage": {
+      "type":"object",
+      "properties":{
+        "name":{"type":"string"},"version":{"type":"string"},"integrity":{"type":"string"},
+        "first_stored_at":{"type":"integer"},"last_used_at":{"type":"integer"},
+        "logical_size":{"type":"integer","minimum":0},"physical_size":{"type":"integer","minimum":0},
+        "file_count":{"type":"integer","minimum":0},"reference_count":{"type":"integer","minimum":0},"pinned":{"type":"boolean"}
+      },"required":["name","version","integrity","first_stored_at","last_used_at","logical_size","physical_size","file_count","reference_count","pinned"],"additionalProperties":true
+    },
+    "packageListItem": {
+      "type":"object",
+      "properties":{
+        "name":{"type":"string"},"version":{"type":"string"},"integrity":{"type":"string"},"size":{"type":"integer","minimum":0},
+        "references":{"type":["integer","null"]},"pinned":{"type":"boolean"},"last_used_at":{"type":["integer","null"]},"reference_state":{"enum":["known","unknown-legacy"]}
+      },"required":["name","version","integrity","size","references","pinned","last_used_at","reference_state"],"additionalProperties":true
+    },
+    "base": {"type":"object","required":["schema","command"],"properties":{"schema":{"type":"string"},"command":{"type":"string"}},"additionalProperties":true},
+    "storePath": {"allOf":[{"$ref":"#/$defs/base"},{"properties":{"schema":{"const":"jsm.v1.store.path"},"command":{"const":"store path"},"path":{"type":"string"}},"required":["path"]}]},
+    "storeStatus": {"allOf":[{"$ref":"#/$defs/base"},{"properties":{"schema":{"const":"jsm.v1.store.status"},"command":{"const":"store status"},"path":{"type":"string"},"total_size":{"type":"integer","minimum":0},"logical_size":{"type":"integer","minimum":0},"package_count":{"type":"integer","minimum":0},"version_count":{"type":"integer","minimum":0},"blob_count":{"type":"integer","minimum":0},"dedupe_ratio":{"type":"number","minimum":0},"reference_count":{"type":"integer","minimum":0},"unindexed_legacy_versions":{"type":"integer","minimum":0}},"required":["path","total_size","logical_size","package_count","version_count","blob_count","dedupe_ratio","reference_count","unindexed_legacy_versions"]}]},
+    "storeList": {"allOf":[{"$ref":"#/$defs/base"},{"properties":{"schema":{"const":"jsm.v1.store.list"},"command":{"const":"store list"},"packages":{"type":"array","items":{"$ref":"#/$defs/packageListItem"}},"sort":{"type":"string"},"filter":{"type":["string","null"]}},"required":["packages"]}]},
+    "storeVersions": {"allOf":[{"$ref":"#/$defs/base"},{"properties":{"schema":{"const":"jsm.v1.store.versions"},"command":{"const":"store versions"},"package":{"type":"string"},"versions":{"type":"array","items":{"type":"object","properties":{"version":{"type":"string"},"integrity":{"type":"string"},"size":{"type":"integer","minimum":0},"references":{"type":["integer","null"]},"pinned":{"type":"boolean"}},"required":["version","integrity","size","references","pinned"],"additionalProperties":true}}},"required":["package","versions"]}]},
+    "storeInfo": {"allOf":[{"$ref":"#/$defs/base"},{"properties":{"schema":{"const":"jsm.v1.store.info"},"command":{"const":"store info"},"packages":{"type":"array","items":{"type":"object"}}},"required":["packages"]}]},
+    "storeUsage": {"allOf":[{"$ref":"#/$defs/base"},{"properties":{"schema":{"const":"jsm.v1.store.usage"},"command":{"const":"store usage"},"package":{"type":"string"},"projects":{"type":"array","items":{"type":"object","properties":{"name":{"type":"string"},"version":{"type":"string"},"path":{"type":"string"},"project_id":{"type":"string"},"lockfile_hash":{"type":"string"},"last_install_at":{"type":"integer"},"stale":{"type":"boolean"}},"required":["name","version","path","project_id","lockfile_hash","last_install_at","stale"],"additionalProperties":true}}},"required":["package","projects"]}]},
+    "storeAdd": {"allOf":[{"$ref":"#/$defs/base"},{"properties":{"schema":{"const":"jsm.v1.store.add"},"command":{"const":"store add"},"packages":{"type":"integer","minimum":0},"stored":{"const":true}},"required":["packages","stored"]}]},
+    "storeRemoveDry": {"allOf":[{"$ref":"#/$defs/base"},{"properties":{"schema":{"const":"jsm.v1.store.remove"},"command":{"const":"store remove"},"dry_run":{"const":true},"packages":{"type":"array","items":{"$ref":"#/$defs/storedPackage"}},"reclaimed_logical_bytes":{"type":"integer","minimum":0},"reclaimed_physical_bytes":{"type":"integer","minimum":0}},"required":["dry_run","packages","reclaimed_logical_bytes","reclaimed_physical_bytes"]}]},
+    "storeRemoveDone": {"allOf":[{"$ref":"#/$defs/base"},{"properties":{"schema":{"const":"jsm.v1.store.remove"},"command":{"const":"store remove"},"dry_run":{"type":"boolean"},"packages_removed":{"type":"integer","minimum":0},"reclaimed_logical_bytes":{"type":"integer","minimum":0},"reclaimed_physical_bytes":{"type":"integer","minimum":0}},"required":["dry_run","packages_removed","reclaimed_logical_bytes","reclaimed_physical_bytes"]}]},
+    "storeForgetProject": {"allOf":[{"$ref":"#/$defs/base"},{"properties":{"schema":{"const":"jsm.v1.store.forget-project"},"command":{"const":"store forget-project"},"project_id":{"type":"string"},"path":{"type":"string"},"dry_run":{"type":"boolean"},"released_package_references":{"type":"integer","minimum":0}},"required":["project_id","path","dry_run","released_package_references"]}]},
+    "storePruneDry": {"allOf":[{"$ref":"#/$defs/base"},{"properties":{"schema":{"const":"jsm.v1.store.prune"},"command":{"const":"store prune"},"dry_run":{"const":true},"packages":{"type":"array","items":{"$ref":"#/$defs/storedPackage"}},"reclaimed_logical_bytes":{"type":"integer","minimum":0},"reclaimed_physical_bytes":{"type":"integer","minimum":0}},"required":["dry_run","packages","reclaimed_logical_bytes","reclaimed_physical_bytes"]}]},
+    "storePruneDone": {"allOf":[{"$ref":"#/$defs/base"},{"properties":{"schema":{"const":"jsm.v1.store.prune"},"command":{"const":"store prune"},"dry_run":{"type":"boolean"},"packages_removed":{"type":"integer","minimum":0},"reclaimed_logical_bytes":{"type":"integer","minimum":0},"reclaimed_physical_bytes":{"type":"integer","minimum":0}},"required":["dry_run","packages_removed","reclaimed_logical_bytes","reclaimed_physical_bytes"]}]},
+    "storeGcDry": {"allOf":[{"$ref":"#/$defs/base"},{"properties":{"schema":{"const":"jsm.v1.store.gc"},"command":{"const":"store gc"},"dry_run":{"const":true},"packages":{"type":"array","items":{"$ref":"#/$defs/storedPackage"}},"reclaimed_logical_bytes":{"type":"integer","minimum":0},"reclaimed_physical_bytes":{"type":"integer","minimum":0}},"required":["dry_run","packages","reclaimed_logical_bytes","reclaimed_physical_bytes"]}]},
+    "storeGcDone": {"allOf":[{"$ref":"#/$defs/base"},{"properties":{"schema":{"const":"jsm.v1.store.gc"},"command":{"const":"store gc"},"dry_run":{"type":"boolean"},"packages_removed":{"type":"integer","minimum":0},"reclaimed_logical_bytes":{"type":"integer","minimum":0},"reclaimed_physical_bytes":{"type":"integer","minimum":0}},"required":["dry_run","packages_removed","reclaimed_logical_bytes","reclaimed_physical_bytes"]}]},
+    "storePin": {"allOf":[{"$ref":"#/$defs/base"},{"properties":{"schema":{"const":"jsm.v1.store.pin"},"command":{"const":"store pin"},"package":{"type":"string"},"pinned":{"const":true}},"required":["package","pinned"]}]},
+    "storeUnpin": {"allOf":[{"$ref":"#/$defs/base"},{"properties":{"schema":{"const":"jsm.v1.store.unpin"},"command":{"const":"store unpin"},"package":{"type":"string"},"pinned":{"const":false}},"required":["package","pinned"]}]},
+    "storePinned": {"allOf":[{"$ref":"#/$defs/base"},{"properties":{"schema":{"const":"jsm.v1.store.pinned"},"command":{"const":"store pinned"},"packages":{"type":"array","items":{"$ref":"#/$defs/storedPackage"}}},"required":["packages"]}]},
+    "storeVerify": {"allOf":[{"$ref":"#/$defs/base"},{"properties":{"schema":{"const":"jsm.v1.store.verify"},"command":{"const":"store verify"},"mode":{"enum":["metadata","full"]},"fixed":{"type":"boolean"},"packages_checked":{"type":"integer","minimum":0},"blobs_checked":{"type":"integer","minimum":0},"logical_bytes_checked":{"type":"integer","minimum":0},"findings":{"type":"array","items":{"type":"object"}}},"required":["mode","fixed","packages_checked","blobs_checked","logical_bytes_checked","findings"]}]},
+    "versions": {"allOf":[{"$ref":"#/$defs/base"},{"properties":{"schema":{"const":"jsm.v1.versions"},"command":{"const":"versions"},"package":{"type":"string"},"versions":{"type":"array","items":{"type":"object","properties":{"version":{"type":"string"},"local":{"type":"boolean"},"deprecated":{"type":["string","null"]},"integrity":{"type":["string","null"]}},"required":["version","local","deprecated","integrity"],"additionalProperties":true}}},"required":["package","versions"]}]},
+    "doctor": {"allOf":[{"$ref":"#/$defs/base"},{"properties":{"schema":{"const":"jsm.v1.doctor"},"command":{"const":"doctor"},"report":{"type":"boolean"},"checks":{"type":"array","items":{"type":"object","properties":{"name":{"type":"string"},"status":{"type":"string"},"explanation":{"type":"string"},"remedy":{"type":"string"}},"required":["name","status","explanation","remedy"],"additionalProperties":true}}},"required":["report","checks"]}]},
+    "lockVerify": {"allOf":[{"$ref":"#/$defs/base"},{"properties":{"schema":{"const":"jsm.v1.lock.verify"},"command":{"const":"lock verify"},"valid":{"type":"boolean"},"stale":{"type":"boolean"},"missing_edges":{"type":"array","items":{"type":"string"}},"lockfile_version":{"type":"integer"},"packages":{"type":"integer","minimum":0}},"required":["valid","stale","missing_edges","lockfile_version","packages"]}]},
+    "lockMerge": {"allOf":[{"$ref":"#/$defs/base"},{"properties":{"schema":{"const":"jsm.v1.lock.merge"},"command":{"const":"lock merge"},"merged":{"const":true},"packages":{"type":"integer","minimum":0}},"required":["merged","packages"]}]},
+    "mergeDriver": {"allOf":[{"$ref":"#/$defs/base"},{"properties":{"schema":{"const":"jsm.v1.lock.install-merge-driver"},"command":{"const":"lock install-merge-driver"},"configured":{"const":true},"attributes":{"type":"string"}},"required":["configured","attributes"]}]},
+    "progress": {"type":"object","properties":{"schema":{"const":"jsm.v1.progress"},"event":{"enum":["operation-started","package-started","detail","operation-ended"]},"message":{"type":"string"}},"required":["schema","event","message"],"additionalProperties":false}
+  }
+}
