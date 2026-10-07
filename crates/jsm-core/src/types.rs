@@ -1,5 +1,7 @@
 use std::{fmt, str::FromStr};
 
+use nodejs_semver::{Range as NpmRange, Version as NpmVersion};
+
 use base64::{Engine as _, engine::general_purpose::STANDARD};
 use serde::{Deserialize, Deserializer, Serialize, de};
 use sha2::{Digest, Sha512};
@@ -101,20 +103,285 @@ fn validate_package_name(value: &str) -> Result<(), &'static str> {
 
 string_type!(PackageName, validate_package_name, "package name");
 
+// Keep adversarial comparator/alternative growth bounded before calling the
+// semver implementation. These limits are above ordinary published npm ranges.
+const MAX_RANGE_ALTERNATIVES: usize = 64;
+const MAX_RANGE_COMPARATOR_TOKENS: usize = 64;
+
 fn validate_range(value: &str) -> Result<(), &'static str> {
-    if value.trim().is_empty() {
-        return Err("must not be empty");
-    }
     if value.len() > 4096 {
         return Err("exceeds the Phase 0 length limit of 4096 bytes");
+    }
+    if value.contains(',') {
+        return Err("commas are not valid npm range separators");
     }
     if value.chars().any(char::is_control) {
         return Err("must not contain control characters");
     }
+    let normalized = value.replace('\u{feff}', " ");
+    if normalized
+        .chars()
+        .any(|character| !character.is_ascii() && !character.is_whitespace())
+    {
+        return Err("must use ASCII semver syntax");
+    }
+    let value = normalized.as_str();
+    let alternatives = value.split("||").collect::<Vec<_>>();
+    if alternatives.len() > MAX_RANGE_ALTERNATIVES {
+        return Err("contains more than 32 disjunctive alternatives");
+    }
+    let mut token_count = 0;
+    for token in alternatives.iter().flat_map(|arm| arm.split_whitespace()) {
+        if token.len() > 256 {
+            return Err("contains a token longer than 256 bytes");
+        }
+        token_count += 1;
+        if token_count > MAX_RANGE_COMPARATOR_TOKENS {
+            return Err("contains more than 64 comparator tokens");
+        }
+    }
+    for token in value.split(|character: char| character.is_whitespace() || character == ',') {
+        let token = token.trim_start_matches(|character| "^~><=".contains(character));
+        let token = token.trim_start_matches(['v', 'V']);
+        let version = token.split(['-', '+']).next().unwrap_or_default();
+        let components = version.split('.').collect::<Vec<_>>();
+        if let Some(wildcard) = components
+            .iter()
+            .position(|part| part.eq_ignore_ascii_case("x") || *part == "*")
+            && components[wildcard + 1..]
+                .iter()
+                .any(|part| !part.eq_ignore_ascii_case("x") && *part != "*")
+        {
+            return Err("numeric components cannot follow a wildcard");
+        }
+    }
+    let tokens = value.split_whitespace().collect::<Vec<_>>();
+    if tokens.contains(&"-") && (tokens.len() != 3 || tokens[1] != "-") {
+        return Err("hyphen ranges require a lower and upper bound");
+    }
     Ok(())
 }
 
-string_type!(Range, validate_range, "version range");
+enum RangeAtom {
+    Any,
+    Empty,
+    Parsed(NpmRange),
+}
+
+fn parse_npm_range(source: &str) -> Result<(NpmRange, bool), String> {
+    let arms = source.split("||").collect::<Vec<_>>();
+    if arms.iter().any(|arm| arm.trim().is_empty()) {
+        return Ok((NpmRange::any(), false));
+    }
+
+    let mut ranges = Vec::new();
+    for arm in arms {
+        let arm = arm.trim();
+        let atoms = if arm.contains(" - ") {
+            vec![arm.to_owned()]
+        } else {
+            let tokens = arm.split_whitespace().collect::<Vec<_>>();
+            let mut atoms = Vec::new();
+            let mut index = 0;
+            while index < tokens.len() {
+                let operator = tokens[index];
+                if matches!(operator, ">" | ">=" | "<" | "<=" | "=" | "^" | "~" | "~>") {
+                    let value = tokens
+                        .get(index + 1)
+                        .ok_or_else(|| "comparator is missing a version".to_string())?;
+                    atoms.push(format!("{operator}{value}"));
+                    index += 2;
+                } else {
+                    atoms.push(operator.to_owned());
+                    index += 1;
+                }
+            }
+            atoms
+        };
+
+        let mut current: Option<NpmRange> = None;
+        let mut unsatisfiable = false;
+        for atom in atoms {
+            let parsed = match normalize_range_atom(&atom)? {
+                RangeAtom::Any => continue,
+                RangeAtom::Empty => {
+                    unsatisfiable = true;
+                    break;
+                }
+                RangeAtom::Parsed(parsed) => parsed,
+            };
+            current = match current.take() {
+                Some(current) => match current.intersect(&parsed) {
+                    Some(intersection) => Some(intersection),
+                    None => {
+                        unsatisfiable = true;
+                        break;
+                    }
+                },
+                None => Some(parsed),
+            };
+        }
+        if !unsatisfiable {
+            ranges.push(current.unwrap_or_else(NpmRange::any));
+        }
+    }
+
+    if ranges.is_empty() {
+        return Ok((NpmRange::any(), true));
+    }
+    let combined_source = ranges
+        .iter()
+        .map(ToString::to_string)
+        .collect::<Vec<_>>()
+        .join(" || ");
+    let combined = NpmRange::parse(&combined_source).map_err(|error| error.to_string())?;
+    Ok((combined, false))
+}
+
+fn normalize_range_atom(atom: &str) -> Result<RangeAtom, String> {
+    let (operator, version) = [">=", "<=", ">", "<", "^", "~>", "~", "="]
+        .into_iter()
+        .find_map(|operator| {
+            atom.strip_prefix(operator)
+                .map(|version| (operator, version))
+        })
+        .unwrap_or(("", atom));
+
+    if matches!(version.to_ascii_lowercase().as_str(), "*" | "x") {
+        return Ok(match operator {
+            ">" | "<" => RangeAtom::Empty,
+            _ => RangeAtom::Any,
+        });
+    }
+
+    let normalized = match operator {
+        "^" if version.starts_with('=') => format!("^{}", &version[1..]),
+        "~" if version.starts_with('=') => format!("~{}", &version[1..]),
+        "~>" if version.starts_with('=') => format!("~>{}", &version[1..]),
+        _ => atom.to_owned(),
+    };
+    NpmRange::parse(&normalized)
+        .map(RangeAtom::Parsed)
+        .map_err(|error| error.to_string())
+}
+
+/// An npm-compatible semantic-version range. The original source is retained for
+/// stable serde and Display output; matching uses node-semver-compatible rules.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct Range {
+    source: String,
+    parsed: NpmRange,
+    empty: bool,
+}
+
+impl serde::Serialize for Range {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        serializer.serialize_str(&self.source)
+    }
+}
+impl<'de> serde::Deserialize<'de> for Range {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let source = String::deserialize(deserializer)?;
+        Self::new(source).map_err(serde::de::Error::custom)
+    }
+}
+impl Range {
+    pub fn new(value: impl Into<String>) -> Result<Self, ValidationError> {
+        let source = value.into();
+        validate_range(&source)
+            .map_err(|error| ValidationError(format!("invalid version range: {error}")))?;
+        let normalized = source.replace('\u{feff}', " ");
+        let (parsed, empty) = parse_npm_range(&normalized)
+            .map_err(|error| ValidationError(format!("invalid version range: {error}")))?;
+        Ok(Self {
+            source,
+            parsed,
+            empty,
+        })
+    }
+
+    pub fn as_str(&self) -> &str {
+        &self.source
+    }
+
+    pub fn matches(&self, version: &Version) -> bool {
+        !self.empty
+            && NpmVersion::parse(version.to_string())
+                .is_ok_and(|version| self.parsed.satisfies(&version))
+    }
+
+    pub fn intersects(&self, other: &Range) -> bool {
+        !self.empty && !other.empty && self.parsed.allows_any(&other.parsed)
+    }
+
+    pub fn intersection(&self, other: &Range) -> Option<Range> {
+        if self.empty || other.empty {
+            return None;
+        }
+        let parsed = self.parsed.intersect(&other.parsed)?;
+        Some(Range {
+            source: parsed.to_string(),
+            parsed,
+            empty: false,
+        })
+    }
+
+    pub fn is_subset_of(&self, other: &Range) -> bool {
+        self.empty
+            || (!other.empty
+                && (self.parsed == other.parsed || other.parsed.allows_all(&self.parsed)))
+    }
+
+    /// Alias used by resolver code for [`Range::intersects`].
+    pub fn intersect(&self, other: &Range) -> bool {
+        self.intersects(other)
+    }
+
+    /// Alias used by resolver code for [`Range::is_subset_of`].
+    pub fn subset_of(&self, other: &Range) -> bool {
+        self.is_subset_of(other)
+    }
+
+    /// Return the parser's normalized representation of this range.
+    pub fn simplify(&self) -> Range {
+        if self.empty {
+            return self.clone();
+        }
+        let source = self.parsed.to_string();
+        if source == self.source {
+            self.clone()
+        } else {
+            Range {
+                source,
+                parsed: self.parsed.clone(),
+                empty: false,
+            }
+        }
+    }
+}
+impl fmt::Display for Range {
+    fn fmt(&self, formatter: &mut fmt::Formatter<'_>) -> fmt::Result {
+        formatter.write_str(&self.source)
+    }
+}
+impl AsRef<str> for Range {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+impl FromStr for Range {
+    type Err = ValidationError;
+
+    fn from_str(source: &str) -> Result<Self, Self::Err> {
+        Self::new(source)
+    }
+}
 
 fn validate_dist_tag(value: &str) -> Result<(), &'static str> {
     if value.is_empty() || value.len() > 214 {
@@ -472,5 +739,109 @@ mod tests {
         fn package_name_parser_never_panics(value in any::<String>()) {
             let _ = PackageName::new(value);
         }
+    }
+
+    #[test]
+    fn npm_range_matching_and_prerelease_rules() {
+        let v = |s| Version::parse(s).unwrap();
+        assert!(Range::new("^1.2.3").unwrap().matches(&v("1.9.0")));
+        assert!(Range::new("^5.15.1").unwrap().matches(&v("5.15.1")));
+        assert!(!Range::new("^1.2.3").unwrap().matches(&v("2.0.0")));
+        assert!(Range::new("1.2.x").unwrap().matches(&v("1.2.99")));
+        assert!(Range::new(">=1.2").unwrap().matches(&v("2.0.0")));
+        assert!(!Range::new(">=1.2").unwrap().matches(&v("1.2.0-alpha.1")));
+        assert!(
+            Range::new(">=1.2.0-alpha.1 <1.3.0")
+                .unwrap()
+                .matches(&v("1.2.0-alpha.2"))
+        );
+        assert!(Range::new("1.0.0 || 2.x").unwrap().matches(&v("2.4.0")));
+    }
+
+    #[test]
+    fn empty_npm_range_means_any_stable_version() {
+        let range = Range::new("").unwrap();
+        assert!(range.matches(&Version::parse("0.0.0").unwrap()));
+        assert!(!range.matches(&Version::parse("0.0.1-alpha.1").unwrap()));
+    }
+
+    #[test]
+    fn wildcard_upper_bound_overflow_is_reported_without_panicking() {
+        assert!(Range::new("18446744073709551615.x").is_err());
+        assert!(Range::new("1.18446744073709551615.x").is_err());
+    }
+
+    #[test]
+    fn pathological_range_tokens_are_rejected_before_semver_parsing() {
+        let long_invalid_token = format!("1.{}", "V".repeat(3_000));
+        assert!(Range::new(long_invalid_token).is_err());
+
+        let many_alternatives = std::iter::repeat_n("1.0.0", 65)
+            .collect::<Vec<_>>()
+            .join(" || ");
+        assert!(Range::new(many_alternatives).is_err());
+
+        let many_comparators = std::iter::repeat_n(">=1.0.0", 65)
+            .collect::<Vec<_>>()
+            .join(" ");
+        assert!(Range::new(many_comparators).is_err());
+
+        let timeout_regression =
+            include_str!("../../../fuzz/corpus/semver_range/timeout_multi_alternatives_20261007");
+        assert!(Range::new(timeout_regression).is_err());
+    }
+
+    #[test]
+    fn many_valid_disjunctions_parse_within_the_supported_range_budget() {
+        let alternatives = std::iter::repeat_n("1.0.0", 60)
+            .collect::<Vec<_>>()
+            .join(" || ");
+        assert!(Range::new(alternatives).is_ok());
+    }
+
+    #[test]
+    fn malformed_unicode_is_rejected_before_semver_parser_and_bom_is_whitespace() {
+        let malformed = format!("1.0.0{}", "�".repeat(1_000));
+        let error = Range::new(malformed).unwrap_err();
+        assert!(error.to_string().contains("ASCII semver syntax"));
+
+        let source = "\u{feff}^1.2.3\u{feff}";
+        let range = Range::new(source).unwrap();
+        assert_eq!(range.as_str(), source);
+        assert!(range.matches(&Version::parse("1.9.0").unwrap()));
+    }
+
+    #[test]
+    fn npm_partial_comparator_boundaries_and_operator_spacing() {
+        let v = |s| Version::parse(s).unwrap();
+        assert!(Range::new("<1.2").unwrap().matches(&v("1.1.99")));
+        assert!(!Range::new("<1.2").unwrap().matches(&v("1.2.0")));
+        assert!(!Range::new("<1.2").unwrap().matches(&v("1.2.99")));
+        assert!(Range::new("<=1.2").unwrap().matches(&v("1.2.99")));
+        assert!(!Range::new("<=1.2").unwrap().matches(&v("1.3.0")));
+        assert!(!Range::new(">1.2").unwrap().matches(&v("1.2.99")));
+        assert!(Range::new(">1.2").unwrap().matches(&v("1.3.0")));
+        assert!(Range::new(">= 1.2").unwrap().matches(&v("1.2.0")));
+        assert!(Range::new(">1.2.x").unwrap().matches(&v("1.3.0")));
+        assert!(!Range::new(">1.2.x").unwrap().matches(&v("1.2.99")));
+        assert!(Range::new("^0").unwrap().matches(&v("0.9.0")));
+        assert!(!Range::new("^0").unwrap().matches(&v("1.0.0")));
+        assert!(Range::new("^0.0").unwrap().matches(&v("0.0.99")));
+        assert!(!Range::new("^0.0").unwrap().matches(&v("0.1.0")));
+        assert!(Range::new("~1").unwrap().matches(&v("1.9.0")));
+        assert!(!Range::new("~1").unwrap().matches(&v("2.0.0")));
+        assert!(Range::new("~> 1.2.3").unwrap().matches(&v("1.2.99")));
+        assert!(!Range::new("~> 1.2.3").unwrap().matches(&v("1.3.0")));
+        assert!(Range::new("1.x.3").is_err());
+    }
+
+    #[test]
+    fn range_set_operations_are_conservative() {
+        let a = Range::new(">=1.0.0 <2.0.0").unwrap();
+        let b = Range::new("^1.5.0").unwrap();
+        assert!(a.intersects(&b));
+        assert!(b.is_subset_of(&a));
+        assert!(!a.is_subset_of(&Range::new("^2.0.0").unwrap()));
+        assert!(a.intersection(&Range::new("^3.0.0").unwrap()).is_none());
     }
 }

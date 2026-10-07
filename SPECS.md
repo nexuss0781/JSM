@@ -246,12 +246,12 @@
 
 **Objective:** correct dependency resolution.
 
-- Implement on **PubGrub**, with package versions ordered per the resolution mode (default highest).
+- Use a deterministic conflict-driven solver (current implementation: Resolvo) with package versions ordered per the resolution mode (default highest).
 - Support dist-tags, ranges, and exact versions; honor `deprecated` as a soft penalty.
 - Handle dependency cycles safely.
 - Fetch metadata lazily and in parallel as the solver requests it (prefetching dependencies of candidates).
 - Produce a deterministic resolution graph independent of network timing.
-- Surface failures as structured conflict derivations (rendering improved in 3.9).
+- Surface failures as structured conflict details (rendering improved in 3.9).
 
 **Exit criteria**
 - Property tests: resolutions satisfy all constraints; results are deterministic across runs.
@@ -570,7 +570,7 @@
 
 **Objective:** failures that teach.
 
-- Render PubGrub derivations as readable trees with package, range, and dependent chain.
+- Render solver conflict information as readable trees with package, range, and dependent chain.
 - Compute suggested fixes: compatible upgrades or downgrades of intermediate packages, override suggestions, peer range adjustments.
 - Provide `--explain` for verbose derivations and `--json` structured conflict data.
 - Link to documentation anchors per error class.

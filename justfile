@@ -27,6 +27,20 @@ coverage:
 bench:
     python3 benches/run.py --smoke
 
+# Test the Phase 1 readiness and benchmark harnesses.
+phase1-harness-test:
+    python3 scripts/phase1_gate.py --self-test
+    python3 -m unittest benches.test_run -v
+
+# Verify the Phase 1 gate and write docs/phase-1-status.{json,md}.
+phase1-verify:
+    python3 scripts/phase1_gate.py --verify
+
+# Compare the release JSM binary with npm and pnpm on the same local fixture.
+phase1-bench:
+    cargo build --release -p jsm-cli --locked
+    python3 benches/run.py --phase1 --jsm-binary target/release/jsm --container-runtime none --repeat 3
+
 # Build the release binary and all libraries.
 release:
     cargo build --workspace --all-targets --release --locked
