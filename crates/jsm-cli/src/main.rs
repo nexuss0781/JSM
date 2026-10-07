@@ -1292,8 +1292,8 @@ fn run_exec(
     let bin_dir = cwd.join("node_modules").join(".bin");
     #[cfg(windows)]
     let candidates = [
-        bin_dir.join(format!("{name}.ps1")),
         bin_dir.join(format!("{name}.cmd")),
+        bin_dir.join(format!("{name}.ps1")),
         bin_dir.join(format!("{name}.exe")),
         bin_dir.join(name),
     ];
@@ -1305,6 +1305,16 @@ fn run_exec(
         .ok_or_else(|| miette!("executable not found in node_modules/.bin: {name}"))?;
     #[cfg(windows)]
     let mut command = if executable
+        .extension()
+        .is_some_and(|extension| extension == "cmd")
+    {
+        // Windows PowerShell 5.1 can split a native command's drive-letter
+        // script path into `C:`; the generated CMD shim preserves it as one
+        // quoted Node argument and is also the conventional Windows entrypoint.
+        let mut command = ProcessCommand::new("cmd.exe");
+        command.args(["/D", "/S", "/C", "call"]).arg(&executable);
+        command
+    } else if executable
         .extension()
         .is_some_and(|extension| extension == "ps1")
     {

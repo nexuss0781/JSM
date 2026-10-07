@@ -266,6 +266,24 @@ impl Store {
                 fs::remove_file(&dest)?;
                 fs::rename(&staged.temp_path, &dest)?;
             }
+            // Windows may report access denied, rather than AlreadyExists,
+            // when another process wins the race and marks the destination
+            // blob readonly before this rename is attempted.
+            Err(error) if error.kind() == io::ErrorKind::PermissionDenied => {
+                match file_has_hash(&dest, &staged.hash) {
+                    Ok(true) => {
+                        set_readonly(&dest)?;
+                        return Ok(staged.hash.clone());
+                    }
+                    Ok(false) => return Err(error.into()),
+                    Err(StoreError::Io(probe_error))
+                        if probe_error.kind() == io::ErrorKind::NotFound =>
+                    {
+                        return Err(error.into());
+                    }
+                    Err(probe_error) => return Err(probe_error),
+                }
+            }
             Err(error) => return Err(error.into()),
         }
         set_readonly(&dest)?;
@@ -903,11 +921,17 @@ mod tests {
         let root = std::env::temp_dir().join(format!("jsm-store-test-{}", unique_suffix()));
         let store = Store::new(&root).unwrap();
         let bytes = b"same bytes from every writer".to_vec();
+        let barrier = std::sync::Arc::new(std::sync::Barrier::new(8));
         let mut writers = Vec::new();
         for _ in 0..8 {
             let s = store.clone();
             let b = bytes.clone();
-            writers.push(std::thread::spawn(move || s.put_blob(&b).unwrap()));
+            let barrier = std::sync::Arc::clone(&barrier);
+            writers.push(std::thread::spawn(move || {
+                let staged = s.stage_blob_stream(io::Cursor::new(&b)).unwrap();
+                barrier.wait();
+                s.publish_staged_blob(staged).unwrap()
+            }));
         }
         let hashes: Vec<_> = writers.into_iter().map(|w| w.join().unwrap()).collect();
         assert!(hashes.windows(2).all(|pair| pair[0] == pair[1]));

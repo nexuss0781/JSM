@@ -29,7 +29,7 @@ It verifies the CLI JSON contract and exercises project initialization, registry
 
 ## Cross-platform bin-link runtime regression
 
-The CI matrix installs Node 22 and runs `cargo test -p jsm-linker --locked` on Linux, macOS, and Windows. `phase1_bin_conflict_executes_the_direct_winner` creates two packages with the same bin name, verifies the direct dependency wins, then executes the generated launcher and checks its output. Unix runs the executable link; Windows runs both generated `.cmd` and PowerShell launchers. The Windows junction regression also verifies that ordinary directories are not mistaken for junctions and that removing a junction leaves its target intact.
+The CI matrix installs Node 22 and runs `phase1_bin_conflict_executes_the_direct_winner` as a dedicated step on Linux, macOS, and Windows before the full workspace test suite. The test creates two packages with the same bin name, verifies the direct dependency wins, then executes the generated launcher and checks its output. Unix runs the executable link; Windows runs both generated `.cmd` and PowerShell launchers. The Windows junction regression also verifies that ordinary directories are not mistaken for junctions and that removing a junction leaves its target intact.
 
 ## Real-registry acceptance set
 
