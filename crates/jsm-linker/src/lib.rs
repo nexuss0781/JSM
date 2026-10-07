@@ -1168,6 +1168,11 @@ fn create_bin_shims(dir: &Path, name: &str, target: &Path) -> Result<(), LinkErr
     use std::os::windows::ffi::OsStrExt;
 
     let target_wide = target.as_os_str().encode_wide().collect::<Vec<_>>();
+    let target_units = target_wide
+        .iter()
+        .map(u16::to_string)
+        .collect::<Vec<_>>()
+        .join(", ");
     let target = target.display().to_string();
     fs::write(
         dir.join(format!("{name}.cmd")),
@@ -1175,15 +1180,11 @@ fn create_bin_shims(dir: &Path, name: &str, target: &Path) -> Result<(), LinkErr
     )?;
     fs::write(
         dir.join(format!("{name}.ps1")),
-        "$sidecar = [System.IO.Path]::ChangeExtension($MyInvocation.MyCommand.Path, '.jsm-bin.json')\r\n\
-         $target_units = Get-Content -Raw -Encoding UTF8 $sidecar | ConvertFrom-Json\r\n\
-         $target = -join ($target_units | ForEach-Object { [char]$_ })\r\n\
-         & node -- $target @args\r\n\
-         exit $LASTEXITCODE\r\n",
-    )?;
-    fs::write(
-        dir.join(format!("{name}.jsm-bin.json")),
-        serde_json::to_vec(&target_wide)?,
+        format!(
+            "$target = -join [char[]]@({target_units})\r\n\
+             & node -- \"$target\" @args\r\n\
+             exit $LASTEXITCODE\r\n"
+        ),
     )?;
     Ok(())
 }
@@ -1606,6 +1607,8 @@ mod tests {
     #[cfg(windows)]
     #[test]
     fn windows_bin_shims_generate_cmd_and_powershell_launchers() {
+        use std::os::windows::ffi::OsStrExt;
+
         let root = std::env::temp_dir().join(format!(
             "jsm-linker-test-{}-windows-shim",
             std::process::id()
@@ -1620,18 +1623,17 @@ mod tests {
         assert!(cmd.contains("node "));
         assert!(cmd.contains("%*"));
         assert!(ps1.contains("node "));
-        assert!(ps1.contains("ChangeExtension"));
-        assert!(ps1.contains("ConvertFrom-Json"));
-        assert!(ps1.contains("ForEach-Object"));
+        assert!(ps1.contains("$target = -join [char[]]@("));
         assert!(ps1.contains("@args"));
         assert!(ps1.contains("exit $LASTEXITCODE"));
-        let target_wide: Vec<u16> =
-            serde_json::from_slice(&fs::read(root.join("tool.jsm-bin.json")).unwrap()).unwrap();
-        use std::os::windows::ffi::OsStringExt;
-        assert_eq!(
-            PathBuf::from(std::ffi::OsString::from_wide(&target_wide)),
-            target
-        );
+        let target_units = target
+            .as_os_str()
+            .encode_wide()
+            .map(|unit| unit.to_string())
+            .collect::<Vec<_>>()
+            .join(", ");
+        assert!(ps1.contains(&format!("$target = -join [char[]]@({target_units})")));
+        assert!(!root.join("tool.jsm-bin.json").exists());
         fs::remove_dir_all(root).unwrap();
     }
 
