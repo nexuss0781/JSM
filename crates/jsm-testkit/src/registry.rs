@@ -28,6 +28,7 @@ struct RegistryState {
     artifacts_by_id: HashMap<String, FixtureArtifact>,
     behavior: RegistryBehavior,
     requests: usize,
+    tarball_requests: usize,
     metadata_etag: Option<String>,
     metadata_last_modified: Option<String>,
     require_authorization: Option<String>,
@@ -71,6 +72,7 @@ impl FakeRegistry {
                     let (mut status, mut body, content_type, behavior, supports_ranges, invalid_range) = {
                         let mut state = worker_state.lock().expect("registry state lock");
                         state.requests += 1;
+                        state.tarball_requests += usize::from(is_tarball);
                         let behavior = state.behavior.clone();
                         let supports_ranges = state.supports_ranges;
                         let invalid_range = state.invalid_range;
@@ -344,6 +346,13 @@ impl FakeRegistry {
 
     pub fn request_count(&self) -> usize {
         self.state.lock().expect("registry state lock").requests
+    }
+
+    pub fn tarball_request_count(&self) -> usize {
+        self.state
+            .lock()
+            .expect("registry state lock")
+            .tarball_requests
     }
 }
 

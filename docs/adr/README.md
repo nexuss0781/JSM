@@ -6,10 +6,11 @@ Copy `TEMPLATE.md` to the next zero-padded number and descriptive slug. Do not r
 
 ## Proposed decisions
 
-- [ADR 0005: SQLite-backed reference registry](0005-sqlite-reference-registry.md) — SQLite is proposed for Phase 2.1; project review is required before implementation.
+- None.
 
 ## Accepted decisions
 
 - [ADR 0002: Lockfile v2 peer-context package identity](0002-lockfile-v2-peer-context.md) — user-approved v2 key and v1 compatibility policy.
 - [ADR 0003: Shared store path and cross-volume fallback](0003-shared-store-path-policy.md) — per-user default store, override precedence, and hard-link/copy policy.
 - [ADR 0004: Permissively licensed dependency solver](0004-permissively-licensed-resolver.md) — Resolvo integration with no dependency-license exceptions.
+- [ADR 0005: SQLite-backed reference registry](0005-sqlite-reference-registry.md) — bundled SQLite, normalized project/package references, short transactions, and schema migration policy.

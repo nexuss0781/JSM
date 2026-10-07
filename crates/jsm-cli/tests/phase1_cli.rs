@@ -129,12 +129,16 @@ fn phase_one_help_exposes_the_complete_command_surface() {
     let normalized_help = help
         .lines()
         .filter(|line| !line.trim().is_empty())
+        .map(str::trim_end)
         .collect::<Vec<_>>()
         .join("\n");
-    assert_eq!(
-        normalized_help + "\n",
-        include_str!("fixtures/phase1-help.txt").replace("\r\n", "\n")
-    );
+    let expected_help = include_str!("fixtures/phase1-help.txt")
+        .lines()
+        .filter(|line| !line.trim().is_empty())
+        .map(str::trim_end)
+        .collect::<Vec<_>>()
+        .join("\n");
+    assert_eq!(normalized_help + "\n", expected_help + "\n");
     for command in [
         "init", "add", "install", "remove", "run", "exec", "list", "why", "config",
     ] {
