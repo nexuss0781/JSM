@@ -407,7 +407,8 @@ fn prune_unlisted_entries(
                 .strip_prefix(root)
                 .map_err(|_| LinkError::UnsafePath(path.display().to_string()))?;
             let metadata = fs::symlink_metadata(&path)?;
-            if metadata.is_dir() && !metadata.file_type().is_symlink() {
+            let is_link = is_symlink_or_junction(&path, &metadata)?;
+            if metadata.is_dir() && !is_link {
                 visit(root, &path, keep)?;
                 if fs::read_dir(&path)?.next().is_none() && !keep.iter().any(|k| k.starts_with(rel))
                 {
@@ -458,8 +459,8 @@ fn publish_top_level(
     }
     let bins = nm.join(".bin");
     if let Ok(metadata) = fs::symlink_metadata(&bins) {
-        if metadata.file_type().is_symlink() {
-            fs::remove_file(&bins)?;
+        if is_symlink_or_junction(&bins, &metadata)? {
+            remove_existing(&bins)?;
         } else {
             return Err(LinkError::Transaction(
                 "refusing to replace unmanaged node_modules/.bin".into(),
@@ -485,7 +486,7 @@ fn validate_top_level(
             reject_symlink_ancestors(nm, parent)?;
         }
         if let Ok(metadata) = fs::symlink_metadata(&path)
-            && !metadata.file_type().is_symlink()
+            && !is_symlink_or_junction(&path, &metadata)?
             && !metadata.is_dir()
         {
             return Err(LinkError::Transaction(format!(
@@ -496,7 +497,7 @@ fn validate_top_level(
     }
     let bins = nm.join(".bin");
     if let Ok(metadata) = fs::symlink_metadata(&bins)
-        && !metadata.file_type().is_symlink()
+        && !is_symlink_or_junction(&bins, &metadata)?
     {
         return Err(LinkError::Transaction(
             "refusing to replace unmanaged node_modules/.bin".into(),
@@ -514,30 +515,30 @@ fn remove_managed_package_link(
     validate_relative(name)?;
     let path = nm.join(name);
     match fs::symlink_metadata(&path) {
-        Ok(metadata) if metadata.file_type().is_symlink() => {
-            let target = fs::read_link(&path)?;
-            let target = if target.is_absolute() {
-                target
+        Ok(metadata) => {
+            if is_symlink_or_junction(&path, &metadata)? {
+                let target = read_link_target(&path)?;
+                let target = if target.is_absolute() {
+                    target
+                } else {
+                    nm.join(target)
+                };
+                let points_into_jsm = target.starts_with(nm.join(".jsm"));
+                if !previously_owned && !points_into_jsm {
+                    return Err(LinkError::Transaction(format!(
+                        "refusing to replace unmanaged link {}",
+                        path.display()
+                    )));
+                }
+                remove_existing(&path)?;
+            } else if previously_owned && metadata.is_dir() {
+                fs::remove_dir_all(&path)?;
             } else {
-                nm.join(target)
-            };
-            let points_into_jsm = target.starts_with(nm.join(".jsm"));
-            if !previously_owned && !points_into_jsm {
                 return Err(LinkError::Transaction(format!(
-                    "refusing to replace unmanaged link {}",
+                    "refusing to replace unmanaged path {}",
                     path.display()
                 )));
             }
-            fs::remove_file(&path)?;
-        }
-        Ok(metadata) if previously_owned && metadata.is_dir() => {
-            fs::remove_dir_all(&path)?;
-        }
-        Ok(_) => {
-            return Err(LinkError::Transaction(format!(
-                "refusing to replace unmanaged path {}",
-                path.display()
-            )));
         }
         Err(error) if error.kind() == io::ErrorKind::NotFound => return Ok(()),
         Err(error) => return Err(error.into()),
@@ -834,8 +835,33 @@ fn validate_bin_name(name: &str) -> Result<(), LinkError> {
     Ok(())
 }
 
+#[cfg(windows)]
+fn is_junction(path: &Path) -> Result<bool, LinkError> {
+    junction::exists(path).map_err(LinkError::Io)
+}
+#[cfg(not(windows))]
+fn is_junction(_path: &Path) -> Result<bool, LinkError> {
+    Ok(false)
+}
+fn is_symlink_or_junction(path: &Path, metadata: &fs::Metadata) -> Result<bool, LinkError> {
+    if metadata.file_type().is_symlink() {
+        Ok(true)
+    } else {
+        is_junction(path)
+    }
+}
+fn read_link_target(path: &Path) -> Result<PathBuf, LinkError> {
+    if is_junction(path)? {
+        #[cfg(windows)]
+        return junction::get_target(path).map_err(LinkError::Io);
+    }
+    fs::read_link(path).map_err(LinkError::Io)
+}
+
 fn ensure_safe_dir(p: &Path) -> Result<(), LinkError> {
-    if p.exists() && fs::symlink_metadata(p)?.file_type().is_symlink() {
+    if let Ok(metadata) = fs::symlink_metadata(p)
+        && is_symlink_or_junction(p, &metadata)?
+    {
         return Err(LinkError::UnsafePath(p.display().to_string()));
     }
     Ok(())
@@ -859,7 +885,10 @@ fn reject_symlink_ancestors(root: &Path, p: &Path) -> Result<(), LinkError> {
     let mut cur = root.to_path_buf();
     for component in rel.components() {
         cur.push(component.as_os_str());
-        if cur != p && cur.exists() && fs::symlink_metadata(&cur)?.file_type().is_symlink() {
+        if cur != p
+            && let Ok(metadata) = fs::symlink_metadata(&cur)
+            && is_symlink_or_junction(&cur, &metadata)?
+        {
             return Err(LinkError::UnsafePath(cur.display().to_string()));
         }
     }
@@ -867,8 +896,13 @@ fn reject_symlink_ancestors(root: &Path, p: &Path) -> Result<(), LinkError> {
 }
 fn remove_existing(p: &Path) -> Result<(), LinkError> {
     if let Ok(m) = fs::symlink_metadata(p) {
-        if m.file_type().is_dir() && !m.file_type().is_symlink() {
+        if is_junction(p)? {
+            #[cfg(windows)]
+            junction::delete(p)?;
+        } else if m.file_type().is_dir() && !m.file_type().is_symlink() {
             fs::remove_dir_all(p)?
+        } else if m.file_type().is_symlink() && m.is_dir() {
+            fs::remove_dir(p)?
         } else {
             fs::remove_file(p)?
         }
@@ -897,8 +931,14 @@ fn file_matches_hash(path: &Path, expected: &str, size: u64) -> Result<bool, Lin
 /// unchanged entries are reused and changed entries are replaced safely.
 fn copy_tree(src: &Path, dst: &Path) -> Result<(), LinkError> {
     let metadata = fs::symlink_metadata(src)?;
-    if metadata.file_type().is_symlink() {
-        let target = fs::read_link(src)?;
+    if is_junction(src)? {
+        let target = read_link_target(src)?;
+        if let Some(parent) = dst.parent() {
+            fs::create_dir_all(parent)?;
+        }
+        symlink_dir(&target, dst)?;
+    } else if metadata.file_type().is_symlink() {
+        let target = read_link_target(src)?;
         if let Some(parent) = dst.parent() {
             fs::create_dir_all(parent)?;
         }
@@ -1061,7 +1101,7 @@ fn symlink_dir(src: &Path, dst: &Path) -> Result<(), LinkError> {
 }
 #[cfg(not(unix))]
 fn symlink_dir(src: &Path, dst: &Path) -> Result<(), LinkError> {
-    std::os::windows::fs::symlink_dir(src, dst).map_err(LinkError::Io)
+    junction::create(src, dst).map_err(LinkError::Io)
 }
 #[cfg(unix)]
 fn create_bin_shims(dir: &Path, name: &str, target: &Path) -> Result<(), LinkError> {
@@ -1504,6 +1544,33 @@ mod tests {
         assert!(ps1.contains("node "));
         assert!(ps1.contains("@args"));
         assert!(ps1.contains("exit $LASTEXITCODE"));
+        fs::remove_dir_all(root).unwrap();
+    }
+
+    #[cfg(windows)]
+    #[test]
+    fn windows_directory_links_use_junctions_and_cleanup_preserves_target() {
+        let root = std::env::temp_dir().join(format!(
+            "jsm-linker-test-{}-junction-{}",
+            std::process::id(),
+            std::time::SystemTime::now()
+                .duration_since(std::time::UNIX_EPOCH)
+                .unwrap()
+                .as_nanos()
+        ));
+        let target = root.join("target");
+        let link = root.join("link");
+        fs::create_dir_all(&target).unwrap();
+        fs::write(target.join("sentinel"), b"target survives").unwrap();
+
+        symlink_dir(&target, &link).unwrap();
+        assert!(junction::exists(&link).unwrap());
+        assert_eq!(fs::read(link.join("sentinel")).unwrap(), b"target survives");
+        assert_eq!(read_link_target(&link).unwrap(), target);
+
+        remove_existing(&link).unwrap();
+        assert!(target.join("sentinel").is_file());
+        assert!(fs::symlink_metadata(&link).is_err());
         fs::remove_dir_all(root).unwrap();
     }
 

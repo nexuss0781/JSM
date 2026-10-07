@@ -17,5 +17,8 @@ sha2.workspace = true
 reflink-copy.workspace = true
 thiserror.workspace = true
 
+[target.'cfg(windows)'.dependencies]
+junction = "2.1.0"
+
 [lints]
 workspace = true
