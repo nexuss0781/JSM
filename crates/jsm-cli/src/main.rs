@@ -1291,42 +1291,6 @@ fn run_exec(
     }
     let bin_dir = cwd.join("node_modules").join(".bin");
     #[cfg(windows)]
-    {
-        use std::os::windows::ffi::OsStringExt;
-
-        let target_file = bin_dir.join(format!("{name}.jsm-bin.json"));
-        if target_file.is_file() {
-            let encoded_target: Vec<u16> =
-                serde_json::from_slice(&fs::read(&target_file).into_diagnostic()?)
-                    .into_diagnostic()?;
-            let target = PathBuf::from(std::ffi::OsString::from_wide(&encoded_target));
-            if !target.is_absolute() {
-                return Err(miette!(
-                    "generated bin target must be absolute: {}",
-                    target.display()
-                ));
-            }
-            if !target.is_file() {
-                return Err(miette!(
-                    "generated bin target does not exist: {}",
-                    target.display()
-                ));
-            }
-            let mut command = ProcessCommand::new("node");
-            command
-                .args([
-                    "-e",
-                    "const target = process.env.JSM_BIN_TARGET; process.argv = [process.execPath, target, ...process.argv.slice(1)]; require('module').runMain();",
-                    "--",
-                ])
-                .args(args)
-                .current_dir(cwd)
-                .env("JSM_BIN_TARGET", &target)
-                .env("PATH", project_path(cwd)?);
-            return finish_child(command, out_json, "exec", Some(name), cancellation);
-        }
-    }
-    #[cfg(windows)]
     let candidates = [
         bin_dir.join(format!("{name}.ps1")),
         bin_dir.join(format!("{name}.cmd")),

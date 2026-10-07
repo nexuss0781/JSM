@@ -1,6 +1,6 @@
 # Phase 1 acceptance and benchmark harness
 
-The Phase 1 gate runner is `scripts/phase1_gate.py`. It reads the authoritative Phase 1 checklist from `TODO.md`, runs repository quality checks, checks the CLI command surface, identifies still-scaffolded implementation crates, and writes a JSON plus Markdown status report. It deliberately fails the phase gate while implementation requirements or evidence are missing; passing the Phase 0 fake-registry tests is not treated as proof of a working JSM package manager.
+The Phase 1 gate runner is `scripts/phase1_gate.py`. It reads the authoritative Phase 1 checklist from `TODO.md`, runs repository quality checks, checks the CLI command surface, identifies still-scaffolded implementation crates, and writes a JSON plus Markdown status report. Passing the Phase 0 fake-registry tests is not treated as proof of a working JSM package manager. Only the exact 24-hour SemVer fuzz item may carry the explicit `[DEFERRED: NON-GATING]` marker; the report keeps it unchecked and labels it deferred rather than passed.
 
 Run the harness unit tests with:
 
@@ -15,7 +15,7 @@ Run the full local verification and produce `docs/phase-1-status.json` and `docs
 python3 scripts/phase1_gate.py --verify
 ```
 
-Exit code `2` means the local checks completed but the Phase 1 gate is still unmet. The report lists open checklist items, absent CLI commands, scaffold crates, and missing acceptance/benchmark evidence. It is intentionally not a CI job that marks an incomplete product as green.
+Exit code `2` means the local checks completed but an in-scope Phase 1 requirement remains unmet. The report lists in-scope gaps, absent CLI commands, scaffold crates, and missing acceptance/benchmark evidence. An explicitly marked fuzz deferral is shown separately and does not appear as passed evidence.
 
 ## Fake-registry CLI end-to-end tests
 
@@ -29,7 +29,7 @@ It verifies the CLI JSON contract and exercises project initialization, registry
 
 ## Cross-platform bin-link runtime regression
 
-The CI matrix installs Node 22 and runs `phase1_bin_conflict_executes_the_direct_winner` as a dedicated step on Linux, macOS, and Windows before the full workspace test suite. The test creates two packages with the same bin name, verifies the direct dependency wins, then executes the generated launcher and checks its output. Unix runs the executable link; Windows runs both generated `.cmd` and PowerShell launchers. For JSM-generated Windows bins, `jsm exec` launches Node directly using a lossless UTF-16 target sidecar; external project shims retain their PowerShell/CMD fallback. The Windows junction regression verifies that ordinary directories are not mistaken for junctions, that a dangling junction remains detectable during the atomic tree swap, and that removing a junction leaves its target intact.
+The CI matrix installs Node 22 and runs `phase1_bin_conflict_executes_the_direct_winner` as a dedicated step on Linux, macOS, and Windows before the full workspace test suite. The test creates two packages with the same bin name, verifies the direct dependency wins, then executes the generated launcher and checks its output. Unix runs the executable link; Windows runs both generated `.cmd` and PowerShell launchers. On Windows, `jsm exec` prefers the generated PowerShell launcher, which reconstructs the entry path from a lossless UTF-16 sidecar before invoking Node; other installed shims retain the PowerShell/CMD fallback. The Windows junction regression verifies that ordinary directories are not mistaken for junctions, that a dangling junction remains detectable during the atomic tree swap, and that removing a junction leaves its target intact.
 
 ## Real-registry acceptance set
 
@@ -64,7 +64,7 @@ This runs npm, pnpm, and the supplied JSM binary on identical deterministic smal
 
 ## SemVer range fuzzing
 
-The Phase 1 SemVer exit criterion requires a full 24-hour libFuzzer run with the tracked seed corpus. Install/use nightly Rust with `cargo-fuzz`, then run:
+The specification's full 24-hour libFuzzer run remains a quality follow-up. For the 2026-10-07 Phase 1 close, the user explicitly deferred this run as non-gating; it was stopped, was not completed, and no evidence report is claimed. The checklist keeps this item unchecked. If a later phase resumes the fuzz campaign, install/use nightly Rust with `cargo-fuzz`, then run:
 
 ```sh
 python3 scripts/run_semver_fuzz_24h.py --duration-seconds 86400 \
@@ -99,4 +99,4 @@ The harness serves deterministic two-file tarballs locally, verifies all 2,000 p
 
 Mutating CLI commands use one progress abstraction: an ASCII spinner on a TTY with per-entry file/byte detail, stable per-package status lines on redirected stderr, and no progress noise in `--quiet` or `--json` mode. Command summaries remain separate from this progress channel.
 
-`python3 scripts/phase1_gate.py --verify` checks the SemVer summary, 100% differential report, real-registry top-100 replay, npm/pnpm/JSM benchmark, 2,000-package memory report, and workspace validation suite.
+`python3 scripts/phase1_gate.py --verify` checks the SemVer differential report, real-registry top-100 replay, npm/pnpm/JSM benchmark, 2,000-package memory report, and workspace validation suite. When the checklist explicitly carries the allowed fuzz deferral marker, the report still labels the 24-hour evidence as `DEFERRED` (not `PASS`) and preserves the non-gating follow-up.
