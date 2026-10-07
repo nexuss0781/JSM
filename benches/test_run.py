@@ -8,7 +8,10 @@ from pathlib import Path
 from unittest.mock import patch
 
 from benches.run import (
+    PHASE1_BENCHMARK_PROTOCOL,
+    clear_directory,
     container_exec_command,
+    configure_tool_cache_dirs,
     install_command,
     load_prior_medians,
     render_markdown,
@@ -65,6 +68,57 @@ class BenchmarkPhaseModeTests(unittest.TestCase):
             path = Path(directory) / "history.jsonl"
             path.write_text("\n".join(json.dumps(row) for row in history) + "\n", encoding="utf-8")
             self.assertEqual(load_prior_medians(path)["jsm|small|cold"], 1.25)
+
+    def test_jsm_cas_and_registry_caches_are_cleared_per_sample(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            cache_root = Path(directory) / "cache"
+            cache_root.mkdir()
+            environment: dict[str, str] = {}
+            configure_tool_cache_dirs(environment, "jsm", cache_root)
+            store = Path(environment["JSM_STORE_DIR"])
+            registry_cache = Path(environment["JSM_CACHE_DIR"])
+            self.assertEqual(store, cache_root / "jsm-store")
+            self.assertEqual(registry_cache, cache_root / "jsm-registry")
+            store.mkdir()
+            registry_cache.mkdir()
+            clear_directory(cache_root)
+            self.assertFalse(store.exists())
+            self.assertFalse(registry_cache.exists())
+
+    def test_prior_medians_ignore_runs_from_a_different_protocol(self) -> None:
+        history = [
+            {
+                "measurement_protocol": "legacy-unisolated-cache",
+                "results": [
+                    {
+                        "tool": "jsm",
+                        "fixture": "small",
+                        "scenario": "cold",
+                        "status": "passed",
+                        "median_seconds": 99.0,
+                    }
+                ],
+            },
+            {
+                "measurement_protocol": PHASE1_BENCHMARK_PROTOCOL,
+                "results": [
+                    {
+                        "tool": "jsm",
+                        "fixture": "small",
+                        "scenario": "cold",
+                        "status": "passed",
+                        "median_seconds": 1.25,
+                    }
+                ],
+            },
+        ]
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "history.jsonl"
+            path.write_text("\n".join(json.dumps(row) for row in history) + "\n", encoding="utf-8")
+            self.assertEqual(
+                load_prior_medians(path, protocol=PHASE1_BENCHMARK_PROTOCOL)["jsm|small|cold"],
+                1.25,
+            )
 
     def test_real_jsm_command_uses_configured_binary_and_phase1_flags(self) -> None:
         with patch.dict(os.environ, {"JSM_BINARY": "/tmp/jsm-test-binary"}):
