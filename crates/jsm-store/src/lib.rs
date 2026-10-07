@@ -557,20 +557,27 @@ fn per_user_cache_suffix(shared_default: &Path) -> PathBuf {
     {
         return relative.to_path_buf();
     }
-    #[cfg(target_os = "windows")]
-    {
-        return PathBuf::from("AppData")
-            .join("Local")
-            .join("jsm")
-            .join("store");
-    }
-    #[cfg(target_os = "macos")]
-    {
-        return PathBuf::from("Library")
-            .join("Caches")
-            .join("jsm")
-            .join("store");
-    }
+    platform_cache_suffix()
+}
+
+#[cfg(target_os = "windows")]
+fn platform_cache_suffix() -> PathBuf {
+    PathBuf::from("AppData")
+        .join("Local")
+        .join("jsm")
+        .join("store")
+}
+
+#[cfg(target_os = "macos")]
+fn platform_cache_suffix() -> PathBuf {
+    PathBuf::from("Library")
+        .join("Caches")
+        .join("jsm")
+        .join("store")
+}
+
+#[cfg(not(any(target_os = "windows", target_os = "macos")))]
+fn platform_cache_suffix() -> PathBuf {
     PathBuf::from(".cache").join("jsm").join("store")
 }
 
@@ -584,11 +591,19 @@ fn volume_id(path: &Path) -> Option<u128> {
 
 #[cfg(target_os = "windows")]
 fn volume_id(path: &Path) -> Option<u128> {
-    use std::os::windows::fs::MetadataExt;
-    existing_metadata(path)
-        .ok()
-        .and_then(|metadata| metadata.volume_serial_number())
-        .map(u128::from)
+    use std::hash::{Hash, Hasher};
+
+    let prefix = existing_path(path)?
+        .components()
+        .find_map(|component| match component {
+            std::path::Component::Prefix(prefix) => {
+                Some(prefix.as_os_str().to_string_lossy().to_ascii_lowercase())
+            }
+            _ => None,
+        })?;
+    let mut hasher = std::collections::hash_map::DefaultHasher::new();
+    prefix.hash(&mut hasher);
+    Some(u128::from(hasher.finish()))
 }
 
 #[cfg(not(any(unix, target_os = "windows")))]
@@ -752,19 +767,21 @@ mod tests {
 
     #[test]
     fn same_volume_selection_keeps_shared_default() {
-        let shared = PathBuf::from("/home/user/.cache/jsm/store");
+        let shared = PathBuf::from("shared-cache/store");
         assert_eq!(
-            select_store_path_for_volumes(1, 1, Some(PathBuf::from("/mnt")), &shared),
+            select_store_path_for_volumes(1, 1, Some(PathBuf::from("volume-root")), &shared),
             shared
         );
     }
 
     #[test]
     fn different_volume_selection_uses_volume_cache_root() {
-        let shared = PathBuf::from("/home/user/.cache/jsm/store");
+        let shared = PathBuf::from("shared-cache/store");
+        let volume_root = PathBuf::from("volume-root");
+        let expected = volume_root.join(platform_cache_suffix());
         assert_eq!(
-            select_store_path_for_volumes(2, 1, Some(PathBuf::from("/mnt")), &shared),
-            PathBuf::from("/mnt/.cache/jsm/store")
+            select_store_path_for_volumes(2, 1, Some(volume_root), &shared),
+            expected
         );
     }
 

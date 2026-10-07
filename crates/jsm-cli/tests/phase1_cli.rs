@@ -1552,6 +1552,7 @@ fn ci_mode_automatically_requires_a_current_lockfile() {
     )
     .unwrap();
     let lock_before = fs::read(project.path().join("jsm.lock")).unwrap();
+    let requests_before_stale_lock = registry.request_count();
     cli(project.path())
         .env("CI", "true")
         .arg("--registry")
@@ -1565,7 +1566,7 @@ fn ci_mode_automatically_requires_a_current_lockfile() {
     );
     assert_eq!(
         registry.request_count(),
-        2,
+        requests_before_stale_lock,
         "frozen stale-lock failure must not resolve online"
     );
 
