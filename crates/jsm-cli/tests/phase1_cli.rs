@@ -7,7 +7,12 @@ use serde_json::Value;
 
 fn cli(cwd: &std::path::Path) -> Command {
     let mut command = Command::cargo_bin("jsm").unwrap();
-    command.arg("--cwd").arg(cwd).env("JSM_LOG", "error");
+    command
+        .arg("--cwd")
+        .arg(cwd)
+        .env("JSM_LOG", "error")
+        .env("CI", "0")
+        .env_remove("JSM_CI");
     command
 }
 
@@ -1607,6 +1612,8 @@ fn assert_signal_cancels_install_without_committing_partial_project_state(
         .arg(&registry_url)
         .arg("install")
         .env("JSM_LOG", "error")
+        .env("CI", "0")
+        .env_remove("JSM_CI")
         .stdout(Stdio::null())
         .stderr(Stdio::null())
         .spawn()
