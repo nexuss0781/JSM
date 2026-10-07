@@ -908,8 +908,18 @@ fn remove_existing(p: &Path) -> Result<(), LinkError> {
             {
                 // Deleting the reparse tag leaves the empty mount-point
                 // directory behind; remove it too so the path can be reused.
-                junction::delete(p)?;
-                fs::remove_dir(p)?;
+                junction::delete(p).map_err(|error| {
+                    LinkError::Io(io::Error::new(
+                        error.kind(),
+                        format!("delete junction reparse point {}: {error}", p.display()),
+                    ))
+                })?;
+                fs::remove_dir(p).map_err(|error| {
+                    LinkError::Io(io::Error::new(
+                        error.kind(),
+                        format!("remove empty junction stub {}: {error}", p.display()),
+                    ))
+                })?;
             }
         } else if m.file_type().is_dir() && !m.file_type().is_symlink() {
             fs::remove_dir_all(p)?
@@ -1113,7 +1123,16 @@ fn symlink_dir(src: &Path, dst: &Path) -> Result<(), LinkError> {
 }
 #[cfg(not(unix))]
 fn symlink_dir(src: &Path, dst: &Path) -> Result<(), LinkError> {
-    junction::create(src, dst).map_err(LinkError::Io)
+    junction::create(src, dst).map_err(|error| {
+        LinkError::Io(io::Error::new(
+            error.kind(),
+            format!(
+                "create junction {} -> {}: {error}",
+                dst.display(),
+                src.display()
+            ),
+        ))
+    })
 }
 #[cfg(unix)]
 fn create_bin_shims(dir: &Path, name: &str, target: &Path) -> Result<(), LinkError> {
@@ -1529,11 +1548,23 @@ mod tests {
         write_bins(&root, &root, &lock, &selected, &direct).unwrap();
         let outputs = invoke_test_bin(&root.join(".bin"), "phase1-tool", "verified-arg");
         assert!(!outputs.is_empty());
-        for output in outputs {
+        #[cfg(windows)]
+        let launcher_names = ["CMD", "PowerShell"];
+        #[cfg(not(windows))]
+        let launcher_names = ["Unix"];
+        for (launcher_kind, output) in launcher_names.into_iter().zip(outputs) {
+            #[cfg(windows)]
+            let launcher_source = {
+                let extension = if launcher_kind == "CMD" { "cmd" } else { "ps1" };
+                fs::read_to_string(root.join(".bin").join(format!("phase1-tool.{extension}")))
+                    .unwrap_or_else(|error| format!("<could not read shim: {error}>"))
+            };
+            #[cfg(not(windows))]
+            let launcher_source = String::new();
             assert!(
                 output.status.success(),
-                "bin launcher failed: {}",
-                String::from_utf8_lossy(&output.stderr)
+                "{launcher_kind} bin launcher failed: {}\n{launcher_source}",
+                String::from_utf8_lossy(&output.stderr),
             );
             assert_eq!(output.stdout, b"winner=z-direct:verified-arg");
         }

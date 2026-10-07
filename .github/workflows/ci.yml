@@ -43,6 +43,8 @@ jobs:
         run: cargo +1.95.0 build --workspace --all-targets --locked
       - name: Clippy
         run: cargo +1.95.0 clippy --workspace --all-targets --all-features --locked -- -D warnings
+      - name: Execute bin-link conflict launchers on this OS
+        run: cargo +1.95.0 test -p jsm-linker --locked phase1_bin_conflict_executes_the_direct_winner
       - name: Test
         run: cargo +1.95.0 test --workspace --all-features --locked
       - name: Documentation
