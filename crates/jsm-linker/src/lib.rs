@@ -1169,16 +1169,17 @@ fn create_bin_shims(dir: &Path, name: &str, target: &Path) -> Result<(), LinkErr
 
     let target_wide = target.as_os_str().encode_wide().collect::<Vec<_>>();
     let target = target.display().to_string();
-    let powershell_target = target.replace("'", "''");
     fs::write(
         dir.join(format!("{name}.cmd")),
         format!("@echo off\r\nnode \"{target}\" %*\r\n"),
     )?;
     fs::write(
         dir.join(format!("{name}.ps1")),
-        format!(
-            "$target = '{powershell_target}'\r\n& node -- $target @args\r\nexit $LASTEXITCODE\r\n"
-        ),
+        "$sidecar = [System.IO.Path]::ChangeExtension($MyInvocation.MyCommand.Path, '.jsm-bin.json')\r\n\
+         $target_units = Get-Content -Raw -Encoding UTF8 $sidecar | ConvertFrom-Json\r\n\
+         $target = -join ($target_units | ForEach-Object { [char]$_ })\r\n\
+         & node -- $target @args\r\n\
+         exit $LASTEXITCODE\r\n",
     )?;
     fs::write(
         dir.join(format!("{name}.jsm-bin.json")),
@@ -1619,6 +1620,9 @@ mod tests {
         assert!(cmd.contains("node "));
         assert!(cmd.contains("%*"));
         assert!(ps1.contains("node "));
+        assert!(ps1.contains("ChangeExtension"));
+        assert!(ps1.contains("ConvertFrom-Json"));
+        assert!(ps1.contains("ForEach-Object"));
         assert!(ps1.contains("@args"));
         assert!(ps1.contains("exit $LASTEXITCODE"));
         let target_wide: Vec<u16> =

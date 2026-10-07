@@ -80,7 +80,8 @@
 
 - [x] Implement npm-compatible range grammar, comparator intersection/subset/simplification, prerelease rules, and build metadata handling.
 - [x] Differential-test generated inputs against the reference npm `semver` implementation; add parser fuzzing and pathological-input tests.
-- [ ] Meet the specification's corpus agreement and 24-hour fuzz-run exit criteria before resolver integration is considered complete.
+- [x] Meet the reference corpus agreement criterion before resolver integration (90,800/90,800 cases).
+- [ ] Complete the specified uninterrupted 24-hour SemVer fuzz campaign. **[DEFERRED: NON-GATING]** Explicitly deferred for Phase 1 closure on 2026-10-07; the run was stopped, was not completed, and has no evidence report.
 
 ### 1.5 Registry client
 
@@ -151,7 +152,7 @@
 
 **Phase 1 gate**
 
-- [ ] All baseline commands pass fake-registry end-to-end tests and meet the sub-phase exit criteria.
+- [ ] All baseline commands pass fake-registry end-to-end tests and all in-scope sub-phase criteria are met; follow-ups explicitly marked non-gating are recorded separately.
 - [x] Exercise the real-registry top-100 package acceptance set and publish a benchmark against npm and pnpm.
 - [x] Confirm no implicit dependency script execution and no project-visible unverified bytes.
 

@@ -9,8 +9,10 @@ from scripts.finalize_semver_fuzz import summarize_run
 from scripts.phase1_gate import (
     BASELINE_COMMANDS,
     discover_cli_surface,
+    is_approved_non_gating_deferral,
     package_install_path,
     read_phase1_checklist,
+    render_report_markdown,
     scrub,
     validate_phase1_benchmark,
     validate_memory_stress,
@@ -36,6 +38,65 @@ class Phase1GateHarnessTests(unittest.TestCase):
             todo_lines[first["source_line"] - 1].strip(),
             f"- [{marker}] " + first["text"],
         )
+        fuzz = next(item for item in checks if "24-hour" in item["text"].lower())
+        self.assertFalse(fuzz["done"])
+        self.assertTrue(fuzz["deferred_non_gating"])
+        self.assertTrue(is_approved_non_gating_deferral(fuzz))
+
+    def test_only_the_24_hour_semver_fuzz_item_can_be_non_gating(self) -> None:
+        fuzz = {
+            "group": "1.4 Semver engine",
+            "text": "Complete the 24-hour SemVer fuzz campaign. [DEFERRED: NON-GATING]",
+            "done": False,
+            "deferred_non_gating": True,
+        }
+        self.assertTrue(is_approved_non_gating_deferral(fuzz))
+        self.assertFalse(is_approved_non_gating_deferral({**fuzz, "done": True}))
+        self.assertFalse(is_approved_non_gating_deferral({**fuzz, "group": "1.12 Bin links"}))
+        self.assertFalse(is_approved_non_gating_deferral({**fuzz, "text": "Other test [DEFERRED: NON-GATING]"}))
+
+    def test_gate_report_shows_deferred_fuzz_as_non_gating_not_passed(self) -> None:
+        fuzz_text = "Complete the 24-hour SemVer fuzz campaign. [DEFERRED: NON-GATING]"
+        evidence = {
+            "top100_report_valid": True,
+            "top100_report": "top100.json",
+            "top100_report_status": "100 package runs passed",
+            "phase1_benchmark_valid": True,
+            "phase1_benchmark_report": "benchmark.json",
+            "phase1_benchmark_status": "benchmark passed",
+            "semver_differential_valid": True,
+            "semver_differential_report": "semver.json",
+            "semver_differential_status": "90,800 cases agree",
+            "semver_fuzz_valid": False,
+            "semver_fuzz_deferred_non_gating": True,
+            "semver_fuzz_report": "fuzz.json",
+            "semver_fuzz_status": "24-hour run not completed; explicitly deferred; no valid report claimed",
+            "memory_stress_valid": True,
+            "memory_stress_report": "memory.json",
+            "memory_stress_status": "2,000 packages passed",
+        }
+        report = {
+            "gate_ready": True,
+            "generated_at": "2026-10-07T00:00:00Z",
+            "git_revision": "abc123",
+            "validation_mode": "verify",
+            "validations": [],
+            "blockers": [],
+            "non_gating_deferrals": [{"text": fuzz_text}],
+            "checklist": {
+                "complete": 52,
+                "total": 53,
+                "deferred_non_gating": 1,
+                "items": [{"group": "1.4 Semver engine", "text": fuzz_text, "done": False}],
+            },
+            "cli_commands": {command: True for command in BASELINE_COMMANDS},
+            "evidence": evidence,
+        }
+        markdown = render_report_markdown(report)
+        self.assertIn("Gate result: PASS", markdown)
+        self.assertIn("DEFERRED", markdown)
+        self.assertIn("not completed", markdown)
+        self.assertNotIn("24-hour SemVer fuzz | PASS", markdown)
 
     def test_validates_one_hundred_unique_package_names(self) -> None:
         names = [f"fixture-{index}" for index in range(99)] + ["@fixture/scoped"]

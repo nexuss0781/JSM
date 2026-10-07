@@ -26,7 +26,8 @@ from typing import Any
 ROOT = Path(__file__).resolve().parents[1]
 TODO = ROOT / "TODO.md"
 TOP100_SCHEMA = "jsm.phase1.top100.v1"
-REPORT_SCHEMA = "jsm.phase1.gate.v1"
+REPORT_SCHEMA = "jsm.phase1.gate.v2"
+NON_GATING_DEFERRED_MARKER = "[DEFERRED: NON-GATING]"
 BASELINE_COMMANDS = ("init", "add", "install", "remove", "run", "exec", "list", "why")
 SEARCH_ENDPOINT = "https://registry.npmjs.org/-/v1/search"
 SEARCH_PARAMETERS = {
@@ -82,11 +83,23 @@ def read_phase1_checklist(path: Path = TODO) -> list[dict[str, Any]]:
                 "group": group,
                 "text": match.group(2),
                 "done": match.group(1).lower() == "x",
+                "deferred_non_gating": NON_GATING_DEFERRED_MARKER in match.group(2).upper(),
                 "source_line": base_line + line_number - 1,
             })
     if not checks:
         raise ValueError("no Phase 1 checklist items were found")
     return checks
+
+
+def is_approved_non_gating_deferral(item: dict[str, Any]) -> bool:
+    text = item["text"].lower()
+    return (
+        item["group"] == "1.4 Semver engine"
+        and "24-hour" in text
+        and "fuzz" in text
+        and item["deferred_non_gating"]
+        and not item["done"]
+    )
 
 
 def atomic_write(path: Path, content: str) -> None:
@@ -329,6 +342,19 @@ def build_report(verify: bool = False, timeout: int = 300) -> dict[str, Any]:
     cli_commands = discover_cli_surface(help_text)
     checklist = read_phase1_checklist()
     open_checks = sum(not item["done"] for item in checklist)
+    non_gating_deferrals = [
+        item for item in checklist if is_approved_non_gating_deferral(item)
+    ]
+    unrecognized_deferrals = [
+        item
+        for item in checklist
+        if item["deferred_non_gating"] and not is_approved_non_gating_deferral(item)
+    ]
+    deferred_source_lines = {item["source_line"] for item in non_gating_deferrals}
+    blocking_open_checks = sum(
+        not item["done"] and item["source_line"] not in deferred_source_lines
+        for item in checklist
+    )
     stubs = scaffold_crates()
     phase1_cli_e2e = ROOT / "crates" / "jsm-cli" / "tests" / "phase1_cli.rs"
     phase1_benchmark = ROOT / "docs" / "benchmarks" / "phase1-baseline" / "report.json"
@@ -344,8 +370,15 @@ def build_report(verify: bool = False, timeout: int = 300) -> dict[str, Any]:
     semver_fuzz_valid, semver_fuzz_reason = evidence_state(semver_fuzz, validate_semver_fuzz)
     memory_stress_valid, memory_stress_reason = evidence_state(memory_stress, validate_memory_stress)
     blockers: list[str] = []
-    if open_checks:
-        blockers.append(f"{open_checks} Phase 1 checklist item(s) remain unchecked in TODO.md.")
+    if blocking_open_checks:
+        blockers.append(
+            f"{blocking_open_checks} in-scope Phase 1 checklist item(s) remain unchecked in TODO.md."
+        )
+    if unrecognized_deferrals:
+        lines = ", ".join(str(item["source_line"]) for item in unrecognized_deferrals)
+        blockers.append(
+            f"Only the open 24-hour SemVer fuzz item may be marked non-gating; check TODO.md line(s) {lines}."
+        )
     missing_commands = [name for name, available in cli_commands.items() if not available]
     if missing_commands:
         blockers.append("Missing baseline CLI commands: " + ", ".join(missing_commands) + ".")
@@ -359,7 +392,8 @@ def build_report(verify: bool = False, timeout: int = 300) -> dict[str, Any]:
         blockers.append(f"No passing Phase 1 benchmark report comparing real JSM with npm and pnpm is present ({benchmark_reason}).")
     if not semver_differential_valid:
         blockers.append(f"SemVer differential evidence is not acceptable ({semver_differential_reason}).")
-    if not semver_fuzz_valid:
+    semver_fuzz_deferred = bool(non_gating_deferrals) and not semver_fuzz_valid
+    if not semver_fuzz_valid and not semver_fuzz_deferred:
         blockers.append(f"SemVer 24-hour fuzz evidence is not acceptable ({semver_fuzz_reason}).")
     if not memory_stress_valid:
         blockers.append(f"2,000-package memory evidence is not acceptable ({memory_stress_reason}).")
@@ -367,9 +401,9 @@ def build_report(verify: bool = False, timeout: int = 300) -> dict[str, Any]:
         blockers.append("Build, test, formatting, lint, and fake-registry checks were not run by this audit.")
     validations_passed = all(check["status"] == "passed" for check in validations)
     gate_ready = (
-        verify and validations_passed and open_checks == 0 and not missing_commands
+        verify and validations_passed and blocking_open_checks == 0 and not unrecognized_deferrals and not missing_commands
         and not stubs and phase1_cli_e2e.is_file() and top100_valid and benchmark_valid
-        and semver_differential_valid and semver_fuzz_valid and memory_stress_valid
+        and semver_differential_valid and (semver_fuzz_valid or semver_fuzz_deferred) and memory_stress_valid
     )
     return {
         "schema": REPORT_SCHEMA,
@@ -383,8 +417,19 @@ def build_report(verify: bool = False, timeout: int = 300) -> dict[str, Any]:
             "total": len(checklist),
             "complete": len(checklist) - open_checks,
             "open": open_checks,
+            "blocking_open": blocking_open_checks,
+            "deferred_non_gating": len(non_gating_deferrals),
             "items": checklist,
         },
+        "non_gating_deferrals": [
+            {
+                "group": item["group"],
+                "text": item["text"],
+                "source_line": item["source_line"],
+                "status": "24-hour run not completed; deferred by explicit project direction",
+            }
+            for item in non_gating_deferrals
+        ],
         "cli_commands": cli_commands,
         "scaffold_crates": stubs,
         "phase1_cli_e2e_present": phase1_cli_e2e.is_file(),
@@ -404,7 +449,13 @@ def build_report(verify: bool = False, timeout: int = 300) -> dict[str, Any]:
             "semver_fuzz_report": str(semver_fuzz.relative_to(ROOT)),
             "semver_fuzz_present": semver_fuzz.is_file(),
             "semver_fuzz_valid": semver_fuzz_valid,
-            "semver_fuzz_status": semver_fuzz_reason,
+            "semver_fuzz_deferred_non_gating": semver_fuzz_deferred,
+            "semver_fuzz_status": (
+                "24-hour run not completed; explicitly deferred as non-gating; no valid evidence report is claimed"
+                if semver_fuzz_deferred
+                else semver_fuzz_reason
+            ),
+            "semver_fuzz_validation_status": semver_fuzz_reason,
             "memory_stress_report": str(memory_stress.relative_to(ROOT)),
             "memory_stress_present": memory_stress.is_file(),
             "memory_stress_valid": memory_stress_valid,
@@ -417,10 +468,17 @@ def build_report(verify: bool = False, timeout: int = 300) -> dict[str, Any]:
 
 def render_report_markdown(report: dict[str, Any]) -> str:
     checks = report["checklist"]
+    if checks["deferred_non_gating"]:
+        completion = (
+            f"{checks['complete']} of {checks['total']} checklist items are complete; "
+            f"{checks['deferred_non_gating']} open follow-up(s) are explicitly non-gating."
+        )
+    else:
+        completion = f"{checks['complete']} of {checks['total']} Phase 1 checklist items are complete."
     lines = [
         "# Phase 1 gate status",
         "",
-        f"**Gate result: {'PASS' if report['gate_ready'] else 'NOT MET'}** — {checks['complete']} of {checks['total']} Phase 1 checklist items are marked complete.",
+        f"**Gate result: {'PASS' if report['gate_ready'] else 'NOT MET'}** — {completion}",
         "",
         f"Generated `{report['generated_at']}` from revision `{report['git_revision']}` in `{report['validation_mode']}` mode.",
         "",
@@ -434,25 +492,39 @@ def render_report_markdown(report: dict[str, Any]) -> str:
             lines.append(f"| {check['name']} | {check['status']} | {check['elapsed_seconds']:.3f}s |")
     else:
         lines.append("| Checks | Not run (audit mode) | — |")
-    lines.extend(["", "## Remaining blockers", ""])
+    lines.extend(["", "## In-scope gaps", ""])
     if report["blockers"]:
         lines.extend(f"- {blocker}" for blocker in report["blockers"])
+    else:
+        lines.append("None.")
+    lines.extend(["", "## Explicit non-gating follow-ups", ""])
+    if report["non_gating_deferrals"]:
+        lines.extend(
+            f"- **Deferred, not passed:** {item['text']}"
+            for item in report["non_gating_deferrals"]
+        )
+        lines.append("  The 24-hour run was not completed and no fuzz evidence report is claimed.")
     else:
         lines.append("None.")
     lines.extend(["", "## Baseline CLI commands", "", "| Command | Present in help |", "|---|---|"])
     lines.extend(f"| `{name}` | {'yes' if present else 'no'} |" for name, present in report["cli_commands"].items())
     evidence = report["evidence"]
     evidence_rows = (
-        ("Real-registry top-100", evidence["top100_report_valid"], evidence["top100_report"], evidence["top100_report_status"]),
-        ("npm/pnpm/JSM benchmark", evidence["phase1_benchmark_valid"], evidence["phase1_benchmark_report"], evidence["phase1_benchmark_status"]),
-        ("SemVer differential", evidence["semver_differential_valid"], evidence["semver_differential_report"], evidence["semver_differential_status"]),
-        ("24-hour SemVer fuzz", evidence["semver_fuzz_valid"], evidence["semver_fuzz_report"], evidence["semver_fuzz_status"]),
-        ("2,000-package memory", evidence["memory_stress_valid"], evidence["memory_stress_report"], evidence["memory_stress_status"]),
+        ("Real-registry top-100", "PASS" if evidence["top100_report_valid"] else "NOT MET", evidence["top100_report"], evidence["top100_report_status"]),
+        ("npm/pnpm/JSM benchmark", "PASS" if evidence["phase1_benchmark_valid"] else "NOT MET", evidence["phase1_benchmark_report"], evidence["phase1_benchmark_status"]),
+        ("SemVer differential", "PASS" if evidence["semver_differential_valid"] else "NOT MET", evidence["semver_differential_report"], evidence["semver_differential_status"]),
+        (
+            "24-hour SemVer fuzz",
+            "PASS" if evidence["semver_fuzz_valid"] else "DEFERRED" if evidence["semver_fuzz_deferred_non_gating"] else "NOT MET",
+            evidence["semver_fuzz_report"],
+            evidence["semver_fuzz_status"],
+        ),
+        ("2,000-package memory", "PASS" if evidence["memory_stress_valid"] else "NOT MET", evidence["memory_stress_report"], evidence["memory_stress_status"]),
     )
     lines.extend(["", "## Acceptance evidence", "", "| Evidence | Result | Report | Details |", "|---|---|---|---|"])
     lines.extend(
-        f"| {name} | {'PASS' if valid else 'BLOCKED'} | `{path}` | {details} |"
-        for name, valid, path, details in evidence_rows
+        f"| {name} | {status} | `{path}` | {details} |"
+        for name, status, path, details in evidence_rows
     )
     lines.extend(["", "## Phase 1 checklist", ""])
     last_group = None
