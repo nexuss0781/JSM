@@ -8,5 +8,12 @@ publish.workspace = true
 [lib]
 path = "src/lib.rs"
 
+[dependencies]
+jsm-security = { path = "../jsm-security" }
+serde.workspace = true
+serde_json.workspace = true
+sha2.workspace = true
+thiserror.workspace = true
+
 [lints]
 workspace = true

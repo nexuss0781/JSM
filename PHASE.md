@@ -58,6 +58,8 @@ A phase may be developed in smaller reviewable increments, but later phases do n
 
 **Gate:** all Phase 1 exit criteria pass; fixture-based end-to-end tests cover each baseline command and failure path; the real-registry top-100 acceptance set is exercised; no unverified content or implicit dependency script execution reaches a project; publish the first comparable benchmark against npm and pnpm. Any unsupported platform behavior is explicit and tested, not silently degraded.
 
+**Acceptance tooling:** [`docs/phase1-harness.md`](docs/phase1-harness.md) documents the readiness auditor, replayable npm package corpus, and real-binary benchmark command. Harness self-tests are tooling checks, not evidence that unfinished product requirements pass.
+
 ## Phase 2 — Store Management and Safety
 
 **Objective:** make the shared store safe to operate, inspect, clean, and recover across projects and processes.
