@@ -1312,7 +1312,7 @@ fn run_exec(
         // script path into `C:`; the generated CMD shim preserves it as one
         // quoted Node argument and is also the conventional Windows entrypoint.
         let mut command = ProcessCommand::new("cmd.exe");
-        command.args(["/D", "/S", "/C", "call"]).arg(&executable);
+        command.args(["/D", "/C", "call"]).arg(&executable);
         command
     } else if executable
         .extension()
