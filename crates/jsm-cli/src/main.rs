@@ -1314,9 +1314,14 @@ fn run_exec(
             }
             let mut command = ProcessCommand::new("node");
             command
-                .arg(&target)
+                .args([
+                    "-e",
+                    "const target = process.env.JSM_BIN_TARGET; process.argv = [process.execPath, target, ...process.argv.slice(1)]; require('module').runMain();",
+                    "--",
+                ])
                 .args(args)
                 .current_dir(cwd)
+                .env("JSM_BIN_TARGET", &target)
                 .env("PATH", project_path(cwd)?);
             return finish_child(command, out_json, "exec", Some(name), cancellation);
         }
