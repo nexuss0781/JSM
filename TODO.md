@@ -113,8 +113,8 @@
 
 ### 1.9 Resolver baseline
 
-- [x] Integrate PubGrub with highest-version default, exact/range/dist-tag resolution, dependency-cycle handling, and lazy parallel metadata retrieval.
-- [x] Ensure identical metadata and inputs produce identical graphs independent of response timing; report structured conflict derivations.
+- [x] Integrate Resolvo with highest-version default, exact/range/dist-tag resolution, dependency-cycle handling, and lazy parallel metadata retrieval.
+- [x] Ensure identical metadata and inputs produce identical graphs independent of response timing; report structured conflict details.
 - [x] Add property tests that every selected package satisfies all constraints and deterministic repeated-run tests.
 
 ### 1.10 Lockfile baseline
@@ -268,7 +268,7 @@
 
 ### 3.9 Conflict explanation and suggestions
 
-- [ ] Render PubGrub derivations as readable dependency/range chains; expose structured conflict JSON and `--explain`.
+- [ ] Render solver conflict information as readable dependency/range chains; expose structured conflict JSON and `--explain`.
 - [ ] Generate candidate upgrade/downgrade/override/peer-range suggestions without presenting guesses as guaranteed fixes.
 - [ ] Review 30 real conflict cases for accuracy, clarity, and actionable guidance.
 
