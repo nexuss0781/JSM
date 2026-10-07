@@ -714,15 +714,23 @@ mod tests {
 
     #[test]
     fn precedence_and_environment_expansion_are_deterministic() {
-        let home = env::var("HOME").expect("test environment supplies HOME");
+        let (home_variable, home) = match env::var("HOME") {
+            Ok(home) => ("HOME", home),
+            Err(_) => (
+                "USERPROFILE",
+                env::var("USERPROFILE").expect("test environment supplies a home directory"),
+            ),
+        };
         let user = Config::parse_npmrc(
             "user/.npmrc",
             "registry=https://user.invalid\nstore-dir=/user/store\n",
         )
         .unwrap();
-        let workspace =
-            Config::parse_jsm_toml("jsm.toml", "registry = \"https://${HOME}/registry\"\n")
-                .unwrap();
+        let workspace = Config::parse_jsm_toml(
+            "jsm.toml",
+            &format!("registry = \"${{{home_variable}}}/registry\"\n"),
+        )
+        .unwrap();
         let project = Config::parse_npmrc(
             "project/.npmrc",
             "registry=https://project.invalid\nstore-dir=/project/store\n",
@@ -765,10 +773,13 @@ mod tests {
         );
         assert_eq!(layers.get("store-dir").as_deref(), Some("/cli/store"));
         assert_eq!(
-            Config::parse_jsm_toml("expansion", "registry = \"https://${HOME}/registry\"\n")
-                .unwrap()
-                .registry
-                .as_deref(),
+            Config::parse_jsm_toml(
+                "expansion",
+                &format!("registry = \"https://${{{home_variable}}}/registry\"\n"),
+            )
+            .unwrap()
+            .registry
+            .as_deref(),
             Some(format!("https://{home}/registry").as_str())
         );
     }

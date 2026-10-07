@@ -712,11 +712,14 @@ fn set_readonly(path: &Path) -> Result<(), StoreError> {
     Ok(())
 }
 
-fn unique_suffix() -> u128 {
-    std::time::SystemTime::now()
+fn unique_suffix() -> String {
+    static COUNTER: std::sync::atomic::AtomicU64 = std::sync::atomic::AtomicU64::new(0);
+    let timestamp = std::time::SystemTime::now()
         .duration_since(std::time::UNIX_EPOCH)
         .unwrap_or_default()
-        .as_nanos()
+        .as_nanos();
+    let sequence = COUNTER.fetch_add(1, std::sync::atomic::Ordering::Relaxed);
+    format!("{}-{timestamp}-{sequence}", std::process::id())
 }
 
 #[cfg(test)]
