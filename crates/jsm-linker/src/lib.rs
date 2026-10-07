@@ -905,7 +905,12 @@ fn remove_existing(p: &Path) -> Result<(), LinkError> {
     if let Ok(m) = fs::symlink_metadata(p) {
         if is_junction(p)? {
             #[cfg(windows)]
-            junction::delete(p)?;
+            {
+                // Deleting the reparse tag leaves the empty mount-point
+                // directory behind; remove it too so the path can be reused.
+                junction::delete(p)?;
+                fs::remove_dir(p)?;
+            }
         } else if m.file_type().is_dir() && !m.file_type().is_symlink() {
             fs::remove_dir_all(p)?
         } else if m.file_type().is_symlink() && m.is_dir() {
@@ -1117,14 +1122,17 @@ fn create_bin_shims(dir: &Path, name: &str, target: &Path) -> Result<(), LinkErr
 }
 #[cfg(windows)]
 fn create_bin_shims(dir: &Path, name: &str, target: &Path) -> Result<(), LinkError> {
-    let target = target.display();
+    let target = target.display().to_string();
+    let powershell_target = target.replace("'", "''");
     fs::write(
         dir.join(format!("{name}.cmd")),
         format!("@echo off\r\nnode \"{target}\" %*\r\n"),
     )?;
     fs::write(
         dir.join(format!("{name}.ps1")),
-        format!("& node \"{target}\" @args\r\nexit $LASTEXITCODE\r\n"),
+        format!(
+            "$target = '{powershell_target}'\r\n& node -- $target @args\r\nexit $LASTEXITCODE\r\n"
+        ),
     )?;
     Ok(())
 }
