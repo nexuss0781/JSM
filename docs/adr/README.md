@@ -4,6 +4,10 @@ Use an ADR for decisions that affect persisted formats, public CLI/JSON behavior
 
 Copy `TEMPLATE.md` to the next zero-padded number and descriptive slug. Do not reuse a number.
 
+## Proposed decisions
+
+- [ADR 0005: SQLite-backed reference registry](0005-sqlite-reference-registry.md) — SQLite is proposed for Phase 2.1; project review is required before implementation.
+
 ## Accepted decisions
 
 - [ADR 0002: Lockfile v2 peer-context package identity](0002-lockfile-v2-peer-context.md) — user-approved v2 key and v1 compatibility policy.
