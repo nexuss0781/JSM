@@ -312,6 +312,7 @@ def build_report(verify: bool = False, timeout: int = 300) -> dict[str, Any]:
             run_check("Rust formatting", ["cargo", "fmt", "--all", "--", "--check"], timeout),
             run_check("Workspace build", ["cargo", "build", "--workspace", "--all-targets", "--locked"], timeout),
             run_check("Workspace tests", ["cargo", "test", "--workspace", "--all-features", "--locked"], timeout),
+            run_check("Phase 1 CLI fake-registry end-to-end tests", ["cargo", "test", "-p", "jsm-cli", "--test", "phase1_cli", "--locked"], timeout),
             run_check("Clippy warnings as errors", ["cargo", "clippy", "--workspace", "--all-targets", "--all-features", "--locked", "--", "-D", "warnings"], timeout),
             run_check("Phase 0 fake-registry testkit suite (not product CLI acceptance)", ["cargo", "test", "-p", "jsm-testkit", "--test", "fake_registry_install", "--locked"], timeout),
         ])

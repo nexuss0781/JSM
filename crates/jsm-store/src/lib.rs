@@ -1021,6 +1021,9 @@ mod tests {
         fs::remove_dir_all(root).unwrap();
     }
 
+    // The non-Unix branch clears the readonly attribute on a temporary test file
+    // so this test can simulate corruption; Unix uses an explicit safe mode.
+    #[allow(clippy::permissions_set_readonly_false)]
     #[test]
     fn corrupt_existing_blob_is_repaired_from_verified_replacement_bytes() {
         let root = std::env::temp_dir().join(format!("jsm-store-test-{}", unique_suffix()));

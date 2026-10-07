@@ -1104,6 +1104,7 @@ pub fn link_project(
 #[cfg(test)]
 mod tests {
     use super::*;
+    use std::process::{Command, Output};
     #[test]
     fn package_keys() {
         assert_eq!(split_key("@a/b@1.0.0"), Some(("@a/b", "1.0.0")));
@@ -1388,6 +1389,100 @@ mod tests {
         assert!(output.status.success());
         assert_eq!(output.stdout, b"invoked");
         let _ = fs::remove_dir_all(root);
+    }
+
+    #[cfg(unix)]
+    fn invoke_test_bin(bin_dir: &Path, name: &str, argument: &str) -> Vec<Output> {
+        vec![
+            Command::new(bin_dir.join(name))
+                .arg(argument)
+                .output()
+                .unwrap(),
+        ]
+    }
+
+    #[cfg(windows)]
+    fn invoke_test_bin(bin_dir: &Path, name: &str, argument: &str) -> Vec<Output> {
+        let cmd = Command::new("cmd.exe")
+            .args(["/D", "/C", "call"])
+            .arg(bin_dir.join(format!("{name}.cmd")))
+            .arg(argument)
+            .output()
+            .unwrap();
+        let powershell = Command::new("powershell.exe")
+            .args([
+                "-NoLogo",
+                "-NoProfile",
+                "-NonInteractive",
+                "-ExecutionPolicy",
+                "Bypass",
+                "-File",
+            ])
+            .arg(bin_dir.join(format!("{name}.ps1")))
+            .arg(argument)
+            .output()
+            .unwrap();
+        vec![cmd, powershell]
+    }
+
+    #[test]
+    fn phase1_bin_conflict_executes_the_direct_winner() {
+        let root = std::env::temp_dir().join(format!(
+            "jsm-linker-test-{}-phase1-bin-conflict space",
+            std::process::id()
+        ));
+        let _ = fs::remove_dir_all(&root);
+        fs::create_dir_all(&root).unwrap();
+
+        let mut lock = Lockfile::default();
+        let mut selected = BTreeSet::new();
+        for name in ["a-indirect", "z-direct"] {
+            let key = format!("{name}@1.0.0");
+            let package_dir = instance_path(&root, &key).join("node_modules").join(name);
+            fs::create_dir_all(&package_dir).unwrap();
+            fs::write(
+                package_dir.join("package.json"),
+                serde_json::json!({
+                    "name": name,
+                    "version": "1.0.0",
+                    "bin": {"phase1-tool": "bin.js"}
+                })
+                .to_string(),
+            )
+            .unwrap();
+            fs::write(
+                package_dir.join("bin.js"),
+                format!(
+                    "#!/usr/bin/env node\nprocess.stdout.write('winner={name}:' + (process.argv[2] || ''));\n"
+                ),
+            )
+            .unwrap();
+            lock.packages.insert(
+                key.clone(),
+                jsm_lockfile::Package {
+                    name: name.to_owned(),
+                    version: "1.0.0".to_owned(),
+                    ..Default::default()
+                },
+            );
+            selected.insert(key);
+        }
+
+        // The direct package sorts after the indirect package, so success proves
+        // direct-dependency priority wins before the lexical tie-breaker.
+        let direct = BTreeMap::from([("z-direct".to_owned(), "z-direct@1.0.0".to_owned())]);
+        write_bins(&root, &root, &lock, &selected, &direct).unwrap();
+        let outputs = invoke_test_bin(&root.join(".bin"), "phase1-tool", "verified-arg");
+        assert!(!outputs.is_empty());
+        for output in outputs {
+            assert!(
+                output.status.success(),
+                "bin launcher failed: {}",
+                String::from_utf8_lossy(&output.stderr)
+            );
+            assert_eq!(output.stdout, b"winner=z-direct:verified-arg");
+        }
+        fs::remove_dir_all(root).unwrap();
     }
 
     #[cfg(windows)]
