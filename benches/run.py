@@ -343,6 +343,16 @@ def scenario_environment(base: dict[str, str], ci_mode: bool) -> dict[str, str]:
         environment["CI"] = "1"
     return environment
 
+PHASE1_BENCHMARK_PROTOCOL = "phase1-per-sample-cache-isolated-v1"
+
+
+def configure_tool_cache_dirs(environment: dict[str, str], tool: str, cache_dir: Path) -> None:
+    if tool == "pnpm":
+        environment["npm_config_store_dir"] = str(cache_dir / "pnpm-store")
+    elif tool == "jsm":
+        environment["JSM_STORE_DIR"] = str(cache_dir / "jsm-store")
+        environment["JSM_CACHE_DIR"] = str(cache_dir / "jsm-registry")
+
 
 def start_container_session(
     runtime: str,
@@ -622,8 +632,7 @@ def benchmark_tool(
             "PNPM_HOME": str(cache_dir / "pnpm"),
             "BUN_INSTALL_CACHE_DIR": str(cache_dir / "bun"),
         })
-        if tool == "pnpm":
-            environment["npm_config_store_dir"] = str(cache_dir / "pnpm-store")
+        configure_tool_cache_dirs(environment, tool, cache_dir)
         if tool == "jsm-stub":
             environment["PATH"] = os.environ.get("PATH", "")
         assert project is not None
@@ -702,6 +711,8 @@ def render_markdown(report: dict[str, Any], previous: dict[str, float]) -> str:
         "| Tool | Version | Fixture | Scenario | Status | Median (s) | Prior median (s) |",
         "|---|---|---|---|---|---:|---:|",
     ]
+    if report.get("measurement_protocol"):
+        lines.insert(5, f"Measurement protocol: `{report['measurement_protocol']}`\\")
     for result in report["results"]:
         version = report["tool_versions"].get(result["tool"], "unavailable")
         key = f"{result['tool']}|{result['fixture']}|{result['scenario']}"
@@ -714,13 +725,15 @@ def render_markdown(report: dict[str, Any], previous: dict[str, float]) -> str:
     return "\n".join(lines)
 
 
-def load_prior_medians(history_path: Path) -> dict[str, float]:
+def load_prior_medians(history_path: Path, protocol: str | None = None) -> dict[str, float]:
     previous: dict[str, float] = {}
     if history_path.exists():
         for line in history_path.read_text(encoding="utf-8").splitlines():
             try:
                 prior_report = json.loads(line)
             except json.JSONDecodeError:
+                continue
+            if protocol is not None and prior_report.get("measurement_protocol") != protocol:
                 continue
             for result in prior_report.get("results", []):
                 if result.get("status") != "passed" or result.get("median_seconds") is None:
@@ -859,7 +872,7 @@ def main() -> int:
             "runtime": "none (host mode)",
             "version": "unavailable",
             "images": {},
-            "isolation_summary": "separate temporary project directories and per-tool caches; processes run on the host, not in containers.",
+            "isolation_summary": "separate temporary projects and per-tool caches; JSM CAS and registry caches are rooted under the cleared per-tool cache directory for every cold/CI sample; host processes, not containers.",
         }
     else:
         runtime_version = subprocess.run(runtime_prefix(container_runtime) + ["--version"], text=True, capture_output=True, timeout=20, check=False)
@@ -895,18 +908,34 @@ def main() -> int:
         },
         "results": results,
     }
+    if args.phase1:
+        report["measurement_protocol"] = PHASE1_BENCHMARK_PROTOCOL
     if args.output_dir is None:
         args.output_dir = ROOT / "docs" / "benchmarks" / "phase1-baseline" if args.phase1 else ROOT / "benches" / "results"
     args.output_dir.mkdir(parents=True, exist_ok=True)
     json_path = args.output_dir / "report.json"
     markdown_path = args.output_dir / "report.md"
     history_path = args.output_dir / "history.jsonl"
-    previous = load_prior_medians(history_path)
+    previous = load_prior_medians(
+        history_path,
+        protocol=PHASE1_BENCHMARK_PROTOCOL if args.phase1 else None,
+    )
     markdown = render_markdown(report, previous)
     json_path.write_text(json.dumps(report, indent=2, sort_keys=True) + "\n", encoding="utf-8")
     markdown_path.write_text(markdown, encoding="utf-8")
     with history_path.open("a", encoding="utf-8") as stream:
-        stream.write(json.dumps({"generated_at": report["generated_at"], "git_revision": git_revision, "results": results}, sort_keys=True) + "\n")
+        stream.write(
+            json.dumps(
+                {
+                    "generated_at": report["generated_at"],
+                    "git_revision": git_revision,
+                    "measurement_protocol": report.get("measurement_protocol"),
+                    "results": results,
+                },
+                sort_keys=True,
+            )
+            + "\n"
+        )
     print(f"Benchmark report: {json_path}")
     print(f"Markdown report: {markdown_path}")
     failed = (

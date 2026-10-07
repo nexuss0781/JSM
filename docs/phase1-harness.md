@@ -46,7 +46,7 @@ python3 benches/run.py --phase1 --jsm-binary target/release/jsm \
   --container-runtime none --repeat 3
 ```
 
-This runs npm, pnpm, and the supplied JSM binary on identical deterministic small fixtures served by the local fake registry, records versions, environment, commands, and samples, and writes to `docs/benchmarks/phase1-baseline/` by default. It is explicitly host-mode evidence; compare only results with matching operating system, tool versions, fixture revision, flags, and network shaping. Use `--fixture`, `--scenario`, `--latency-ms`, and `--bandwidth-bytes-per-second` to define a comparable workload. No Phase 1 product benchmark should be published until the real JSM binary successfully completes the scenarios.
+This runs npm, pnpm, and the supplied JSM binary on identical deterministic small fixtures served by the local fake registry, records versions, environment, commands, samples, Git revision, and measurement protocol, and writes to `docs/benchmarks/phase1-baseline/` by default. It is explicitly host-mode evidence; compare only results with matching operating system, tool versions, fixture revision, flags, network shaping, and measurement protocol. JSM's CAS store and registry metadata cache are rooted under its temporary benchmark cache directory and cleared for every cold and CI sample. Prior medians from older protocols are ignored. Use `--fixture`, `--scenario`, `--latency-ms`, and `--bandwidth-bytes-per-second` to define a comparable workload. No Phase 1 product benchmark should be published until the real JSM binary successfully completes the scenarios.
 
 ## SemVer range fuzzing
 
