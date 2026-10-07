@@ -1051,27 +1051,15 @@ fn exec_runs_a_registry_installed_package_bin_and_forwards_arguments() {
     assert!(String::from_utf8_lossy(&install.stderr).contains("jsm: Fetching fixture-bin@1.0.0"));
     #[cfg(windows)]
     {
-        use std::os::windows::ffi::OsStringExt;
-
-        let sidecar = project
-            .path()
-            .join("node_modules/.bin/fixture-tool.jsm-bin.json");
-        assert!(sidecar.is_file(), "generated bin target sidecar is missing");
-        let encoded_target: Vec<u16> =
-            serde_json::from_slice(&fs::read(&sidecar).unwrap()).unwrap();
-        let target = std::path::PathBuf::from(std::ffi::OsString::from_wide(&encoded_target));
-        assert!(
-            target.is_absolute(),
-            "generated bin target is not absolute: {target:?}"
-        );
-        assert!(
-            target.ends_with(std::path::Path::new("bin/tool.js")),
-            "generated bin target is unexpected: {target:?}"
-        );
         let launcher = project.path().join("node_modules/.bin/fixture-tool.ps1");
         assert!(
             launcher.is_file(),
             "generated PowerShell launcher is missing"
+        );
+        let launcher_source = fs::read_to_string(&launcher).unwrap();
+        assert!(
+            launcher_source.contains("$target = -join [char[]]@("),
+            "PowerShell launcher does not embed its lossless target path"
         );
         let mut path_entries = vec![project.path().join("node_modules/.bin")];
         if let Some(path) = std::env::var_os("PATH") {
@@ -1097,7 +1085,7 @@ fn exec_runs_a_registry_installed_package_bin_and_forwards_arguments() {
             "direct PowerShell launcher failed: {}\nstdout: {}\nscript: {}",
             String::from_utf8_lossy(&direct.stderr),
             String::from_utf8_lossy(&direct.stdout),
-            fs::read_to_string(&launcher).unwrap()
+            launcher_source
         );
         assert_eq!(String::from_utf8_lossy(&direct.stdout).trim(), "alpha|beta");
     }
