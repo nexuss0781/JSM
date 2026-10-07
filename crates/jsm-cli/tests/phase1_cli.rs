@@ -1068,6 +1068,38 @@ fn exec_runs_a_registry_installed_package_bin_and_forwards_arguments() {
             target.ends_with(std::path::Path::new("bin/tool.js")),
             "generated bin target is unexpected: {target:?}"
         );
+        let launcher = project.path().join("node_modules/.bin/fixture-tool.ps1");
+        assert!(
+            launcher.is_file(),
+            "generated PowerShell launcher is missing"
+        );
+        let mut path_entries = vec![project.path().join("node_modules/.bin")];
+        if let Some(path) = std::env::var_os("PATH") {
+            path_entries.extend(std::env::split_paths(&path));
+        }
+        let direct_path = std::env::join_paths(path_entries).unwrap();
+        let direct = std::process::Command::new("powershell.exe")
+            .args([
+                "-NoProfile",
+                "-NonInteractive",
+                "-ExecutionPolicy",
+                "Bypass",
+                "-File",
+            ])
+            .arg(&launcher)
+            .args(["alpha", "beta"])
+            .current_dir(project.path())
+            .env("PATH", direct_path)
+            .output()
+            .unwrap();
+        assert!(
+            direct.status.success(),
+            "direct PowerShell launcher failed: {}\nstdout: {}\nscript: {}",
+            String::from_utf8_lossy(&direct.stderr),
+            String::from_utf8_lossy(&direct.stdout),
+            fs::read_to_string(&launcher).unwrap()
+        );
+        assert_eq!(String::from_utf8_lossy(&direct.stdout).trim(), "alpha|beta");
     }
     let output = cli(project.path())
         .arg("exec")
@@ -1076,10 +1108,16 @@ fn exec_runs_a_registry_installed_package_bin_and_forwards_arguments() {
         .arg("beta")
         .output()
         .unwrap();
+    #[cfg(windows)]
+    let launcher_source =
+        fs::read_to_string(project.path().join("node_modules/.bin/fixture-tool.ps1"))
+            .unwrap_or_else(|error| format!("<could not read PowerShell shim: {error}>"));
+    #[cfg(not(windows))]
+    let launcher_source = String::new();
     assert!(
         output.status.success(),
-        "package bin failed: {}",
-        String::from_utf8_lossy(&output.stderr)
+        "package bin failed: {}\nPowerShell shim:\n{launcher_source}",
+        String::from_utf8_lossy(&output.stderr),
     );
     assert_eq!(String::from_utf8_lossy(&output.stdout).trim(), "alpha|beta");
 }
