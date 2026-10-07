@@ -17,6 +17,16 @@ python3 scripts/phase1_gate.py --verify
 
 Exit code `2` means the local checks completed but the Phase 1 gate is still unmet. The report lists open checklist items, absent CLI commands, scaffold crates, and missing acceptance/benchmark evidence. It is intentionally not a CI job that marks an incomplete product as green.
 
+## Fake-registry CLI end-to-end tests
+
+The product-level baseline command suite uses `jsm-cli/tests/phase1_cli.rs`; run it directly with:
+
+```sh
+cargo test -p jsm-cli --test phase1_cli --locked
+```
+
+It verifies the CLI JSON contract and exercises project initialization, registry-backed `add`/`install`/`remove`, installed-package `exec`, project script `run`, and `list`/`why` behavior. Registry-backed cases use the in-process fake registry and assert lockfile, installed-file, frozen/offline, failure-cleanup, and lifecycle-script non-execution behavior. The full `--verify` audit records this suite as a separate validation in addition to the workspace-wide tests and Phase 0 testkit tests.
+
 ## Real-registry acceptance set
 
 Create a timestamped, replayable snapshot of 100 npm search results:
