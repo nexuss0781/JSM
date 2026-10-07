@@ -847,13 +847,84 @@ pub(super) fn dynamic_completion(
             }
         }
     }
-    for candidate in candidates
-        .into_iter()
-        .filter(|candidate| candidate.starts_with(prefix))
-    {
-        println!("{candidate}");
+    let normalized_project_prefix = if kind == CompletionKind::Projects {
+        canonicalized_completion_prefix(prefix)
+    } else {
+        None
+    };
+    for candidate in candidates {
+        if candidate.starts_with(prefix) {
+            println!("{candidate}");
+        } else if let Some(normalized_prefix) = &normalized_project_prefix
+            && let Some(alias) = project_completion_alias(prefix, &candidate, normalized_prefix)
+        {
+            println!("{alias}");
+        }
     }
     Ok(())
+}
+
+fn canonicalized_completion_prefix(prefix: &str) -> Option<String> {
+    let mut probe = Path::new(prefix).to_path_buf();
+    if !probe.is_absolute() {
+        return None;
+    }
+    let mut suffix = Vec::new();
+    loop {
+        if let Ok(mut resolved) = fs::canonicalize(&probe) {
+            for component in suffix.iter().rev() {
+                resolved.push(component);
+            }
+            return Some(resolved.to_string_lossy().into_owned());
+        }
+        suffix.push(probe.file_name()?.to_os_string());
+        if !probe.pop() {
+            return None;
+        }
+    }
+}
+
+fn project_completion_alias(
+    prefix: &str,
+    candidate: &str,
+    normalized_prefix: &str,
+) -> Option<String> {
+    let separator = std::path::MAIN_SEPARATOR;
+    let prefix_base = if prefix.len() > 1 {
+        prefix.trim_end_matches(separator)
+    } else {
+        prefix
+    };
+    let normalized_base = if normalized_prefix.len() > 1 {
+        normalized_prefix.trim_end_matches(separator)
+    } else {
+        normalized_prefix
+    };
+    let suffix = candidate.strip_prefix(normalized_base)?;
+    Some(format!("{prefix_base}{suffix}"))
+}
+
+#[cfg(all(test, unix))]
+mod completion_path_tests {
+    use super::{canonicalized_completion_prefix, project_completion_alias};
+    use std::{fs, os::unix::fs::symlink};
+
+    #[test]
+    fn project_completion_preserves_symlink_alias_for_partial_paths() {
+        let temp = tempfile::tempdir().unwrap();
+        let actual = temp.path().join("actual");
+        fs::create_dir(&actual).unwrap();
+        let alias = temp.path().join("alias");
+        symlink(&actual, &alias).unwrap();
+
+        let prefix = alias.join("proj").to_string_lossy().into_owned();
+        let normalized_prefix = canonicalized_completion_prefix(&prefix).unwrap();
+        let candidate = actual.join("project-root").to_string_lossy().into_owned();
+        let suggestion = project_completion_alias(&prefix, &candidate, &normalized_prefix).unwrap();
+
+        assert_eq!(suggestion, alias.join("project-root").to_string_lossy());
+        assert!(suggestion.starts_with(&prefix));
+    }
 }
 
 pub(super) fn topic_help(topic: &str) -> Result<()> {
