@@ -10,10 +10,15 @@ path = "src/lib.rs"
 
 [dependencies]
 jsm-security = { path = "../jsm-security" }
+fs4.workspace = true
+rusqlite.workspace = true
 serde.workspace = true
 serde_json.workspace = true
 sha2.workspace = true
 thiserror.workspace = true
+
+[dev-dependencies]
+tempfile.workspace = true
 
 [lints]
 workspace = true

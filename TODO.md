@@ -1,6 +1,6 @@
 # JSM Implementation Backlog
 
-> **Status:** Phase 0 foundations and gate are complete on `main` (merged PR #2); the Phase 1 gate is verified on `main` (merged PR #3), with its 24-hour SemVer fuzz campaign explicitly deferred and non-gating; Phases 2–7 remain open.
+> **Status:** Phase 0 foundations and gate are complete on `main` (merged PR #2); the Phase 1 gate is verified on `main` (merged PR #3), with its 24-hour SemVer fuzz campaign explicitly deferred and non-gating. ADR PR #4 is merged; Phase 2 implementation and local validation are complete in PR #5 targeting `main`, and its checklist remains open until merge. Phases 3–7 remain open.
 > **Companion:** [`PHASE.md`](PHASE.md) defines sequencing, phase gates, and cross-phase invariants.
 > **Requirement source:** [`SPECS.md`](SPECS.md) is authoritative for detailed behavior and exit criteria; [`PROJECT.md`](PROJECT.md) is authoritative for product goals and scope.
 
@@ -557,7 +557,8 @@
 
 Track these open questions from `PROJECT.md` as ADRs at the point they block a decision. Do not let unresolved decisions silently become permanent behavior.
 
-- [ ] **Before store/format implementation (0.1, 1.6, 1.10, 2.1):** finalize product/binary naming; store default and per-volume selection; reference DB; package/peer instance identity and lockfile representation.
+- [ ] **Before store/format implementation (0.1, 1.6, 1.10, 2.1):** finalize product/binary naming.
+- [x] **Store/format decisions (1.6, 1.10, 2.1):** store default and per-volume selection (ADR 0003); package/peer instance identity and lockfile representation (ADR 0002); reference database (accepted ADR 0005).
 - [ ] **Before changing linker defaults (3.8):** select compatibility default and document isolated/hoisted trade-offs.
 - [ ] **Before script execution release (4.4, 5.7):** confirm policy defaults, approval storage, supported sandbox guarantees, and explicit degraded modes.
 - [ ] **Before publishing v1.0 (5.13):** decide license, governance/ownership, distribution channels, signing identity, supported migration window, and release policy.

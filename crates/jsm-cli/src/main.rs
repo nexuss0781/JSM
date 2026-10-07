@@ -2,7 +2,7 @@ use std::{
     fmt::Write as _,
     path::PathBuf,
     thread,
-    time::{Duration, SystemTime},
+    time::{Duration, SystemTime, UNIX_EPOCH},
 };
 
 use clap::{Parser, Subcommand, ValueEnum};
@@ -14,7 +14,7 @@ use jsm_linker::{LinkOptions, link};
 use jsm_lockfile::{Importer, Lockfile, Package, package_instance_key, peer_context_hash};
 use jsm_registry::{PackageMetadata, Packument, Registry, RegistryConfig, RegistryError};
 use jsm_resolver::{Candidate, Provider, Resolver};
-use jsm_store::Store;
+use jsm_store::{PackageReference, ProjectReference, Store, hash_bytes};
 use miette::{IntoDiagnostic, Result, miette};
 use serde_json::{Value, json};
 use std::{
@@ -39,8 +39,15 @@ use tracing_subscriber::{
 
 use jsm_core::{DependencySpec, DistTag, Integrity, PackageName, Range, Spec, Version, redact};
 
+mod phase2;
+
 #[derive(Debug, Parser, Clone)]
-#[command(name = "jsm", version, about = "Rust JavaScript package manager")]
+#[command(
+    name = "jsm",
+    version,
+    about = "Rust JavaScript package manager",
+    disable_help_subcommand = true
+)]
 struct Cli {
     #[arg(long, global = true, default_value = ".")]
     cwd: PathBuf,
@@ -62,6 +69,8 @@ struct Cli {
     no_color: bool,
     #[arg(long, global = true)]
     non_interactive: bool,
+    #[arg(long, global = true, value_enum, default_value_t = ProgressMode::Auto)]
+    progress: ProgressMode,
     #[arg(long, global = true)]
     config: Option<PathBuf>,
     /// Write a Chrome trace for diagnostic runs.
@@ -78,11 +87,48 @@ enum FrozenLockfileMode {
     Never,
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq, ValueEnum, Default)]
+enum ProgressMode {
+    #[default]
+    Auto,
+    Ndjson,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, ValueEnum, Default)]
+enum StoreSort {
+    #[default]
+    Name,
+    Size,
+    Used,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, ValueEnum)]
+enum CompletionShell {
+    Bash,
+    Zsh,
+    Fish,
+    PowerShell,
+    Elvish,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, ValueEnum)]
+enum CompletionKind {
+    Packages,
+    Projects,
+}
+
 #[derive(Debug, Clone, Subcommand)]
 enum Command {
     /// Emit the Phase 0 observability sample (hidden from normal command listings).
     #[command(name = "phase0-demo", hide = true)]
     Phase0Demo,
+    #[command(name = "__complete", hide = true)]
+    DynamicCompletion {
+        #[arg(value_enum)]
+        kind: CompletionKind,
+        #[arg(default_value = "")]
+        prefix: String,
+    },
     Init {
         #[arg(short = 'y', long)]
         yes: bool,
@@ -139,6 +185,115 @@ enum Command {
         #[command(subcommand)]
         command: ConfigCommand,
     },
+    Store {
+        #[command(subcommand)]
+        command: StoreCommand,
+    },
+    Versions {
+        package: String,
+    },
+    Doctor {
+        #[arg(long)]
+        fix: bool,
+        #[arg(long)]
+        report: bool,
+    },
+    Lock {
+        #[command(subcommand)]
+        command: LockCommand,
+    },
+    Completion {
+        #[arg(value_enum)]
+        shell: CompletionShell,
+    },
+    Help {
+        topic: String,
+    },
+}
+
+#[derive(Debug, Clone, Subcommand)]
+enum StoreCommand {
+    Path,
+    Status,
+    List {
+        #[arg(long, value_enum, default_value_t = StoreSort::Name)]
+        sort: StoreSort,
+        #[arg(long)]
+        filter: Option<String>,
+    },
+    Versions {
+        package: String,
+    },
+    Info {
+        package: String,
+    },
+    Add {
+        specs: Vec<String>,
+        #[arg(long)]
+        from_lockfile: bool,
+    },
+    Remove {
+        package: String,
+        #[arg(long)]
+        all: bool,
+        #[arg(long)]
+        force: bool,
+        #[arg(long)]
+        dry_run: bool,
+        #[arg(short = 'y', long)]
+        yes: bool,
+    },
+    Usage {
+        package: String,
+    },
+    ForgetProject {
+        project: String,
+        #[arg(long)]
+        dry_run: bool,
+        #[arg(short = 'y', long)]
+        yes: bool,
+    },
+    Prune {
+        #[arg(long)]
+        dry_run: bool,
+        #[arg(short = 'y', long)]
+        yes: bool,
+    },
+    Gc {
+        #[arg(long)]
+        older_than: Option<String>,
+        #[arg(long)]
+        max_size: Option<String>,
+        #[arg(long)]
+        dry_run: bool,
+        #[arg(short = 'y', long)]
+        yes: bool,
+    },
+    Pin {
+        package: String,
+    },
+    Unpin {
+        package: String,
+    },
+    Pinned,
+    Verify {
+        package: Option<String>,
+        #[arg(long)]
+        full: bool,
+        #[arg(long)]
+        fix: bool,
+    },
+}
+
+#[derive(Debug, Clone, Subcommand)]
+enum LockCommand {
+    Verify,
+    Merge {
+        base: PathBuf,
+        ours: PathBuf,
+        theirs: PathBuf,
+    },
+    InstallMergeDriver,
 }
 #[derive(Debug, Clone, Subcommand)]
 enum ConfigCommand {
@@ -274,6 +429,9 @@ fn main() -> Result<()> {
 
 fn run(cli: Cli, cancellation: &CancellationToken) -> Result<()> {
     ensure_not_cancelled(cancellation)?;
+    if cli.progress == ProgressMode::Ndjson && !cli.json {
+        return Err(miette!("--progress=ndjson requires --json"));
+    }
     let cwd = fs::canonicalize(&cli.cwd).into_diagnostic()?;
     let command = cli.command.clone().unwrap_or(Command::Install {
         frozen_lockfile: None,
@@ -294,11 +452,12 @@ fn run(cli: Cli, cancellation: &CancellationToken) -> Result<()> {
             exact,
             save_prefix,
         } => {
-            let mut progress = OperationProgress::start(
+            let mut progress = OperationProgress::start_with_ndjson(
                 "Adding and installing packages",
                 cli.quiet,
                 cli.json,
                 cli.non_interactive || ci_enabled(),
+                cli.progress == ProgressMode::Ndjson,
             );
             add(
                 &cli,
@@ -320,11 +479,12 @@ fn run(cli: Cli, cancellation: &CancellationToken) -> Result<()> {
             prod,
             no_lockfile,
         } => {
-            let mut progress = OperationProgress::start(
+            let mut progress = OperationProgress::start_with_ndjson(
                 "Resolving, fetching, and linking dependencies",
                 cli.quiet,
                 cli.json,
                 cli.non_interactive || ci_enabled(),
+                cli.progress == ProgressMode::Ndjson,
             );
             let frozen = match frozen_lockfile {
                 Some(FrozenLockfileMode::Always) => true,
@@ -342,11 +502,12 @@ fn run(cli: Cli, cancellation: &CancellationToken) -> Result<()> {
             )
         }
         Command::Remove { packages } => {
-            let mut progress = OperationProgress::start(
+            let mut progress = OperationProgress::start_with_ndjson(
                 "Removing and updating packages",
                 cli.quiet,
                 cli.json,
                 cli.non_interactive || ci_enabled(),
+                cli.progress == ProgressMode::Ndjson,
             );
             remove(&cli, &cwd, packages, cli.json, cancellation, &mut progress)
         }
@@ -354,6 +515,15 @@ fn run(cli: Cli, cancellation: &CancellationToken) -> Result<()> {
         Command::Why { package } => why(&cwd, &package, cli.json),
         Command::Run { script, args } => run_script(&cwd, &script, &args, cli.json, cancellation),
         Command::Exec { command, args } => run_exec(&cwd, &command, &args, cli.json, cancellation),
+        Command::Store { command } => phase2::store_command(&cli, &cwd, command, cancellation),
+        Command::Versions { package } => phase2::remote_versions(&cli, &cwd, &package),
+        Command::Doctor { fix, report } => phase2::doctor(&cli, &cwd, fix, report),
+        Command::Lock { command } => phase2::lock_command(&cli, &cwd, command),
+        Command::Completion { shell } => phase2::completion(shell),
+        Command::DynamicCompletion { kind, prefix } => {
+            phase2::dynamic_completion(&cli, &cwd, kind, &prefix)
+        }
+        Command::Help { topic } => phase2::topic_help(&topic),
         Command::Config { .. } => unreachable!(),
     }
 }
@@ -1030,10 +1200,29 @@ fn install(
     progress: &mut OperationProgress,
 ) -> Result<()> {
     ensure_not_cancelled(cancellation)?;
+    let config = effective_config(cli, cwd)?;
+    let configured_store = cli
+        .store_dir
+        .clone()
+        .or_else(|| config.store_dir.as_deref().map(PathBuf::from));
+    let store = Store::open_for_project(cwd, configured_store.as_deref()).into_diagnostic()?;
+    {
+        // Exclusive startup cleanup cannot race a live fetch or extraction.
+        let _maintenance = store.maintenance_lease(false).into_diagnostic()?;
+        store
+            .clean_orphan_temps(Duration::from_secs(24 * 60 * 60))
+            .into_diagnostic()?;
+    }
+    let _maintenance = store.maintenance_lease(true).into_diagnostic()?;
+    let reference_index = store.reference_registry().into_diagnostic()?;
+    let _project_lease = reference_index
+        .project_lease(&cwd.to_string_lossy())
+        .into_diagnostic()?;
+    recover_install_journal(cwd, &reference_index)?;
+    clean_project_orphans(cwd, Duration::from_secs(24 * 60 * 60))?;
     let manifest = read_manifest(cwd)?;
     let (importer, roots) = manifest_importer(&manifest, prod)?;
     let lock_path = cwd.join("jsm.lock");
-    let config = effective_config(cli, cwd)?;
     let reg = registry(&config, cli, cwd)?;
     let lock = if no_lockfile {
         resolve_lock(&reg, &importer, &roots)?
@@ -1081,17 +1270,20 @@ fn install(
         resolve_lock(&reg, &importer, &roots)?
     };
     ensure_not_cancelled(cancellation)?;
-    let configured_store = cli
-        .store_dir
-        .clone()
-        .or_else(|| config.store_dir.as_deref().map(PathBuf::from));
-    let store = Store::open_for_project(cwd, configured_store.as_deref()).into_diagnostic()?;
     for (id, package) in &lock.packages {
         ensure_not_cancelled(cancellation)?;
         let name = PackageName::new(package.name.clone()).into_diagnostic()?;
         let version = Version::parse(&package.version).into_diagnostic()?;
         let version_text = version.to_string();
         let integrity = Integrity::new(package.integrity.clone()).into_diagnostic()?;
+        let _package_lease = store
+            .package_lease(&format!(
+                "{}@{}@{}",
+                name.as_str(),
+                version_text,
+                integrity.as_str()
+            ))
+            .into_diagnostic()?;
         if !store.has_package(name.as_str(), &version_text, integrity.as_str()) {
             progress.package_started(&format!("Fetching {name}@{version_text}"));
             let body = reg
@@ -1123,9 +1315,13 @@ fn install(
             )
             .map_err(|error| miette!("failed to extract package `{id}`: {error}"))?;
         }
+        reference_index
+            .clear_corrupt(name.as_str(), &version_text, integrity.as_str())
+            .into_diagnostic()?;
     }
     ensure_not_cancelled(cancellation)?;
-    link(
+    let transaction = begin_install_journal(cwd, &reference_index, !no_lockfile && !frozen)?;
+    let link_result = link(
         cwd,
         &store,
         &lock,
@@ -1134,9 +1330,69 @@ fn install(
             ..Default::default()
         },
     )
-    .into_diagnostic()?;
-    if !no_lockfile && !frozen {
-        lock.write(&lock_path).into_diagnostic()?;
+    .into_diagnostic();
+    if let Err(error) = link_result {
+        recover_install_journal(cwd, &reference_index)?;
+        return Err(error);
+    }
+    maybe_crash("after-link");
+    if !no_lockfile
+        && !frozen
+        && let Err(error) = lock.write(&lock_path).into_diagnostic()
+    {
+        recover_install_journal(cwd, &reference_index)?;
+        return Err(error);
+    }
+    maybe_crash("after-lockfile");
+    let reference_commit = (|| -> Result<()> {
+        let lockfile_hash = if no_lockfile {
+            hash_bytes(lock.serialize().as_bytes())
+        } else {
+            hash_bytes(&fs::read(&lock_path).into_diagnostic()?)
+        };
+        let mut package_refs = BTreeMap::new();
+        for package in lock.packages.values() {
+            let manifest = store
+                .get_package_manifest(&package.name, &package.version, &package.integrity)
+                .into_diagnostic()?
+                .ok_or_else(|| {
+                    miette!(
+                        "verified package {}@{} disappeared before install commit",
+                        package.name,
+                        package.version
+                    )
+                })?;
+            let reference = store.package_reference(&manifest).into_diagnostic()?;
+            package_refs.insert(
+                (
+                    reference.name.clone(),
+                    reference.version.clone(),
+                    reference.integrity.clone(),
+                ),
+                reference,
+            );
+        }
+        reference_index
+            .register_install(
+                cwd,
+                &lockfile_hash,
+                &package_refs
+                    .into_values()
+                    .collect::<Vec<PackageReference>>(),
+            )
+            .into_diagnostic()?;
+        Ok(())
+    })();
+    if let Err(error) = reference_commit {
+        recover_install_journal(cwd, &reference_index)?;
+        return Err(error);
+    }
+    maybe_crash("after-references");
+    // Removing the journal is the commit point; leftover backups are only garbage.
+    fs::remove_file(&transaction.journal).into_diagnostic()?;
+    sync_directory(cwd);
+    if let Err(error) = cleanup_transaction_backups(cwd, &transaction) {
+        tracing::warn!(%error,"could not remove committed install backup; a later install will clean it");
     }
     if cli.json {
         emit_json(
@@ -1147,6 +1403,215 @@ fn install(
         println!("installed {} packages", lock.packages.len());
     }
     Ok(())
+}
+
+struct InstallTransaction {
+    journal: PathBuf,
+    node_modules_backup: PathBuf,
+    lockfile_backup: PathBuf,
+    had_node_modules: bool,
+    had_lockfile: bool,
+}
+
+fn begin_install_journal(
+    cwd: &Path,
+    registry: &jsm_store::ReferenceRegistry,
+    move_lockfile: bool,
+) -> Result<InstallTransaction> {
+    let journal = cwd.join(".jsm-install-journal.json");
+    if journal.exists() {
+        return Err(miette!(
+            "an install recovery journal already exists; refusing to start a second transaction"
+        ));
+    }
+    let previous_project = registry.project_for_path(cwd).into_diagnostic()?;
+    let previous_packages = match &previous_project {
+        Some(project) => registry
+            .packages_for_project(&project.project_id)
+            .into_diagnostic()?,
+        None => Vec::new(),
+    };
+    let stamp = format!(
+        "{}-{}",
+        std::process::id(),
+        SystemTime::now()
+            .duration_since(UNIX_EPOCH)
+            .unwrap_or_default()
+            .as_nanos()
+    );
+    let node_modules_backup = cwd.join(format!(".jsm-install-backup-{stamp}"));
+    let lockfile_backup = cwd.join(format!(".jsm-lock-backup-{stamp}"));
+    let had_node_modules = fs::symlink_metadata(cwd.join("node_modules")).is_ok();
+    let had_lockfile = fs::symlink_metadata(cwd.join("jsm.lock")).is_ok();
+    let had_project_marker = fs::symlink_metadata(cwd.join(".jsm-project-id")).is_ok();
+    let payload = json!({"version":1,"node_modules_backup":node_modules_backup.file_name().unwrap().to_string_lossy(),
+        "lockfile_backup":lockfile_backup.file_name().unwrap().to_string_lossy(),"had_node_modules":had_node_modules,
+        "had_lockfile":had_lockfile,"had_project_marker":had_project_marker,
+        "previous_project":previous_project,"previous_packages":previous_packages});
+    phase2::atomic_write(&journal, &serde_json::to_vec(&payload).into_diagnostic()?)?;
+    sync_directory(cwd);
+    maybe_crash("after-journal");
+    if had_node_modules
+        && let Err(error) = fs::rename(cwd.join("node_modules"), &node_modules_backup)
+    {
+        let _ = recover_install_journal(cwd, registry);
+        return Err(error).into_diagnostic();
+    }
+    maybe_crash("after-node-modules-backup");
+    if had_lockfile
+        && move_lockfile
+        && let Err(error) = fs::rename(cwd.join("jsm.lock"), &lockfile_backup)
+    {
+        let _ = recover_install_journal(cwd, registry);
+        return Err(error).into_diagnostic();
+    }
+    maybe_crash("after-lockfile-backup");
+    sync_directory(cwd);
+    Ok(InstallTransaction {
+        journal,
+        node_modules_backup,
+        lockfile_backup,
+        had_node_modules,
+        had_lockfile,
+    })
+}
+
+fn recover_install_journal(cwd: &Path, registry: &jsm_store::ReferenceRegistry) -> Result<()> {
+    let journal = cwd.join(".jsm-install-journal.json");
+    if !journal.exists() {
+        return Ok(());
+    }
+    let bytes = fs::read(&journal).into_diagnostic()?;
+    let value: Value = serde_json::from_slice(&bytes).into_diagnostic()?;
+    if value["version"].as_u64() != Some(1) {
+        return Err(miette!(
+            "unsupported or malformed install journal; preserve it and inspect before continuing"
+        ));
+    }
+    let backup_path = |field: &str, prefix: &str| -> Result<PathBuf> {
+        let name = value[field]
+            .as_str()
+            .ok_or_else(|| miette!("install journal is missing {field}"))?;
+        let path = Path::new(name);
+        if path.file_name().and_then(|part| part.to_str()) != Some(name)
+            || !name.starts_with(prefix)
+        {
+            return Err(miette!("unsafe install journal backup path"));
+        }
+        Ok(cwd.join(path))
+    };
+    let node_backup = backup_path("node_modules_backup", ".jsm-install-backup-")?;
+    let lock_backup = backup_path("lockfile_backup", ".jsm-lock-backup-")?;
+    restore_transaction_path(
+        &cwd.join("node_modules"),
+        &node_backup,
+        value["had_node_modules"].as_bool().unwrap_or(false),
+    )?;
+    restore_transaction_path(
+        &cwd.join("jsm.lock"),
+        &lock_backup,
+        value["had_lockfile"].as_bool().unwrap_or(false),
+    )?;
+    let previous: Option<ProjectReference> =
+        serde_json::from_value(value["previous_project"].clone()).into_diagnostic()?;
+    let packages: Vec<PackageReference> =
+        serde_json::from_value(value["previous_packages"].clone()).into_diagnostic()?;
+    if let Some(project) = previous {
+        registry
+            .register_install(cwd, &project.lockfile_hash, &packages)
+            .into_diagnostic()?;
+    } else {
+        registry.remove_project_at(cwd).into_diagnostic()?;
+        if !value["had_project_marker"].as_bool().unwrap_or(false) {
+            let _ = fs::remove_file(cwd.join(".jsm-project-id"));
+        }
+    }
+    fs::remove_file(&journal).into_diagnostic()?;
+    let _ = fs::remove_dir_all(&node_backup);
+    let _ = fs::remove_file(&lock_backup);
+    sync_directory(cwd);
+    Ok(())
+}
+
+fn restore_transaction_path(target: &Path, backup: &Path, had_original: bool) -> Result<()> {
+    let backup_exists = fs::symlink_metadata(backup).is_ok();
+    if had_original {
+        if backup_exists {
+            remove_any_path(target)?;
+            fs::rename(backup, target).into_diagnostic()?;
+        } else if fs::symlink_metadata(target).is_err() {
+            return Err(miette!(
+                "install recovery is missing both original and backup at {}",
+                target.display()
+            ));
+        }
+    } else {
+        remove_any_path(target)?;
+    }
+    Ok(())
+}
+
+fn remove_any_path(path: &Path) -> Result<()> {
+    let Ok(metadata) = fs::symlink_metadata(path) else {
+        return Ok(());
+    };
+    if metadata.file_type().is_dir() && !metadata.file_type().is_symlink() {
+        fs::remove_dir_all(path).into_diagnostic()
+    } else {
+        fs::remove_file(path).into_diagnostic()
+    }
+}
+
+fn clean_project_orphans(cwd: &Path, age: Duration) -> Result<()> {
+    let now = SystemTime::now();
+    for entry in fs::read_dir(cwd).into_diagnostic()? {
+        let entry = entry.into_diagnostic()?;
+        let name = entry.file_name().to_string_lossy().into_owned();
+        if !(name.starts_with(".jsm-install-backup-") || name.starts_with(".jsm-lock-backup-")) {
+            continue;
+        }
+        let Ok(metadata) = entry.metadata() else {
+            continue;
+        };
+        let old = metadata
+            .modified()
+            .ok()
+            .and_then(|modified| now.duration_since(modified).ok())
+            .is_some_and(|elapsed| elapsed >= age);
+        if old {
+            remove_any_path(&entry.path())?;
+        }
+    }
+    Ok(())
+}
+
+fn cleanup_transaction_backups(cwd: &Path, transaction: &InstallTransaction) -> Result<()> {
+    if transaction.had_node_modules {
+        remove_any_path(&transaction.node_modules_backup)?;
+    }
+    if transaction.had_lockfile {
+        remove_any_path(&transaction.lockfile_backup)?;
+    }
+    sync_directory(cwd);
+    Ok(())
+}
+
+fn sync_directory(path: &Path) {
+    #[cfg(unix)]
+    {
+        if let Ok(directory) = fs::File::open(path) {
+            let _ = directory.sync_all();
+        }
+    }
+}
+
+fn maybe_crash(boundary: &str) {
+    #[cfg(debug_assertions)]
+    if std::env::var("JSM_TEST_CRASH_AT").ok().as_deref() == Some(boundary) {
+        std::process::abort();
+    }
+    #[cfg(not(debug_assertions))]
+    let _ = boundary;
 }
 
 fn remove(

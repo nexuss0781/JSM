@@ -4,6 +4,9 @@ use sha2::{Digest, Sha256};
 use std::{collections::BTreeMap, fs, path::Path};
 use thiserror::Error;
 
+mod merge;
+pub use merge::{merge_lockfiles, verify_lockfile};
+
 pub const CRATE_NAME: &str = "jsm-lockfile";
 pub const LEGACY_LOCKFILE_VERSION: u64 = 1;
 pub const CURRENT_LOCKFILE_VERSION: u64 = 2;
