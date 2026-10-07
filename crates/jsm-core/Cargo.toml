@@ -10,6 +10,7 @@ path = "src/lib.rs"
 
 [dependencies]
 base64.workspace = true
+nodejs-semver = { version = "=7.0.0", default-features = false }
 regex.workspace = true
 semver.workspace = true
 serde.workspace = true

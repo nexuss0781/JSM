@@ -24,9 +24,25 @@ EXPECTED = {
     "jsm-daemon",
     "jsm-testkit",
 }
-# New internal edges require a reviewed update to this explicit Phase 0 policy.
+# New internal edges require a reviewed update to this explicit policy.
 ALLOWED_EDGES = {
-    "jsm-cli": {"jsm-core", "jsm-testkit"},  # testkit is a dev dependency only
+    "jsm-cli": {
+        "jsm-core",
+        "jsm-fetch",
+        "jsm-linker",
+        "jsm-lockfile",
+        "jsm-registry",
+        "jsm-resolver",
+        "jsm-store",
+        "jsm-testkit",  # testkit is a dev dependency only
+    },
+    "jsm-fetch": {"jsm-core", "jsm-security", "jsm-store", "jsm-testkit"},
+    "jsm-linker": {"jsm-core", "jsm-lockfile", "jsm-store"},
+    "jsm-lockfile": {"jsm-core"},
+    "jsm-registry": {"jsm-core", "jsm-testkit"},  # testkit is a dev dependency only
+    "jsm-resolver": {"jsm-core"},
+    "jsm-security": {"jsm-core"},
+    "jsm-store": {"jsm-core", "jsm-security"},
     "jsm-testkit": {"jsm-core"},
 }
 

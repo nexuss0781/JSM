@@ -1,0 +1,10 @@
+{
+  "init": ["command", "created", "schema"],
+  "add": ["command", "field", "packages", "schema"],
+  "install": ["command", "lockfile", "packages", "schema"],
+  "remove": ["command", "packages", "schema"],
+  "run": ["command", "exitCode", "name", "schema", "stderr", "stdout"],
+  "exec": ["command", "exitCode", "name", "schema", "stderr", "stdout"],
+  "list": ["command", "packages", "schema"],
+  "why": ["command", "direct", "package", "schema"]
+}

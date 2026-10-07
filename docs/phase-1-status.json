@@ -1,0 +1,600 @@
+{
+  "blockers": [],
+  "checklist": {
+    "blocking_open": 0,
+    "complete": 52,
+    "deferred_non_gating": 1,
+    "items": [
+      {
+        "deferred_non_gating": false,
+        "done": true,
+        "group": "1.1 CLI skeleton",
+        "source_line": 63,
+        "text": "Implement the global flags, command aliases, CI detection, non-interactive/frozen-lockfile behavior, progress rendering, and non-TTY output."
+      },
+      {
+        "deferred_non_gating": false,
+        "done": true,
+        "group": "1.1 CLI skeleton",
+        "source_line": 64,
+        "text": "Add typo suggestions and graceful SIGINT/SIGTERM cancellation with defined exit codes and temp-data cleanup."
+      },
+      {
+        "deferred_non_gating": false,
+        "done": true,
+        "group": "1.1 CLI skeleton",
+        "source_line": 65,
+        "text": "Snapshot-test help and verify cancellation never exposes partial project state."
+      },
+      {
+        "deferred_non_gating": false,
+        "done": true,
+        "group": "1.2 Configuration system",
+        "source_line": 69,
+        "text": "Implement the documented precedence across CLI, `JSM_*`, project/workspace config, user config, and defaults."
+      },
+      {
+        "deferred_non_gating": false,
+        "done": true,
+        "group": "1.2 Configuration system",
+        "source_line": 70,
+        "text": "Parse `.npmrc` registry/scope/auth/proxy/TLS settings and environment expansion with documented precedence."
+      },
+      {
+        "deferred_non_gating": false,
+        "done": true,
+        "group": "1.2 Configuration system",
+        "source_line": 71,
+        "text": "Add `config get|set|list|delete` scopes, validation with file/line/key diagnostics, JSON Schema, and precedence/invalid-input tests."
+      },
+      {
+        "deferred_non_gating": false,
+        "done": true,
+        "group": "1.3 Manifest handling",
+        "source_line": 75,
+        "text": "Parse and preserve supported dependency, script, bin, engine, platform, workspace, override, export, and file fields."
+      },
+      {
+        "deferred_non_gating": false,
+        "done": true,
+        "group": "1.3 Manifest handling",
+        "source_line": 76,
+        "text": "Implement minimal-diff edits that preserve formatting, key order, indentation, and trailing newline."
+      },
+      {
+        "deferred_non_gating": false,
+        "done": true,
+        "group": "1.3 Manifest handling",
+        "source_line": 77,
+        "text": "Add dependency-type and exact/prefix save flags; test round trips against a real-manifest corpus and malformed input."
+      },
+      {
+        "deferred_non_gating": false,
+        "done": true,
+        "group": "1.4 Semver engine",
+        "source_line": 81,
+        "text": "Implement npm-compatible range grammar, comparator intersection/subset/simplification, prerelease rules, and build metadata handling."
+      },
+      {
+        "deferred_non_gating": false,
+        "done": true,
+        "group": "1.4 Semver engine",
+        "source_line": 82,
+        "text": "Differential-test generated inputs against the reference npm `semver` implementation; add parser fuzzing and pathological-input tests."
+      },
+      {
+        "deferred_non_gating": false,
+        "done": true,
+        "group": "1.4 Semver engine",
+        "source_line": 83,
+        "text": "Meet the reference corpus agreement criterion before resolver integration (90,800/90,800 cases)."
+      },
+      {
+        "deferred_non_gating": true,
+        "done": false,
+        "group": "1.4 Semver engine",
+        "source_line": 84,
+        "text": "Complete the specified uninterrupted 24-hour SemVer fuzz campaign. **[DEFERRED: NON-GATING]** Explicitly deferred for Phase 1 closure on 2026-10-07; the run was stopped, was not completed, and has no evidence report."
+      },
+      {
+        "deferred_non_gating": false,
+        "done": true,
+        "group": "1.5 Registry client",
+        "source_line": 88,
+        "text": "Implement pooled HTTPS/HTTP2-capable client, abbreviated packuments with full-metadata fallback, ETag/Last-Modified cache, and offline behavior."
+      },
+      {
+        "deferred_non_gating": false,
+        "done": true,
+        "group": "1.5 Registry client",
+        "source_line": 89,
+        "text": "Add scoped registry authentication, secret-safe credential handling, proxy/custom CA support, timeouts, retry/backoff, and `Retry-After` handling."
+      },
+      {
+        "deferred_non_gating": false,
+        "done": true,
+        "group": "1.5 Registry client",
+        "source_line": 90,
+        "text": "Sanitize all registry metadata before path use; abstract the registry behind a trait for later mirrors/indexes."
+      },
+      {
+        "deferred_non_gating": false,
+        "done": true,
+        "group": "1.5 Registry client",
+        "source_line": 91,
+        "text": "Test 304, flaky 5xx, timeout, truncation, auth failure, and cache/offline behavior using the fake registry."
+      },
+      {
+        "deferred_non_gating": false,
+        "done": true,
+        "group": "1.6 Store: content-addressed storage",
+        "source_line": 95,
+        "text": "Implement platform-default store paths and overrides through flag, environment, and config."
+      },
+      {
+        "deferred_non_gating": false,
+        "done": true,
+        "group": "1.6 Store: content-addressed storage",
+        "source_line": 96,
+        "text": "Implement versioned store layout and sharded SHA-512 blob paths; resolve the open default/per-volume store policy in an ADR."
+      },
+      {
+        "deferred_non_gating": false,
+        "done": true,
+        "group": "1.6 Store: content-addressed storage",
+        "source_line": 97,
+        "text": "Implement verified, idempotent temp-write/fsync-policy/atomic-rename blob publication and read-only blob permissions."
+      },
+      {
+        "deferred_non_gating": false,
+        "done": true,
+        "group": "1.6 Store: content-addressed storage",
+        "source_line": 98,
+        "text": "Implement per-volume placement or safe link fallback and the specified Store API."
+      },
+      {
+        "deferred_non_gating": false,
+        "done": true,
+        "group": "1.6 Store: content-addressed storage",
+        "source_line": 99,
+        "text": "Test concurrent writers, existing-blob skip, invalid hash rejection, and killed-writer recovery."
+      },
+      {
+        "deferred_non_gating": false,
+        "done": true,
+        "group": "1.7 Store: package manifests",
+        "source_line": 103,
+        "text": "Store manifests keyed by package name/version/tarball integrity with file path, hash, mode, size, symlink, and package metadata records."
+      },
+      {
+        "deferred_non_gating": false,
+        "done": true,
+        "group": "1.7 Store: package manifests",
+        "source_line": 104,
+        "text": "Validate paths, symlink targets, duplicate/case-colliding paths, device entries, and non-standard archive roots before commit."
+      },
+      {
+        "deferred_non_gating": false,
+        "done": true,
+        "group": "1.7 Store: package manifests",
+        "source_line": 105,
+        "text": "Make the package manifest the commit point and implement a compact/fast read path for large manifests."
+      },
+      {
+        "deferred_non_gating": false,
+        "done": true,
+        "group": "1.7 Store: package manifests",
+        "source_line": 106,
+        "text": "Pass malicious archive tests for traversal, absolute paths, symlink escape, duplicate paths, and decompression bombs."
+      },
+      {
+        "deferred_non_gating": false,
+        "done": true,
+        "group": "1.8 Fetch and extract pipeline",
+        "source_line": 110,
+        "text": "Stream response bytes through integrity verification, decompression, tar parsing, hashing, CAS writes, and manifest commit without retaining a full tarball."
+      },
+      {
+        "deferred_non_gating": false,
+        "done": true,
+        "group": "1.8 Fetch and extract pipeline",
+        "source_line": 111,
+        "text": "Bound channels, buffers, per-package and whole-install memory; enforce entry-count, uncompressed-size, path-length, and compression-ratio limits."
+      },
+      {
+        "deferred_non_gating": false,
+        "done": true,
+        "group": "1.8 Fetch and extract pipeline",
+        "source_line": 112,
+        "text": "Add safe resumable-download support where available and per-package progress events."
+      },
+      {
+        "deferred_non_gating": false,
+        "done": true,
+        "group": "1.8 Fetch and extract pipeline",
+        "source_line": 113,
+        "text": "Test truncated downloads, hash mismatches, limits, cancellation, memory ceiling, and absence of partially committed packages."
+      },
+      {
+        "deferred_non_gating": false,
+        "done": true,
+        "group": "1.9 Resolver baseline",
+        "source_line": 117,
+        "text": "Integrate Resolvo with highest-version default, exact/range/dist-tag resolution, dependency-cycle handling, and lazy parallel metadata retrieval."
+      },
+      {
+        "deferred_non_gating": false,
+        "done": true,
+        "group": "1.9 Resolver baseline",
+        "source_line": 118,
+        "text": "Ensure identical metadata and inputs produce identical graphs independent of response timing; report structured conflict details."
+      },
+      {
+        "deferred_non_gating": false,
+        "done": true,
+        "group": "1.9 Resolver baseline",
+        "source_line": 119,
+        "text": "Add property tests that every selected package satisfies all constraints and deterministic repeated-run tests."
+      },
+      {
+        "deferred_non_gating": false,
+        "done": true,
+        "group": "1.10 Lockfile baseline",
+        "source_line": 123,
+        "text": "Implement deterministic, sorted `jsm.lock` serialization with importers, packages, integrity, URL, dependency edges, engine/platform fields, and format/tool versions."
+      },
+      {
+        "deferred_non_gating": false,
+        "done": true,
+        "group": "1.10 Lockfile baseline",
+        "source_line": 124,
+        "text": "Resolve package-instance identity and lockfile representation for peer-context instances before freezing the format; document in an ADR."
+      },
+      {
+        "deferred_non_gating": false,
+        "done": true,
+        "group": "1.10 Lockfile baseline",
+        "source_line": 125,
+        "text": "Detect manifest/lockfile staleness; implement newer-major rejection, `--frozen-lockfile`, and `--no-lockfile` semantics."
+      },
+      {
+        "deferred_non_gating": false,
+        "done": true,
+        "group": "1.10 Lockfile baseline",
+        "source_line": 126,
+        "text": "Test byte-identical output under shuffled inputs and stale cases for add, remove, and changed ranges."
+      },
+      {
+        "deferred_non_gating": false,
+        "done": true,
+        "group": "1.11 Isolated linker baseline",
+        "source_line": 130,
+        "text": "Build the `.jsm` virtual-store layout with direct-dependency top-level links and internal dependency-edge links; write linker state with lockfile hash/settings."
+      },
+      {
+        "deferred_non_gating": false,
+        "done": true,
+        "group": "1.11 Isolated linker baseline",
+        "source_line": 131,
+        "text": "Probe and use reflink, hardlink, then copy fallback; enforce copy/reflink for mutable/script/patch outputs and reject unsafe paths again at link time."
+      },
+      {
+        "deferred_non_gating": false,
+        "done": true,
+        "group": "1.11 Isolated linker baseline",
+        "source_line": 132,
+        "text": "Incrementally update changed entries, preserve the previous valid tree on failure, and remove orphans only after successful commit."
+      },
+      {
+        "deferred_non_gating": false,
+        "done": true,
+        "group": "1.11 Isolated linker baseline",
+        "source_line": 133,
+        "text": "Verify Node can load declared dependencies and undeclared dependencies are not accidentally resolvable."
+      },
+      {
+        "deferred_non_gating": false,
+        "done": true,
+        "group": "1.12 Bin links",
+        "source_line": 137,
+        "text": "Support string/map `bin` and `directories.bin`; create Unix executables and Windows `.cmd`/PowerShell shims."
+      },
+      {
+        "deferred_non_gating": false,
+        "done": true,
+        "group": "1.12 Bin links",
+        "source_line": 138,
+        "text": "Define deterministic conflict resolution and warnings; document when shebangs are rewritten."
+      },
+      {
+        "deferred_non_gating": false,
+        "done": true,
+        "group": "1.12 Bin links",
+        "source_line": 139,
+        "text": "Test executable invocation and conflict behavior on all supported CI operating systems."
+      },
+      {
+        "deferred_non_gating": false,
+        "done": true,
+        "group": "1.13 Baseline commands",
+        "source_line": 144,
+        "text": "Implement `init`, `add`, `install`, `remove`, `run`, `exec`, basic `list`, and basic `why` with documented arguments and aliases."
+      },
+      {
+        "deferred_non_gating": false,
+        "done": true,
+        "group": "1.13 Baseline commands",
+        "source_line": 145,
+        "text": "Implement versioned `--json` output for each baseline command and schema/snapshot tests."
+      },
+      {
+        "deferred_non_gating": false,
+        "done": true,
+        "group": "1.13 Baseline commands",
+        "source_line": 146,
+        "text": "Add end-to-end tests for success, missing package, network/integrity failures, frozen-lockfile errors, and script execution behavior."
+      },
+      {
+        "deferred_non_gating": false,
+        "done": true,
+        "group": "1.14 Integrity and safety baseline",
+        "source_line": 150,
+        "text": "Verify SHA-512 tarball integrity and blob hashes before content is committed or linked; make any SHA-1 exception explicit, opt-in, and warned."
+      },
+      {
+        "deferred_non_gating": false,
+        "done": true,
+        "group": "1.14 Integrity and safety baseline",
+        "source_line": 151,
+        "text": "Reject traversal and symlink escapes during both extraction and linking."
+      },
+      {
+        "deferred_non_gating": false,
+        "done": true,
+        "group": "1.14 Integrity and safety baseline",
+        "source_line": 152,
+        "text": "Ensure dependency lifecycle scripts cannot execute in the Phase 1 binary; test the absence of an execution path."
+      },
+      {
+        "deferred_non_gating": false,
+        "done": true,
+        "group": "Phase 1 gate",
+        "source_line": 156,
+        "text": "All baseline commands pass fake-registry end-to-end tests and all in-scope sub-phase criteria are met; follow-ups explicitly marked non-gating are recorded separately."
+      },
+      {
+        "deferred_non_gating": false,
+        "done": true,
+        "group": "Phase 1 gate",
+        "source_line": 157,
+        "text": "Exercise the real-registry top-100 package acceptance set and publish a benchmark against npm and pnpm."
+      },
+      {
+        "deferred_non_gating": false,
+        "done": true,
+        "group": "Phase 1 gate",
+        "source_line": 158,
+        "text": "Confirm no implicit dependency script execution and no project-visible unverified bytes."
+      }
+    ],
+    "open": 1,
+    "total": 53
+  },
+  "cli_commands": {
+    "add": true,
+    "exec": true,
+    "init": true,
+    "install": true,
+    "list": true,
+    "remove": true,
+    "run": true,
+    "why": true
+  },
+  "evidence": {
+    "memory_stress_present": true,
+    "memory_stress_report": "benches/results/phase1-memory-2000/report.json",
+    "memory_stress_status": "2,000 packages installed within 512 MiB (peak 27.8 MiB)",
+    "memory_stress_valid": true,
+    "phase1_benchmark_present": true,
+    "phase1_benchmark_report": "docs/benchmarks/phase1-baseline/report.json",
+    "phase1_benchmark_status": "JSM, npm, and pnpm benchmark scenarios passed",
+    "phase1_benchmark_valid": true,
+    "semver_differential_present": true,
+    "semver_differential_report": "docs/semver-differential.json",
+    "semver_differential_status": "90,800 SemVer cases agree 100% with npm",
+    "semver_differential_valid": true,
+    "semver_fuzz_deferred_non_gating": true,
+    "semver_fuzz_present": false,
+    "semver_fuzz_report": "docs/phase1-semver-fuzz-24h.json",
+    "semver_fuzz_status": "24-hour run not completed; explicitly deferred as non-gating; no valid evidence report is claimed",
+    "semver_fuzz_valid": false,
+    "semver_fuzz_validation_status": "report is missing",
+    "top100_report": "benches/results/phase1-top100/report.json",
+    "top100_report_present": true,
+    "top100_report_status": "100 package runs passed",
+    "top100_report_valid": true
+  },
+  "gate_ready": true,
+  "generated_at": "2026-10-07T10:34:01Z",
+  "git_revision": "c8f40bf30f62ef92b5a5b1a0c743c6e542a13316",
+  "non_gating_deferrals": [
+    {
+      "group": "1.4 Semver engine",
+      "source_line": 84,
+      "status": "24-hour run not completed; deferred by explicit project direction",
+      "text": "Complete the specified uninterrupted 24-hour SemVer fuzz campaign. **[DEFERRED: NON-GATING]** Explicitly deferred for Phase 1 closure on 2026-10-07; the run was stopped, was not completed, and has no evidence report."
+    }
+  ],
+  "phase1_cli_e2e_present": true,
+  "repository": "/workspace/JSM",
+  "scaffold_crates": [],
+  "schema": "jsm.phase1.gate.v2",
+  "validation_mode": "verify",
+  "validations": [
+    {
+      "command": [
+        "/opt/manus/python/bin/python3",
+        "scripts/phase1_gate.py",
+        "--self-test"
+      ],
+      "diagnostic_tail": "nessTests.test_cli_surface_does_not_mistake_phase0_demo_for_phase1_commands) ... ok\ntest_fuzz_finalizer_requires_full_run_and_no_artifacts (scripts.test_phase1_gate.Phase1GateHarnessTests.test_fuzz_finalizer_requires_full_run_and_no_artifacts) ... ok\ntest_gate_evidence_requires_a_complete_passing_suite (scripts.test_phase1_gate.Phase1GateHarnessTests.test_gate_evidence_requires_a_complete_passing_suite) ... ok\ntest_gate_report_shows_deferred_fuzz_as_non_gating_not_passed (scripts.test_phase1_gate.Phase1GateHarnessTests.test_gate_report_shows_deferred_fuzz_as_non_gating_not_passed) ... ok\ntest_memory_stress_requires_all_packages_within_512_mib (scripts.test_phase1_gate.Phase1GateHarnessTests.test_memory_stress_requires_all_packages_within_512_mib) ... ok\ntest_only_the_24_hour_semver_fuzz_item_can_be_non_gating (scripts.test_phase1_gate.Phase1GateHarnessTests.test_only_the_24_hour_semver_fuzz_item_can_be_non_gating) ... ok\ntest_reads_phase1_items_and_gate_from_todo (scripts.test_phase1_gate.Phase1GateHarnessTests.test_reads_phase1_items_and_gate_from_todo) ... ok\ntest_rejects_wrong_count_duplicates_and_unsafe_names (scripts.test_phase1_gate.Phase1GateHarnessTests.test_rejects_wrong_count_duplicates_and_unsafe_names) ... ok\ntest_scoped_package_path_is_built_as_components (scripts.test_phase1_gate.Phase1GateHarnessTests.test_scoped_package_path_is_built_as_components) ... ok\ntest_semver_evidence_requires_full_agreement_and_clean_24_hour_fuzz (scripts.test_phase1_gate.Phase1GateHarnessTests.test_semver_evidence_requires_full_agreement_and_clean_24_hour_fuzz) ... ok\ntest_sensitive_values_are_scrubbed_from_diagnostics (scripts.test_phase1_gate.Phase1GateHarnessTests.test_sensitive_values_are_scrubbed_from_diagnostics) ... ok\ntest_validates_one_hundred_unique_package_names (scripts.test_phase1_gate.Phase1GateHarnessTests.test_validates_one_hundred_unique_package_names) ... ok\n\n----------------------------------------------------------------------\nRan 12 tests in 0.008s\n\nOK\n",
+      "elapsed_seconds": 0.197,
+      "name": "Phase 1 gate harness tests",
+      "return_code": 0,
+      "status": "passed"
+    },
+    {
+      "command": [
+        "/opt/manus/python/bin/python3",
+        "-m",
+        "unittest",
+        "benches.test_run",
+        "-v"
+      ],
+      "diagnostic_tail": "test_container_exec_applies_ci_only_when_requested (benches.test_run.BenchmarkPhaseModeTests.test_container_exec_applies_ci_only_when_requested) ... ok\ntest_jsm_cas_and_registry_caches_are_cleared_per_sample (benches.test_run.BenchmarkPhaseModeTests.test_jsm_cas_and_registry_caches_are_cleared_per_sample) ... ok\ntest_phase0_stub_remains_separate_from_real_jsm (benches.test_run.BenchmarkPhaseModeTests.test_phase0_stub_remains_separate_from_real_jsm) ... ok\ntest_phase1_report_is_not_labeled_as_stub_smoke (benches.test_run.BenchmarkPhaseModeTests.test_phase1_report_is_not_labeled_as_stub_smoke) ... ok\ntest_prior_medians_ignore_failed_benchmark_runs (benches.test_run.BenchmarkPhaseModeTests.test_prior_medians_ignore_failed_benchmark_runs) ... ok\ntest_prior_medians_ignore_runs_from_a_different_protocol (benches.test_run.BenchmarkPhaseModeTests.test_prior_medians_ignore_runs_from_a_different_protocol) ... ok\ntest_real_jsm_command_uses_configured_binary_and_phase1_flags (benches.test_run.BenchmarkPhaseModeTests.test_real_jsm_command_uses_configured_binary_and_phase1_flags) ... ok\ntest_scenario_environment_does_not_leak_ci_into_cold_runs (benches.test_run.BenchmarkPhaseModeTests.test_scenario_environment_does_not_leak_ci_into_cold_runs) ... ok\n\n----------------------------------------------------------------------\nRan 8 tests in 0.007s\n\nOK\n",
+      "elapsed_seconds": 0.15,
+      "name": "Benchmark mode tests",
+      "return_code": 0,
+      "status": "passed"
+    },
+    {
+      "command": [
+        "/opt/manus/python/bin/python3",
+        "-m",
+        "py_compile",
+        "scripts/phase1_gate.py",
+        "scripts/test_phase1_gate.py",
+        "scripts/finalize_semver_fuzz.py",
+        "scripts/phase1_memory_2000.py",
+        "benches/run.py",
+        "benches/test_run.py"
+      ],
+      "diagnostic_tail": "",
+      "elapsed_seconds": 0.081,
+      "name": "Python syntax",
+      "return_code": 0,
+      "status": "passed"
+    },
+    {
+      "command": [
+        "/opt/manus/python/bin/python3",
+        "scripts/check_workspace.py"
+      ],
+      "diagnostic_tail": "workspace policy OK: 13 crates, no cycles, core isolated, jsm-cli is the only binary\n",
+      "elapsed_seconds": 0.144,
+      "name": "Workspace dependency policy",
+      "return_code": 0,
+      "status": "passed"
+    },
+    {
+      "command": [
+        "cargo",
+        "fmt",
+        "--all",
+        "--",
+        "--check"
+      ],
+      "diagnostic_tail": "",
+      "elapsed_seconds": 0.907,
+      "name": "Rust formatting",
+      "return_code": 0,
+      "status": "passed"
+    },
+    {
+      "command": [
+        "cargo",
+        "build",
+        "--workspace",
+        "--all-targets",
+        "--locked"
+      ],
+      "diagnostic_tail": "    Finished `dev` profile [unoptimized + debuginfo] target(s) in 1.21s\n",
+      "elapsed_seconds": 1.297,
+      "name": "Workspace build",
+      "return_code": 0,
+      "status": "passed"
+    },
+    {
+      "command": [
+        "cargo",
+        "test",
+        "--workspace",
+        "--all-features",
+        "--locked"
+      ],
+      "diagnostic_tail": "sts\n\ntest result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s\n\n\n    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.27s\n     Running unittests src/lib.rs (target/debug/deps/jsm_build-610e573608c5e56b)\n     Running unittests src/lib.rs (target/debug/deps/jsm_cli-ddbee6eb6b0191cb)\n     Running unittests src/main.rs (target/debug/deps/jsm-ba20bf2fe881c5a1)\n     Running tests/phase0_cli.rs (target/debug/deps/phase0_cli-9a9f17eacfbf84dd)\n     Running tests/phase1_cli.rs (target/debug/deps/phase1_cli-65d7db895947e7da)\n     Running unittests src/lib.rs (target/debug/deps/jsm_core-fb3cd6c53f8caa3a)\n     Running unittests src/lib.rs (target/debug/deps/jsm_daemon-33c17995d53c5d82)\n     Running unittests src/lib.rs (target/debug/deps/jsm_fetch-f8db248509c0ebf5)\n     Running unittests src/lib.rs (target/debug/deps/jsm_linker-6bbaee9ed2ff0da7)\n     Running unittests src/lib.rs (target/debug/deps/jsm_lockfile-964785464de282db)\n     Running unittests src/lib.rs (target/debug/deps/jsm_registry-c83b31fe913b8845)\n     Running tests/registry_acceptance.rs (target/debug/deps/registry_acceptance-f62d7c1b32bf5bf8)\n     Running unittests src/lib.rs (target/debug/deps/jsm_resolver-4397d269def2b01b)\n     Running unittests src/lib.rs (target/debug/deps/jsm_security-764872e79a5562da)\n     Running unittests src/lib.rs (target/debug/deps/jsm_store-a5e8fa69c5f057da)\n     Running unittests src/lib.rs (target/debug/deps/jsm_testkit-99e014e2b669437e)\n     Running tests/fake_registry_install.rs (target/debug/deps/fake_registry_install-dafa44dce9b9d5f3)\n     Running unittests src/lib.rs (target/debug/deps/jsm_workspace-a25023cc777c4a84)\n   Doc-tests jsm_build\n   Doc-tests jsm_cli\n   Doc-tests jsm_core\n   Doc-tests jsm_daemon\n   Doc-tests jsm_fetch\n   Doc-tests jsm_linker\n   Doc-tests jsm_lockfile\n   Doc-tests jsm_registry\n   Doc-tests jsm_resolver\n   Doc-tests jsm_security\n   Doc-tests jsm_store\n   Doc-tests jsm_testkit\n   Doc-tests jsm_workspace\n",
+      "elapsed_seconds": 12.208,
+      "name": "Workspace tests",
+      "return_code": 0,
+      "status": "passed"
+    },
+    {
+      "command": [
+        "cargo",
+        "test",
+        "-p",
+        "jsm-cli",
+        "--test",
+        "phase1_cli",
+        "--locked"
+      ],
+      "diagnostic_tail": "roject_npmrc ... ok\ntest install_alias_and_add_save_flags_are_available ... ok\ntest config_project_scope_supports_typed_values_and_redacts_credentials ... ok\ntest install_prefers_non_deprecated_version_but_keeps_constraint_semantics ... ok\ntest add_and_no_lockfile_install_work_with_the_fake_registry ... ok\ntest invalid_environment_configuration_reports_the_key ... ok\ntest add_dependency_type_flags_update_the_requested_manifest_fields ... ok\ntest install_uses_plain_progress_fallback_when_stderr_is_not_a_tty ... ok\ntest exec_runs_a_registry_installed_package_bin_and_forwards_arguments ... ok\ntest ci_mode_automatically_requires_a_current_lockfile ... ok\ntest phase_one_help_exposes_the_complete_command_surface ... ok\ntest missing_optional_root_dependency_does_not_block_install ... ok\ntest npm_optional_dependency_overrides_duplicate_required_dependency ... ok\ntest optional_peer_dependency_is_not_automatically_installed ... ok\ntest install_uses_cli_environment_and_project_store_directory_overrides ... ok\ntest unknown_command_suggests_a_similar_baseline_command ... ok\ntest install_uses_only_the_fake_registry_writes_lockfile_and_disables_scripts ... ok\ntest workspace_root_registry_config_applies_to_member_projects ... ok\ntest nested_versions_are_locked_and_resolved_from_each_parent_package ... ok\ntest registry_precedence_is_cli_then_environment_project_workspace_and_user ... ok\ntest run_and_exec_launch_project_commands_and_forward_exit_codes ... ok\ntest install_failure_paths_never_publish_partial_project_state ... ok\ntest sigterm_cancels_install_without_committing_partial_project_state ... ok\ntest sigint_cancels_install_without_committing_partial_project_state ... ok\n\ntest result: ok. 25 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 4.16s\n\n\n   Compiling jsm-cli v0.1.0 (/workspace/JSM/crates/jsm-cli)\n    Finished `test` profile [unoptimized + debuginfo] target(s) in 5.01s\n     Running tests/phase1_cli.rs (target/debug/deps/phase1_cli-ceeec0c70a25c722)\n",
+      "elapsed_seconds": 9.27,
+      "name": "Phase 1 CLI fake-registry end-to-end tests",
+      "return_code": 0,
+      "status": "passed"
+    },
+    {
+      "command": [
+        "cargo",
+        "clippy",
+        "--workspace",
+        "--all-targets",
+        "--all-features",
+        "--locked",
+        "--",
+        "-D",
+        "warnings"
+      ],
+      "diagnostic_tail": "    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.63s\n",
+      "elapsed_seconds": 0.774,
+      "name": "Clippy warnings as errors",
+      "return_code": 0,
+      "status": "passed"
+    },
+    {
+      "command": [
+        "cargo",
+        "test",
+        "-p",
+        "jsm-testkit",
+        "--test",
+        "fake_registry_install",
+        "--locked"
+      ],
+      "diagnostic_tail": "\nrunning 6 tests\ntest fake_registry_status_failures_are_controlled_and_reported ... ok\ntest lifecycle_scripts_are_not_executed_during_fixture_install ... ok\ntest traversal_archive_is_rejected_before_publication ... ok\ntest truncated_fixture_is_rejected_before_any_destination_is_visible ... ok\ntest fake_registry_can_require_bearer_authentication ... ok\ntest fixture_installs_from_loopback_registry_and_is_snapshottable ... ok\n\ntest result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.03s\n\n\n    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.28s\n     Running tests/fake_registry_install.rs (target/debug/deps/fake_registry_install-33af6daf24234bf7)\n",
+      "elapsed_seconds": 0.417,
+      "name": "Phase 0 fake-registry testkit suite (not product CLI acceptance)",
+      "return_code": 0,
+      "status": "passed"
+    },
+    {
+      "command": [
+        "cargo",
+        "run",
+        "-q",
+        "-p",
+        "jsm-cli",
+        "--locked",
+        "--",
+        "--help"
+      ],
+      "diagnostic_tail": "Rust JavaScript package manager\n\nUsage: jsm [OPTIONS] [COMMAND]\n\nCommands:\n  init     \n  add      \n  install  \n  remove   \n  run      \n  exec     \n  list     \n  why      \n  config   \n  help     Print this message or the help of the given subcommand(s)\n\nOptions:\n      --cwd <CWD>              [default: .]\n      --json                   \n      --quiet                  \n      --verbose                \n      --offline                \n      --prefer-offline         \n      --store-dir <STORE_DIR>  \n      --registry <REGISTRY>    \n      --no-color               \n      --non-interactive        \n      --config <CONFIG>        \n      --trace <FILE>           Write a Chrome trace for diagnostic runs\n  -h, --help                   Print help\n  -V, --version                Print version\n",
+      "elapsed_seconds": 3.331,
+      "name": "CLI help surface",
+      "return_code": 0,
+      "status": "passed"
+    }
+  ],
+  "working_tree_clean_before_report": true
+}

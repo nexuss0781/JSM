@@ -52,11 +52,13 @@ A phase may be developed in smaller reviewable increments, but later phases do n
 - **1.1–1.3 CLI, configuration, and manifests:** stable command/flag behavior, layered configuration and `.npmrc` compatibility, format-preserving `package.json` edits.
 - **1.4–1.5 Semver and registry:** npm-compatible ranges and prerelease behavior; resilient, cached npm-compatible metadata and tarball access.
 - **1.6–1.8 Store and fetching:** versioned CAS, validated package manifests, atomic publication, bounded streaming fetch/extract, integrity checks, and resource limits.
-- **1.9–1.10 Resolution and lockfile:** deterministic PubGrub resolution and stable lockfile serialization/staleness rules.
+- **1.9–1.10 Resolution and lockfile:** deterministic Resolvo-backed resolution and stable lockfile serialization/staleness rules.
 - **1.11–1.12 Linking and bins:** isolated linker, incremental materialization, executable shims, and safe cross-platform links.
 - **1.13–1.14 Commands and security baseline:** `init`, `add`, `install`, `remove`, `run`, `exec`, basic inspection, integrity enforcement, and a Phase 1 binary with no dependency-script execution path.
 
 **Gate:** all Phase 1 exit criteria pass; fixture-based end-to-end tests cover each baseline command and failure path; the real-registry top-100 acceptance set is exercised; no unverified content or implicit dependency script execution reaches a project; publish the first comparable benchmark against npm and pnpm. Any unsupported platform behavior is explicit and tested, not silently degraded.
+
+**Acceptance tooling:** [`docs/phase1-harness.md`](docs/phase1-harness.md) documents the readiness auditor, replayable npm package corpus, and real-binary benchmark command. Harness self-tests are tooling checks, not evidence that unfinished product requirements pass.
 
 ## Phase 2 — Store Management and Safety
 

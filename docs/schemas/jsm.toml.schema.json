@@ -1,0 +1,27 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://jsm.dev/schemas/jsm.toml.schema.json",
+  "title": "JSM configuration",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "registry": { "type": "string", "format": "uri", "pattern": "^https?://" },
+    "proxy": { "type": "string", "format": "uri", "pattern": "^https?://" },
+    "http-proxy": { "type": "string", "format": "uri", "pattern": "^https?://" },
+    "https-proxy": { "type": "string", "format": "uri", "pattern": "^https?://" },
+    "no-proxy": { "type": "string", "description": "Comma-separated proxy bypass hosts or suffixes." },
+    "prefer-offline": { "type": "boolean" },
+    "strict-ssl": { "type": "boolean" },
+    "strict_ssl": { "type": "boolean" },
+    "cafile": { "type": "string" },
+    "store-dir": { "type": "string", "minLength": 1, "description": "Store path; relative paths are resolved from the project root." },
+    "auth-token": { "type": "string", "description": "Credential; never print or log this value." },
+    "_authToken": { "type": "string", "description": "Credential; never print or log this value." },
+    "_auth": { "type": "string", "description": "Base64 username:password credential; never print or log this value." }
+  },
+  "patternProperties": {
+    "^@[A-Za-z0-9._-]+:registry$": { "type": "string", "format": "uri", "pattern": "^https?://" },
+    "^@[A-Za-z0-9._-]+:(?:auth-token|_authToken|_auth)$": { "type": "string", "description": "Credential; never print or log this value." },
+    "^//[^/@\\s]+(?::[0-9]+)?/.*:(?:_authToken|_auth)$": { "type": "string", "description": "Registry-scoped credential; never print or log this value." }
+  }
+}

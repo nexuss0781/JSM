@@ -13,3 +13,15 @@ The harness generates packages with stable tar metadata, serves packuments and t
 **Interpretation:** Phase 0 `warm-store` and `warm-lockfile` labels measure repeated package-manager runs/cache behavior, not a JSM shared-store implementation. `jsm-stub` only reads a manifest and records a marker; it is not an installer, and its measurements must never be presented as JSM performance. Baselines calibrate fixtures and methodology; they do not establish the product's performance targets.
 
 Container images are pinned by tag and their resolved digest is captured in each report; npm uses the pinned Node image, pnpm/Yarn use pinned Corepack versions, Bun and the Python stub use pinned images. The benchmark smoke job explicitly requires Docker so CI cannot silently fall back to host mode. Docker containers run as the host UID/GID to keep bind-mounted caches writable and removable; rootless Podman uses its default UID mapping. A local report does not establish reproducibility across operating systems; compare only reports with matching fixture hash, tool and image versions, flags, runtime, OS, and network profile.
+
+## Phase 1 real-binary comparison
+
+The Phase 0 smoke remains unchanged and uses only `jsm-stub`. Once the Phase 1 CLI is implemented, build and benchmark the actual binary separately:
+
+```sh
+cargo build --release -p jsm-cli --locked
+python3 benches/run.py --phase1 --jsm-binary target/release/jsm \
+  --container-runtime none --repeat 3
+```
+
+This mode runs npm, pnpm, and the supplied JSM executable against the same deterministic small fixture and local fake registry. It writes a `jsm.phase1.benchmark.v1` report to `docs/benchmarks/phase1-baseline/` by default. Phase 1 mode is host-only (all tools run on the same machine with per-tool project and cache directories), so its results must not be compared directly with the containerized Phase 0 baseline or across mismatched operating systems and tool versions. JSM's CAS store and registry metadata cache are explicitly rooted under its temporary per-tool cache directory; that root is cleared before every cold and CI sample. The report records a measurement-protocol identifier, and prior medians are shown only for matching protocols. A report is valid Phase 1 evidence only if all three tools complete the selected scenarios; a Phase 0 stub result is never substituted for JSM. The harness removes an inherited `CI` value for ordinary scenarios and sets `CI=1` only for the final `ci` sample, so cold and prewarm installs do not accidentally become frozen-lockfile installs.
