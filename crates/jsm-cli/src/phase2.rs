@@ -919,7 +919,11 @@ mod completion_path_tests {
 
         let prefix = alias.join("proj").to_string_lossy().into_owned();
         let normalized_prefix = canonicalized_completion_prefix(&prefix).unwrap();
-        let candidate = actual.join("project-root").to_string_lossy().into_owned();
+        let canonical_actual = fs::canonicalize(&actual).unwrap();
+        let candidate = canonical_actual
+            .join("project-root")
+            .to_string_lossy()
+            .into_owned();
         let suggestion = project_completion_alias(&prefix, &candidate, &normalized_prefix).unwrap();
 
         assert_eq!(suggestion, alias.join("project-root").to_string_lossy());
