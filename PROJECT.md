@@ -1036,7 +1036,7 @@ $ jsm store remove react@18.2.0
 
 1. **Name and branding.** Is `jsm` final, or should the tool have a distinct brand? Check crates.io, npm, and binary name collisions.
 2. **Store default location policy.** One store per user, or per volume with automatic selection?
-3. **Embedded database choice** for the reference registry: SQLite vs. a Rust-native KV store (such as `redb` or `sled`).
+3. **Embedded database choice** for the reference registry. **Resolved:** SQLite via bundled `rusqlite`, per [ADR 0005](docs/adr/0005-sqlite-reference-registry.md).
 4. **Default linker for compatibility.** Isolated by default, or hoisted by default with isolated opt-in?
 5. **Sandbox strictness defaults.** How much breakage is acceptable for stronger isolation?
 6. **Registry index strategy.** Build and host a sparse index, or rely on the official registry metadata API?

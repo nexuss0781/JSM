@@ -8,6 +8,14 @@ use std::io::{self, Read, Write};
 use std::path::{Path, PathBuf};
 use thiserror::Error;
 
+mod management;
+mod reference;
+pub use management::{ReclaimedBytes, VerificationFinding, VerificationReport};
+pub use reference::{
+    PackageReference, ProjectReference, ReferenceRegistry, StoreLease, StoredPackage, UsageProject,
+    hash_bytes, hash_file,
+};
+
 pub const CRATE_NAME: &str = "jsm-store";
 const FORMAT_VERSION: &str = "2\n";
 const FORMAT_VERSION_NUMBER: u32 = 2;
@@ -19,6 +27,8 @@ pub enum StoreError {
     Io(#[from] io::Error),
     #[error("serialization error: {0}")]
     Json(#[from] serde_json::Error),
+    #[error("reference registry database error: {0}")]
+    Database(#[from] rusqlite::Error),
     #[error("invalid store or package data: {0}")]
     Invalid(String),
     #[error("integrity error: {0}")]
@@ -142,7 +152,14 @@ impl Store {
         let store = Self {
             root: root.as_ref().to_path_buf(),
         };
-        for dir in ["files/sha512", "packages", "tmp"] {
+        for dir in [
+            "files/sha512",
+            "packages",
+            "tmp",
+            "index",
+            "locks",
+            "quarantine",
+        ] {
             let path = store.root.join(dir);
             fs::create_dir_all(&path)?;
             if !path.is_dir() {
@@ -167,6 +184,7 @@ impl Store {
         } else {
             atomic_write(&version, FORMAT_VERSION.as_bytes())?;
         }
+        let _ = ReferenceRegistry::open(&store.root)?;
         Ok(store)
     }
     /// Store root path.

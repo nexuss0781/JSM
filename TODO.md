@@ -557,7 +557,8 @@
 
 Track these open questions from `PROJECT.md` as ADRs at the point they block a decision. Do not let unresolved decisions silently become permanent behavior.
 
-- [ ] **Before store/format implementation (0.1, 1.6, 1.10, 2.1):** finalize product/binary naming; store default and per-volume selection; reference DB; package/peer instance identity and lockfile representation.
+- [ ] **Before store/format implementation (0.1, 1.6, 1.10, 2.1):** finalize product/binary naming.
+- [x] **Store/format decisions (1.6, 1.10, 2.1):** store default and per-volume selection (ADR 0003); package/peer instance identity and lockfile representation (ADR 0002); reference database (accepted ADR 0005).
 - [ ] **Before changing linker defaults (3.8):** select compatibility default and document isolated/hoisted trade-offs.
 - [ ] **Before script execution release (4.4, 5.7):** confirm policy defaults, approval storage, supported sandbox guarantees, and explicit degraded modes.
 - [ ] **Before publishing v1.0 (5.13):** decide license, governance/ownership, distribution channels, signing identity, supported migration window, and release policy.
