@@ -633,6 +633,7 @@ fn existing_path(path: &Path) -> Option<PathBuf> {
     }
 }
 
+#[cfg(unix)]
 fn existing_metadata(path: &Path) -> io::Result<fs::Metadata> {
     let existing = existing_path(path)
         .ok_or_else(|| io::Error::new(io::ErrorKind::NotFound, "no existing ancestor"))?;
