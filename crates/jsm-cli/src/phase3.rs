@@ -295,6 +295,45 @@ pub fn switch(
     Ok(())
 }
 
+pub fn copy_dir_preserve_symlinks(src: &Path, dst: &Path) -> Result<()> {
+    fs::create_dir_all(dst).into_diagnostic()?;
+    for entry in fs::read_dir(src).into_diagnostic()? {
+        let entry = entry.into_diagnostic()?;
+        let path = entry.path();
+        let target = dst.join(entry.file_name());
+        let metadata = fs::symlink_metadata(&path).into_diagnostic()?;
+        if metadata.file_type().is_symlink() {
+            let link_target = fs::read_link(&path).into_diagnostic()?;
+            #[cfg(unix)]
+            std::os::unix::fs::symlink(&link_target, &target).into_diagnostic()?;
+            #[cfg(windows)]
+            {
+                if path.is_dir() {
+                    std::os::windows::fs::symlink_dir(&link_target, &target).into_diagnostic()?;
+                } else {
+                    std::os::windows::fs::symlink_file(&link_target, &target).into_diagnostic()?;
+                }
+            }
+        } else if metadata.is_dir() {
+            copy_dir_preserve_symlinks(&path, &target)?;
+        } else {
+            if let Some(parent) = target.parent() {
+                fs::create_dir_all(parent).into_diagnostic()?;
+            }
+            fs::copy(&path, &target).into_diagnostic()?;
+        }
+    }
+    Ok(())
+}
+
+pub fn materialization_cache_key(lock: &Lockfile) -> String {
+    hash_bytes(lock.serialize().as_bytes())
+}
+
+pub fn materialization_cache_dir(store: &Store, key: &str) -> PathBuf {
+    store.root().join("materialization").join(key)
+}
+
 fn now_seconds() -> i64 {
     SystemTime::now()
         .duration_since(UNIX_EPOCH)

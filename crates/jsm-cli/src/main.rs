@@ -1425,6 +1425,25 @@ fn manifest_importer(m: &Value, prod: bool) -> Result<(Importer, Vec<DependencyS
     Ok((importer, roots))
 }
 
+fn resolve_lock_explained(
+    cli: &Cli,
+    reg: &Registry,
+    importer: &Importer,
+    roots: &[DependencySpec],
+    prefer_store: bool,
+    store: &Store,
+) -> Result<Lockfile> {
+    match resolve_lock(reg, importer, roots, prefer_store, store) {
+        Ok(lock) => Ok(lock),
+        Err(error) => {
+            if cli.explain {
+                eprintln!("resolution conflict: {error}");
+            }
+            Err(error)
+        }
+    }
+}
+
 fn resolve_lock(
     reg: &Registry,
     importer: &Importer,
@@ -1592,6 +1611,7 @@ fn resolve_lock(
 }
 
 #[allow(clippy::too_many_arguments)]
+#[allow(clippy::needless_borrow)]
 fn install(
     cli: &Cli,
     cwd: &Path,
@@ -1628,7 +1648,7 @@ fn install(
     let lock_path = cwd.join("jsm.lock");
     let reg = registry(&config, cli, cwd)?;
     let lock = if no_lockfile {
-        resolve_lock(&reg, &importer, &roots, cli.prefer_store, &store)?
+        resolve_lock_explained(&cli, &reg, &importer, &roots, cli.prefer_store, &store)?
     } else if lock_path.exists() {
         let existing = Lockfile::read(&lock_path).map_err(|error| CommandExit {
             code: 6,
@@ -1647,7 +1667,7 @@ fn install(
                 }
                 .into());
             }
-            resolve_lock(&reg, &importer, &roots, cli.prefer_store, &store)?
+            resolve_lock_explained(&cli, &reg, &importer, &roots, cli.prefer_store, &store)?
         } else if existing.lockfile_version == jsm_lockfile::LEGACY_LOCKFILE_VERSION {
             if frozen {
                 existing
@@ -1657,7 +1677,7 @@ fn install(
                         message: error.to_string(),
                     })?
             } else {
-                resolve_lock(&reg, &importer, &roots, cli.prefer_store, &store)?
+                resolve_lock_explained(&cli, &reg, &importer, &roots, cli.prefer_store, &store)?
             }
         } else {
             existing
@@ -1670,7 +1690,7 @@ fn install(
             }
             .into());
         }
-        resolve_lock(&reg, &importer, &roots, cli.prefer_store, &store)?
+        resolve_lock_explained(&cli, &reg, &importer, &roots, cli.prefer_store, &store)?
     };
     ensure_not_cancelled(cancellation)?;
     for (id, package) in &lock.packages {
@@ -1724,20 +1744,40 @@ fn install(
     }
     ensure_not_cancelled(cancellation)?;
     let transaction = begin_install_journal(cwd, &reference_index, !no_lockfile && !frozen)?;
-    let link_result = link(
-        cwd,
-        &store,
-        &lock,
-        LinkOptions {
-            include_dev: !prod,
-            settings: BTreeMap::from([(String::from("linker"), cli.linker.clone())]),
-            ..Default::default()
-        },
-    )
-    .into_diagnostic();
+    let cache_key = phase3::materialization_cache_key(&lock);
+    let cache_dir = phase3::materialization_cache_dir(&store, &cache_key);
+    let cache_node_modules = cache_dir.join("node_modules");
+    let mut cache_hit = false;
+    if cache_node_modules.is_dir() {
+        let dest = cwd.join("node_modules");
+        let _ = fs::remove_dir_all(&dest);
+        if phase3::copy_dir_preserve_symlinks(&cache_node_modules, &dest).is_ok() {
+            cache_hit = true;
+        }
+    }
+    let link_result = if cache_hit {
+        Ok(())
+    } else {
+        link(
+            cwd,
+            &store,
+            &lock,
+            LinkOptions {
+                include_dev: !prod,
+                settings: BTreeMap::from([(String::from("linker"), cli.linker.clone())]),
+                ..Default::default()
+            },
+        )
+        .map(|_| ())
+        .into_diagnostic()
+    };
     if let Err(error) = link_result {
         recover_install_journal(cwd, &reference_index)?;
         return Err(error);
+    }
+    if !cache_hit {
+        let _ = fs::create_dir_all(&cache_dir);
+        let _ = phase3::copy_dir_preserve_symlinks(&cwd.join("node_modules"), &cache_node_modules);
     }
     maybe_crash("after-link");
     if !no_lockfile
