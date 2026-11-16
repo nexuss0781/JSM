@@ -54,6 +54,8 @@ Options:
       --registry <REGISTRY>    
       --no-color               
       --non-interactive        
+  -r, --recursive              
+      --filter <FILTER>        
       --progress <PROGRESS>    [default: auto] [possible values: auto, ndjson]
       --config <CONFIG>        
       --trace <FILE>           Write a Chrome trace for diagnostic runs

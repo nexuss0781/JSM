@@ -76,6 +76,10 @@ struct Cli {
     no_color: bool,
     #[arg(long, global = true)]
     non_interactive: bool,
+    #[arg(short = 'r', long, global = true)]
+    recursive: bool,
+    #[arg(long, global = true)]
+    filter: Option<String>,
     #[arg(long, global = true, value_enum, default_value_t = ProgressMode::Auto)]
     progress: ProgressMode,
     #[arg(long, global = true)]
@@ -631,7 +635,13 @@ fn run(cli: Cli, cancellation: &CancellationToken) -> Result<()> {
         }
         Command::List => list(&cwd, cli.json),
         Command::Why { package } => why(&cwd, &package, cli.json),
-        Command::Run { script, args } => run_script(&cwd, &script, &args, cli.json, cancellation),
+        Command::Run { script, args } => {
+            if cli.recursive {
+                phase5::run_recursive(&cli, &cwd, &script, &args, cancellation)
+            } else {
+                run_script(&cwd, &script, &args, cli.json, cancellation)
+            }
+        }
         Command::Exec { command, args } => run_exec(&cwd, &command, &args, cli.json, cancellation),
         Command::Store { command } => phase2::store_command(&cli, &cwd, command, cancellation),
         Command::Versions { package } => phase2::remote_versions(&cli, &cwd, &package),

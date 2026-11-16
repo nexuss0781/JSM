@@ -123,6 +123,53 @@ pub fn deploy(cli: &Cli, cwd: &Path, dir: &Path) -> Result<()> {
     Ok(())
 }
 
+pub fn run_recursive(
+    cli: &Cli,
+    cwd: &Path,
+    script: &str,
+    args: &[String],
+    cancellation: &CancellationToken,
+) -> Result<()> {
+    let manifest = read_manifest(cwd)?;
+    let patterns = manifest
+        .get("workspaces")
+        .and_then(Value::as_array)
+        .map(|arr| {
+            arr.iter()
+                .filter_map(Value::as_str)
+                .map(str::to_owned)
+                .collect::<Vec<_>>()
+        })
+        .unwrap_or_default();
+    let mut dirs = vec![cwd.to_path_buf()];
+    for pattern in patterns {
+        let base = pattern.trim_end_matches("/*").trim_end_matches("/**");
+        let root = cwd.join(base);
+        if let Ok(entries) = fs::read_dir(&root) {
+            for entry in entries.flatten() {
+                let path = entry.path();
+                if path.join("package.json").is_file() {
+                    dirs.push(path);
+                }
+            }
+        }
+    }
+    for dir in dirs {
+        // filter by name if provided
+        if let Some(filter) = &cli.filter {
+            let name = read_manifest(&dir)
+                .ok()
+                .and_then(|m| m.get("name").and_then(Value::as_str).map(str::to_owned))
+                .unwrap_or_default();
+            if !name.contains(filter) {
+                continue;
+            }
+        }
+        let _ = super::run_script(&dir, script, args, cli.json, cancellation);
+    }
+    Ok(())
+}
+
 fn copy_dir(src: &Path, dst: &Path) -> Result<()> {
     fs::create_dir_all(dst).into_diagnostic()?;
     for entry in fs::read_dir(src).into_diagnostic()? {
