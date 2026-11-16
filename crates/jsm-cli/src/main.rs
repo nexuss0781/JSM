@@ -2043,6 +2043,68 @@ fn run_script(
     out_json: bool,
     cancellation: &CancellationToken,
 ) -> Result<()> {
+    let script_path = Path::new(script);
+    if script_path.is_file() {
+        // Zero-install inline dependency support: read directives from the file.
+        let content = fs::read_to_string(script_path).into_diagnostic()?;
+        let mut deps = Vec::new();
+        for line in content.lines() {
+            let trimmed = line.trim();
+            if let Some(rest) = trimmed.strip_prefix("// jsm:") {
+                deps.extend(rest.split_whitespace().map(str::to_string));
+            }
+        }
+        if !deps.is_empty() {
+            let temp = std::env::temp_dir().join("jsm-zero-install");
+            let _ = fs::remove_dir_all(&temp);
+            fs::create_dir_all(&temp).into_diagnostic()?;
+            let mut manifest = serde_json::json!({"name":"zero-install","version":"1.0.0","dependencies":{}});
+            let obj = manifest.get_mut("dependencies").unwrap().as_object_mut().unwrap();
+            for dep in &deps {
+                obj.insert(dep.clone(), serde_json::json!("latest"));
+            }
+            fs::write(
+                temp.join("package.json"),
+                serde_json::to_string_pretty(&manifest).into_diagnostic()? + "\n",
+            )
+            .into_diagnostic()?;
+            let silent = Cli {
+                cwd: temp.clone(),
+                json: false,
+                quiet: true,
+                verbose: false,
+                offline: false,
+                prefer_offline: false,
+                store_dir: None,
+                registry: None,
+                no_color: true,
+                non_interactive: true,
+                progress: ProgressMode::Auto,
+                config: None,
+                trace: None,
+                command: None,
+                prefer_store: false,
+                recursive: false,
+                filter: None,
+                linker: "isolated".into(),
+            };
+            // reuse effective? simpler: call install via a minimal Cli
+            let mut progress = OperationProgress::start_with_ndjson(
+                "Zero-install",
+                true,
+                false,
+                true,
+                false,
+            );
+            let _ = install(&silent, &temp, false, false, false, cancellation, &mut progress);
+            let mut command = ProcessCommand::new("node");
+            command.arg(script_path).args(args).current_dir(&temp);
+            if let Ok(path) = project_path(&temp) {
+                command.env("PATH", path);
+            }
+            return finish_child(command, out_json, "run", Some(script), cancellation);
+        }
+    }
     let manifest = read_manifest(cwd)?;
     let command_text = manifest
         .get("scripts")
