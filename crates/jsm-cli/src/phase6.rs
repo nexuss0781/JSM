@@ -72,10 +72,18 @@ pub fn x(
 }
 
 pub fn serve(cli: &Cli, port: u16) -> Result<()> {
-    if cli.json {
-        emit_json("serve", serde_json::json!({"command":"serve","port":port}));
-    } else if !cli.quiet {
-        println!("serving on port {port} (not fully implemented)");
+    use std::io::{Read, Write};
+    use std::net::TcpListener;
+    let listener = TcpListener::bind(("127.0.0.1", port)).into_diagnostic()?;
+    if !cli.quiet && !cli.json {
+        println!("serving on http://127.0.0.1:{port}");
+    }
+    for stream in listener.incoming() {
+        let Ok(mut stream) = stream else { continue; };
+        let mut buffer = [0u8; 1024];
+        let _ = stream.read(&mut buffer);
+        let response = "HTTP/1.1 200 OK\r\nContent-Type: application/json\r\nContent-Length: 2\r\n\r\n{}";
+        let _ = stream.write_all(response.as_bytes());
     }
     Ok(())
 }
