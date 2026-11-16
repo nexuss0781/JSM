@@ -62,9 +62,9 @@ pub fn approve_scripts(cli: &Cli, cwd: &Path, packages: Vec<String>) -> Result<(
     Ok(())
 }
 
-pub fn patch(cli: &Cli, cwd: &Path, package: &str) -> Result<()> {
+pub fn patch(cli: &Cli, _cwd: &Path, package: &str) -> Result<()> {
     // Extract package to a temp editable directory by locating in store (best effort)
-    let store = Store::open_for_project(cwd, cli.store_dir.as_deref()).into_diagnostic()?;
+    let store = Store::open_for_project(_cwd, cli.store_dir.as_deref()).into_diagnostic()?;
     let temp = std::env::temp_dir().join(format!("jsm-patch-{}", package.replace('/', "-")));
     let _ = fs::remove_dir_all(&temp);
     fs::create_dir_all(&temp).into_diagnostic()?;
@@ -85,7 +85,7 @@ pub fn patch(cli: &Cli, cwd: &Path, package: &str) -> Result<()> {
     Ok(())
 }
 
-pub fn patch_commit(cli: &Cli, cwd: &Path, dir: &Path) -> Result<()> {
+pub fn patch_commit(cli: &Cli, _cwd: &Path, dir: &Path) -> Result<()> {
     if cli.json {
         emit_json("patch-commit", serde_json::json!({"command":"patch-commit","dir":dir}));
     } else if !cli.quiet {
@@ -94,7 +94,7 @@ pub fn patch_commit(cli: &Cli, cwd: &Path, dir: &Path) -> Result<()> {
     Ok(())
 }
 
-pub fn migrate(cli: &Cli, cwd: &Path, from: Option<String>) -> Result<()> {
+pub fn migrate(cli: &Cli, _cwd: &Path, from: Option<String>) -> Result<()> {
     if cli.json {
         emit_json("migrate", serde_json::json!({"command":"migrate","from":from}));
     } else if !cli.quiet {
@@ -103,7 +103,7 @@ pub fn migrate(cli: &Cli, cwd: &Path, from: Option<String>) -> Result<()> {
     Ok(())
 }
 
-pub fn audit(cli: &Cli, cwd: &Path) -> Result<()> {
+pub fn audit(cli: &Cli, _cwd: &Path) -> Result<()> {
     if cli.json {
         emit_json("audit", serde_json::json!({"command":"audit","advisories":[]}));
     } else if !cli.quiet {

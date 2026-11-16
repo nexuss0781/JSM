@@ -1,7 +1,6 @@
 use super::*;
-use std::fs;
 
-pub fn capabilities(cli: &Cli, cwd: &Path, package: &str) -> Result<()> {
+pub fn capabilities(cli: &Cli, _cwd: &Path, package: &str) -> Result<()> {
     if cli.json {
         emit_json("capabilities", serde_json::json!({"command":"capabilities","package":package,"capabilities":[]}));
     } else if !cli.quiet {
@@ -62,16 +61,6 @@ pub fn cache_materialization_clear(cli: &Cli) -> Result<()> {
         emit_json("cache", serde_json::json!({"command":"cache","type":"materialization","cleared":true}));
     } else if !cli.quiet {
         println!("cleared materialization cache");
-    }
-    Ok(())
-}
-
-pub fn zero_install_run(cli: &Cli, cwd: &Path, script: &str) -> Result<()> {
-    let _ = (cwd, script);
-    if cli.json {
-        emit_json("run", serde_json::json!({"command":"run","script":script}));
-    } else if !cli.quiet {
-        println!("ran {script}");
     }
     Ok(())
 }

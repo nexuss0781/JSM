@@ -33,7 +33,7 @@ pub fn update(
 pub fn outdated(cli: &Cli, cwd: &Path) -> Result<()> {
     let manifest = read_manifest(cwd)?;
     let lock = if cwd.join("jsm.lock").exists() {
-        Some(Lockfile::read(&cwd.join("jsm.lock")).into_diagnostic()?)
+        Some(Lockfile::read(cwd.join("jsm.lock")).into_diagnostic()?)
     } else {
         None
     };
@@ -84,7 +84,7 @@ fn find_manifest(store: &Store, name: &str, version: &str) -> Result<jsm_store::
             return Ok(m);
         }
     }
-    Err(miette!("missing manifest for {name}@{version}").into())
+    Err(miette!("missing manifest for {name}@{version}"))
 }
 
 pub fn diff(cli: &Cli, cwd: &Path, left: &str, right: &str) -> Result<()> {
@@ -120,7 +120,7 @@ pub fn diff(cli: &Cli, cwd: &Path, left: &str, right: &str) -> Result<()> {
 }
 
 pub fn dupes(cli: &Cli, cwd: &Path) -> Result<()> {
-    let lock = Lockfile::read(&cwd.join("jsm.lock")).into_diagnostic()?;
+    let lock = Lockfile::read(cwd.join("jsm.lock")).into_diagnostic()?;
     let mut by_name: BTreeMap<String, Vec<String>> = BTreeMap::new();
     for p in lock.packages.values() {
         by_name

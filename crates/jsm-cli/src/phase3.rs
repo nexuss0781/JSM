@@ -97,7 +97,7 @@ pub fn undo(
 ) -> Result<()> {
     let mut state = load_history(cwd);
     if state.position == 0 {
-        return Err(miette!("nothing to undo").into());
+        return Err(miette!("nothing to undo"));
     }
     let entry = state.entries[state.position - 1].clone();
     restore_lockfile(cwd, entry.before.clone())?;
@@ -123,7 +123,7 @@ pub fn redo(
 ) -> Result<()> {
     let mut state = load_history(cwd);
     if state.position >= state.entries.len() {
-        return Err(miette!("nothing to redo").into());
+        return Err(miette!("nothing to redo"));
     }
     let entry = state.entries[state.position].clone();
     restore_lockfile(cwd, entry.after.clone())?;
@@ -268,7 +268,7 @@ pub fn switch(
         }
     }
     if !found {
-        return Err(miette!("package `{package}` is not a dependency").into());
+        return Err(miette!("package `{package}` is not a dependency"));
     }
     fs::write(&path, manifest.source()).into_diagnostic()?;
     let mut silent = cli.clone();

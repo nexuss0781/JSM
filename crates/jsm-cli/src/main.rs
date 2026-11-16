@@ -674,12 +674,12 @@ fn run(cli: Cli, cancellation: &CancellationToken) -> Result<()> {
         Command::Patch { package } => phase5::patch(&cli, &cwd, &package),
         Command::PatchCommit { dir } => phase5::patch_commit(&cli, &cwd, &dir),
         Command::Migrate { from } => phase5::migrate(&cli, &cwd, from),
-        Command::Audit { prod } => phase5::audit(&cli, &cwd),
+        Command::Audit { prod: _ } => phase5::audit(&cli, &cwd),
         Command::Deploy { dir } => phase5::deploy(&cli, &cwd, &dir),
         Command::Update {
             packages,
             latest,
-            review,
+            review: _,
         } => {
             let mut progress = OperationProgress::start_with_ndjson(
                 "Updating dependencies",
