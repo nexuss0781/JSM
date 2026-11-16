@@ -849,6 +849,39 @@ fn phase0_demo() -> Result<()> {
     println!("Phase 0 tracing demo completed; no package was installed.");
     Ok(())
 }
+fn typosquat_suggestion(name: &str) -> Option<String> {
+    const POPULAR: &[&str] = &[
+        "react", "react-dom", "lodash", "express", "axios", "typescript", "webpack",
+        "babel", "eslint", "prettier", "jest", "mocha", "chai", "next", "vue",
+    ];
+    for popular in POPULAR {
+        if name != *popular && levenshtein(name, popular) <= 2 {
+            return Some((*popular).to_string());
+        }
+    }
+    None
+}
+
+fn levenshtein(a: &str, b: &str) -> usize {
+    if a.is_empty() {
+        return b.len();
+    }
+    if b.is_empty() {
+        return a.len();
+    }
+    let mut prev: Vec<usize> = (0..=b.len()).collect();
+    let mut curr = vec![0; b.len() + 1];
+    for (i, ca) in a.chars().enumerate() {
+        curr[0] = i + 1;
+        for (j, cb) in b.chars().enumerate() {
+            let cost = if ca == cb { 0 } else { 1 };
+            curr[j + 1] = (prev[j + 1] + 1).min(curr[j] + 1).min(prev[j] + cost);
+        }
+        std::mem::swap(&mut prev, &mut curr);
+    }
+    prev[b.len()]
+}
+
 fn manifest_path(cwd: &Path) -> PathBuf {
     cwd.join("package.json")
 }
@@ -924,6 +957,9 @@ fn add(
             .map(|(n, v)| (n.to_string(), v.to_string()))
             .unwrap_or((raw, "latest".into()));
         PackageName::new(name.clone()).into_diagnostic()?;
+        if let Some(suggestion) = typosquat_suggestion(&name) {
+            eprintln!("warning: `{name}` is similar to popular package `{suggestion}`");
+        }
         let preserve = version == "latest"
             || version.starts_with(['>', '<', '=', '*'])
             || version.contains("||")
