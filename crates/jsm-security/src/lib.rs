@@ -3,6 +3,7 @@ use sha2::{Digest, Sha512};
 use std::collections::HashSet;
 use std::path::{Component, Path};
 use thiserror::Error;
+use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Error, Clone, PartialEq, Eq)]
 pub enum SafetyError {
@@ -18,6 +19,127 @@ pub enum SafetyError {
     InvalidIntegrity,
     #[error("integrity mismatch: expected {expected}, got {actual}")]
     IntegrityMismatch { expected: String, actual: String },
+}
+
+/// Sandbox policy defining what a build process can access.
+#[derive(Debug, Clone, Default, Serialize, Deserialize, PartialEq, Eq)]
+pub struct SandboxPolicy {
+    /// Allow network access
+    pub allow_network: bool,
+    /// Allow reading from paths outside build directory
+    pub allow_read_outside: bool,
+    /// Allow writing to paths outside build/output directory
+    pub allow_write_outside: bool,
+    /// Additional allowed read paths
+    pub allowed_read_paths: Vec<String>,
+    /// Additional allowed write paths
+    pub allowed_write_paths: Vec<String>,
+    /// Environment variables to allow
+    pub allowed_env: Vec<String>,
+    /// Maximum memory in MB
+    pub max_memory_mb: Option<u64>,
+    /// Maximum CPU time in seconds
+    pub max_cpu_time_secs: Option<u64>,
+}
+
+impl SandboxPolicy {
+    /// Strict policy for builds (no network, limited filesystem).
+    pub fn strict() -> Self {
+        Self {
+            allow_network: false,
+            allow_read_outside: false,
+            allow_write_outside: false,
+            allowed_read_paths: vec![],
+            allowed_write_paths: vec![],
+            allowed_env: vec![],
+            max_memory_mb: Some(4096),
+            max_cpu_time_secs: Some(300),
+        }
+    }
+    
+    /// Permissive policy for development.
+    pub fn permissive() -> Self {
+        Self {
+            allow_network: true,
+            allow_read_outside: true,
+            allow_write_outside: true,
+            allowed_read_paths: vec![],
+            allowed_write_paths: vec![],
+            allowed_env: vec![],
+            max_memory_mb: None,
+            max_cpu_time_secs: None,
+        }
+    }
+}
+
+/// Sandbox execution result.
+#[derive(Debug, Clone)]
+pub struct SandboxResult {
+    pub success: bool,
+    pub exit_code: Option<i32>,
+    pub stdout: String,
+    pub stderr: String,
+}
+
+/// Sandbox for executing build commands with isolation.
+pub struct Sandbox {
+    policy: SandboxPolicy,
+}
+
+impl Sandbox {
+    pub fn new(policy: &SandboxPolicy) -> Result<Self, SandboxError> {
+        Ok(Self { policy: policy.clone() })
+    }
+    
+    pub fn policy(&self) -> &SandboxPolicy {
+        &self.policy
+    }
+    
+    /// Execute a command with sandboxing.
+    pub async fn execute(
+        &self,
+        working_dir: &Path,
+        command: &str,
+        args: &[String],
+        env: &std::collections::BTreeMap<String, String>,
+        timeout: std::time::Duration,
+    ) -> Result<SandboxResult, SandboxError> {
+        // For now, execute without actual sandboxing (platform-specific impl later)
+        let mut cmd = tokio::process::Command::new(command);
+        cmd.args(args)
+            .current_dir(working_dir)
+            .envs(env)
+            .stdout(std::process::Stdio::piped())
+            .stderr(std::process::Stdio::piped());
+        
+        // Apply timeout
+        let output = tokio::time::timeout(
+            timeout,
+            cmd.output()
+        ).await
+            .map_err(|_| SandboxError::Timeout)?
+            .map_err(SandboxError::Io)?;
+        
+        Ok(SandboxResult {
+            success: output.status.success(),
+            exit_code: output.status.code(),
+            stdout: String::from_utf8_lossy(&output.stdout).to_string(),
+            stderr: String::from_utf8_lossy(&output.stderr).to_string(),
+        })
+    }
+}
+
+/// Sandbox errors.
+#[derive(Debug, thiserror::Error)]
+pub enum SandboxError {
+    #[error("I/O error: {0}")]
+    Io(#[from] std::io::Error),
+    #[error("Sandbox timeout")]
+    Timeout,
+    #[error("Sandbox policy violation: {0}")]
+    PolicyViolation(String),
+    #[error("Sandbox not supported on this platform")]
+    UnsupportedPlatform,
 }
 
 /// Validate a tar entry path and return its normalized slash-separated form.

@@ -65,7 +65,7 @@ pub trait Provider {
 
     /// Fetch peer dependency candidates for a package.
     /// Returns optional peer dependency specifiers that the package declares.
-    fn peer_candidates(&self, package: &PackageName) -> Result<BTreeMap<PackageName, Spec>, Self::Error> {
+    fn peer_candidates(&self, _package: &PackageName) -> Result<BTreeMap<PackageName, Spec>, Self::Error> {
         Ok(BTreeMap::new())
     }
 

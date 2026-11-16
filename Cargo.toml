@@ -50,7 +50,9 @@ reflink-copy = "0.1.30"
 ureq = "2.12"
 walkdir = "2.5"
 fs4 = "1.1.0"
+hex = "0.4"
 rusqlite = { version = "0.40.2", features = ["bundled"] }
+tokio = { version = "1.42", features = ["sync", "time", "macros", "rt", "rt-multi-thread", "process"] }
 
 [workspace.lints.rust]
 unsafe_code = "forbid"

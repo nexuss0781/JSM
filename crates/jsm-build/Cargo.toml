@@ -10,3 +10,15 @@ path = "src/lib.rs"
 
 [lints]
 workspace = true
+
+[dependencies]
+jsm-core = { path = "../jsm-core", version = "0.1.0" }
+jsm-security = { path = "../jsm-security", version = "0.1.0" }
+jsm-store = { path = "../jsm-store", version = "0.1.0" }
+serde = { workspace = true, features = ["derive"] }
+serde_json = { workspace = true }
+sha2 = { workspace = true }
+hex = { workspace = true }
+thiserror = { workspace = true }
+tokio = { workspace = true, features = ["sync", "time", "macros"] }
+tracing = { workspace = true }

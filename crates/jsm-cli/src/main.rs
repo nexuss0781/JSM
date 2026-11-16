@@ -45,6 +45,7 @@ mod phase4;
 mod phase5;
 mod phase6;
 mod phase7;
+mod build;
 
 #[derive(Debug, Parser, Clone)]
 #[command(
@@ -293,6 +294,14 @@ enum Command {
     },
     Deploy {
         dir: PathBuf,
+    },
+    Build {
+        #[arg(long)]
+        package: Option<String>,
+        #[arg(long)]
+        all: bool,
+        #[arg(long)]
+        dry_run: bool,
     },
     Update {
         packages: Vec<String>,
@@ -802,6 +811,16 @@ fn run(cli: Cli, cancellation: &CancellationToken) -> Result<()> {
         Command::Migrate { from } => phase5::migrate(&cli, &cwd, from),
         Command::Audit { prod: _ } => phase5::audit(&cli, &cwd),
         Command::Deploy { dir } => phase5::deploy(&cli, &cwd, &dir),
+        Command::Build { package, all, dry_run } => {
+            let mut progress = OperationProgress::start_with_ndjson(
+                "Building native packages",
+                cli.quiet,
+                cli.json,
+                cli.non_interactive || ci_enabled(),
+                cli.progress == ProgressMode::Ndjson,
+            );
+            build::build_command(&cli, &cwd, package, all, dry_run, cancellation, &mut progress)
+        }
         Command::Update {
             packages,
             latest,

@@ -21,6 +21,8 @@ jsm-lockfile = { path = "../jsm-lockfile" }
 jsm-registry = { path = "../jsm-registry" }
 jsm-resolver = { path = "../jsm-resolver" }
 jsm-store = { path = "../jsm-store" }
+jsm-build = { path = "../jsm-build" }
+jsm-security = { path = "../jsm-security" }
 miette.workspace = true
 indicatif.workspace = true
 semver.workspace = true
@@ -28,6 +30,9 @@ serde.workspace = true
 serde_json.workspace = true
 toml.workspace = true
 base64.workspace = true
+hex.workspace = true
+sha2.workspace = true
+tokio.workspace = true
 thiserror.workspace = true
 tracing.workspace = true
 tracing-chrome.workspace = true

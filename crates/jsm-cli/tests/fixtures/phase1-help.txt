@@ -35,6 +35,7 @@ Commands:
   migrate          
   audit            
   deploy           
+  build            
   update           
   outdated         
   diff             
