@@ -14,50 +14,88 @@
 
 ---
 
-## Unchecked Items (Priority Order)
+## Unchecked Items (Grouped by Feature Area)
 
-### Phase 4 — Real-World Compatibility
-
+### 1. Build System & Caching
 - [ ] Implement build key over package integrity, script hash, runtime ABI, platform, toolchain, allowlisted env, dependency build keys, and sandbox policy
 - [ ] Capture approved build outputs separately from immutable store payloads and store them safely under the build key
 - [ ] Add `cache build list|info|clear|verify`, hit/miss reporting, and cross-project cache reuse tests
+- [ ] Implement resolution order: local cache, trusted remote cache when enabled, platform packages, recognized prebuild conventions, then controlled compilation
+- [ ] Fetch prebuilds through verified CAS pipeline; never permit arbitrary lifecycle script downloads to bypass controls
+- [ ] Test top native packages/platforms and report cache/prebuilt/compiled result
+- [ ] Implement S3-compatible, GCS, Azure Blob, HTTPS, and `jsm serve` backends with read-only/read-write roles
+- [ ] Sign and verify build-key artifacts; implement key rotation, namespace isolation, TTL, audit logs, and poisoning defenses
+- [ ] Test CI-to-developer reuse, tampered artifacts, unauthorized access, and backend failure behavior
+
+### 2. Parallel Build Scheduler
 - [ ] Schedule dependency builds topologically within CPU, memory, and configured concurrency limits
 - [ ] Save per-package logs; sanitize environment; provide standard npm compatibility variables, timeouts, and process-tree cancellation
 - [ ] Verify required failures roll back installs, optional failures are recorded, and cancellation leaves no orphan processes
+
+### 3. Sandbox & Script Security
+- [ ] Resolve and document per-OS sandbox capability/default policy before enabling execution; degrade with explicit warning only where the spec allows
+- [ ] Implement Linux, macOS, and Windows least-privilege sandbox adapters with no network by default and bounded read/write paths
+- [ ] Include sandbox policy in build keys and implement explicit `--no-sandbox` opt-out with warning
+- [ ] Run escape tests for network, paths, credentials, and process limits; test common native builds on supported platforms
+- [ ] Implement default-deny dependency lifecycle scripts and configured root-script behavior/`--ignore-scripts`
+- [ ] Implement interactive/non-interactive `approve-scripts`; bind approvals to package/range and script-content hash
+- [ ] Warn with skipped scripts and remediation; test that deny mode cannot run dependency scripts and script changes invalidate prior approval
+- [ ] Persist approved script hashes and detect changes/new lifecycle scripts on package update
+- [ ] Revoke stale approvals and show reviewable script/file diffs before execution
+- [ ] Test unchanged, modified, newly added, and removed script cases
+
+### 4. Package Insight & Diff Commands
 - [ ] Implement store-backed file/dependency/script/exports/size diff for versions and optional content diff
 - [ ] Add dependency-path and size explanation, duplicate reports with safe suggestions, unused-dependency analysis with ignore/config references, and outdated views
 - [ ] Compare diff against extracted tarballs and measure `unused` precision on a labeled corpus
+- [ ] Implement per-package version/size/dependency/script/exports/provenance/advisory/age change report for `update --review` and interactive selection
+- [ ] Support table and versioned JSON output and reuse local store diff where possible
+- [ ] Test reports with controlled upgrade fixtures covering every reported change category
+
+### 5. Package Executor (`jsm x`) & Zero-Install
 - [ ] Resolve and fetch packages into the shared store and create isolated, lockfile-keyed ephemeral environments
 - [ ] Add bin disambiguation, multiple `--package` support, TTL for floating ranges, and `--refresh`
 - [ ] Enforce script policy/sandbox availability and benchmark warm invocation against the specified budget
+- [ ] Parse inline dependency declarations and resolve them into isolated cached ephemeral environments
+- [ ] Support optional reproducibility sidecar and configured Node/Bun/Deno runtime/TypeScript loader selection
+- [ ] Test first run with no project files and warm rerun against the specified budget
+
+### 6. Release & Resolution Policies
 - [ ] Implement minimum release age, per-package exceptions, exclusion explanations, lowest/lowest-direct, and time-based `--before` resolution
 - [ ] Document precedence with locks, explicit updates, and store preference
 - [ ] Test deterministic behavior using fixture publish timestamps, including cases where cooldown leaves no eligible version
+
+### 7. Compatibility Corpus & CI
 - [ ] Build isolated top-1,000 package install/load corpus and 100+ real repository corpus with their test scripts
 - [ ] Compare dependency trees/runtime behavior with npm and pnpm; classify known differences and block unreviewed regressions
 - [ ] Run nightly/release-candidate tests across Linux glibc/musl, macOS, and Windows; publish dashboard and known issues
 - [ ] Reach 95% Corpus A at Phase 4 gate and define tracking to 98% for v1.0
+
+### 8. Enterprise Networking & Registry Auth
 - [ ] Implement scoped/per-registry bearer/basic and npm auth compatibility plus credential-helper integration where supported
 - [ ] Add HTTP(S) proxy, `NO_PROXY`, custom CA, client certificates, and registry mirror/fallback health policy
 - [ ] Define and secure any CI OIDC token extension point; never persist credentials in lockfiles, store, logs, or diagnostics
 - [ ] Test authenticated fake registry, proxy, custom-CA endpoint, and failover paths
-- [ ] Compatibility, peer, optional/platform, script-deny, build-cache, and enterprise-networking acceptance suites pass
-- [ ] Corpus A meets the 95% gate; exceptions and regressions are documented
 
-### Phase 5 — Production Readiness (v1.0)
-
+### 9. Workspaces & Monorepo
 - [ ] Discover workspace globs, exclusions, local packages, and supported `workspace:` ranges with publish-time rewriting
 - [ ] Implement one importer-aware lockfile, filters (including git-changed/dependency/dependent forms), and workspace-aware commands
 - [ ] Implement recursive script execution with topological ordering, parallelism, streaming, and bail policy; test 100-package fixture
 - [ ] Implement named/default catalogs and `catalog:` protocol
 - [ ] Implement package/parent/range overrides, resolutions, dependency references, unused-override warnings, and update-by-catalog
 - [ ] Document and test precedence, nested selectors, and scoped package behavior
+
+### 10. Patching
 - [ ] Implement safe extraction to a working copy, patch diff/commit/remove, and content-hash registration
 - [ ] Apply patches only to per-project mutable materializations; include patch hashes in lockfile/cache keys
 - [ ] Test store immutability and clear hunk-level diagnostics when patches stop applying
+
+### 11. Lockfile Migration
 - [ ] Implement importers for package-lock v1/v2/v3, shrinkwrap, Yarn Classic/Berry, pnpm, and Bun formats as specified
 - [ ] Implement `migrate --from`, dry-run/diff, integrity checks, precise untranslated-entry report, optional exporters, and opt-in old-lockfile removal
 - [ ] Import applicable ecosystem configuration without silently overriding user settings; test Corpus B resolution preservation target
+
+### 12. Supply Chain Security (Provenance, Audit)
 - [ ] Implement registry signature verification and key rotation/cache handling
 - [ ] Verify npm provenance/Sigstore bundles including certificate, transparency inclusion, and builder identity
 - [ ] Implement off/warn/require policy, exceptions, non-regression signal, compact lockfile status, and offline verification with cached material
@@ -65,25 +103,19 @@
 - [ ] Build/sync local OSV and GitHub advisory data incrementally and support offline scans
 - [ ] Implement `audit` filters, dependency paths, threshold exit behavior, justified expiring exceptions, and SARIF/JSON output
 - [ ] Test results against reference scanners on fixtures and ensure `--fix` review/application behavior is explicit
-- [ ] Resolve and document per-OS sandbox capability/default policy before enabling execution; degrade with explicit warning only where the spec allows
-- [ ] Implement Linux, macOS, and Windows least-privilege sandbox adapters with no network by default and bounded read/write paths
-- [ ] Include sandbox policy in build keys and implement explicit `--no-sandbox` opt-out with warning
-- [ ] Run escape tests for network, paths, credentials, and process limits; test common native builds on supported platforms
-- [ ] Implement resolution order: local cache, trusted remote cache when enabled, platform packages, recognized prebuild conventions, then controlled compilation
-- [ ] Fetch prebuilds through verified CAS pipeline; never permit arbitrary lifecycle script downloads to bypass controls
-- [ ] Test top native packages/platforms and report cache/prebuilt/compiled result
-- [ ] Persist approved script hashes and detect changes/new lifecycle scripts on package update
-- [ ] Revoke stale approvals and show reviewable script/file diffs before execution
-- [ ] Test unchanged, modified, newly added, and removed script cases
-- [ ] Implement per-package version/size/dependency/script/exports/provenance/advisory/age change report for `update --review` and interactive selection
-- [ ] Support table and versioned JSON output and reuse local store diff where possible
-- [ ] Test reports with controlled upgrade fixtures covering every reported change category
+
+### 13. Store Export/Import & Production Slimming
 - [ ] Implement minimal lockfile/package store bundle with integrity manifest and optional signature; add incremental bundle support
 - [ ] Verify and merge imports idempotently and add offline install-from-bundle flow
 - [ ] Prove export/import installation succeeds in a disconnected CI fixture and tampering is rejected
 - [ ] Implement production-only installs, conservative opt-in slim rules/allow-deny config, and self-contained workspace deploy output
 - [ ] Report size before/after; preserve files required by runtime exports and package semantics
 - [ ] Run runtime smoke tests for slimmed compatibility corpus outputs
+- [ ] Implement deterministic dependency/app layers, Docker-oriented install mode, and documented BuildKit store-cache mounts
+- [ ] Add CycloneDX/SPDX SBOM generation for deploy output
+- [ ] Benchmark reference Dockerfiles against npm/pnpm for build time and image size; publish methodology
+
+### 14. Release Engineering & Documentation
 - [ ] Implement reproducible release builds, signed artifacts/checksums/SBOM, CI-only tagged release candidate, and supported distribution channels
 - [ ] Add verified self-update with stable/beta channels; define CLI, JSON, lockfile, and store versioning/deprecation/migration policy
 - [ ] Add `SECURITY.md`, vulnerability disclosure process, and dependency-update automation
@@ -91,44 +123,34 @@
 - [ ] Write getting-started, generated command/config references, store/lockfile, security, troubleshooting, architecture, and contributor documentation
 - [ ] Add npm/Yarn/pnpm/Bun migration, workspace, CI, Docker, and cache recipes
 - [ ] Validate command/config examples, links, schemas, and docs snippets in CI; ensure every command and config key is documented
-- [ ] All Phase 5 exit criteria pass; Corpus A reaches 98%; ratified Appendix D budgets pass
-- [ ] Security review, required fuzzing, crash/concurrency/platform suites, release signing, SBOM, migration checks, and documentation tests pass
-- [ ] Produce a signed release candidate from a tagged commit by CI alone; publish compatibility and benchmark evidence
 
-### Phase 6 — Ecosystem and Scale (post-v1.0)
-
+### 15. Registry-as-a-Service (`jsm serve`)
 - [ ] Implement npm-compatible read API with upstream fallback/cache, configurable policy, token auth, TLS, rate limits, and access logging
 - [ ] Add health/metrics endpoints and integrity-verified optional LAN/peer fetch
 - [ ] Test two clients sharing an upstream fetch and verify unauthorized clients cannot retrieve protected data
-- [ ] Implement S3-compatible, GCS, Azure Blob, HTTPS, and `jsm serve` backends with read-only/read-write roles
-- [ ] Sign and verify build-key artifacts; implement key rotation, namespace isolation, TTL, audit logs, and poisoning defenses
-- [ ] Test CI-to-developer reuse, tampered artifacts, unauthorized access, and backend failure behavior
+
+### 16. Sparse Registry Index & Merkle Sync
 - [ ] Specify and version a sharded incremental compressed index with delta/ETag synchronization
 - [ ] Implement client cache and optional generation/server mode; fall back to the standard registry metadata API
 - [ ] Prove warm-index large-fixture resolution uses zero per-package network requests and remains correct after updates
 - [ ] Maintain Merkle roots/subtrees for package manifests and blobs and define signed root behavior for bundles/served stores
 - [ ] Implement fast verification and store/bundle synchronization by subtree comparison
 - [ ] Test tampering/divergence detection and meet the unchanged-store verification improvement target
+
+### 16. Optional Daemon (`jsmd`)
 - [ ] Implement versioned local socket/named-pipe protocol with user-only permissions and no remote control interface
 - [ ] Add opt-in metadata warming, project watch/prefetch, optional git hooks, idle maintenance, resource limits, and daemon diagnostics
 - [ ] Verify every CLI operation has equivalent daemon-free behavior and branch checkout prefetch meets its acceptance target
+
+### 17. Capability Analysis & Typosquat
 - [ ] Analyze and cache package capabilities for network, process, filesystem, environment, native loading, dynamic code, and obfuscation indicators
 - [ ] Surface changes in update/diff and implement configurable policy plus `capabilities` output
 - [ ] Measure precision/recall on benign and safe malicious-sample datasets; add false-positive controls
 - [ ] Implement popular-name edit/confusable/scope-impersonation checks and metadata anomaly hints for new dependencies
 - [ ] Bundle/update popularity data and make strictness configurable with offline behavior
 - [ ] Test known typosquat samples and quantify false positives on the popular-name corpus
-- [ ] Parse inline dependency declarations and resolve them into isolated cached ephemeral environments
-- [ ] Support optional reproducibility sidecar and configured Node/Bun/Deno runtime/TypeScript loader selection
-- [ ] Test first run with no project files and warm rerun against the specified budget
-- [ ] Implement deterministic dependency/app layers, Docker-oriented install mode, and documented BuildKit store-cache mounts
-- [ ] Add CycloneDX/SPDX SBOM generation for deploy output
-- [ ] Benchmark reference Dockerfiles against npm/pnpm for build time and image size; publish methodology
-- [ ] All Phase 6 sub-phase acceptance criteria pass; service threat models, auth/signature checks, and integration tests are reviewed
-- [ ] Serve, remote cache, sparse index, and daemon are optional and can be disabled without affecting core correctness
 
-### Phase 7 — Advanced Extensions (post-v1.0)
-
+### 17. Advanced Extensions (Phase 7)
 - [ ] Implement content-defined chunking and zstd for eligible large files, retaining whole-file blobs for small files
 - [ ] Implement transparent reconstruction, integrity, resumable migration, rollback, and bounded cache behavior
 - [ ] Test disk savings on many package versions and keep materialization within the approved regression tolerance
@@ -152,8 +174,7 @@
 
 ## Completed Phases
 
-### Phase 0
-
+### Phase 0 — Foundations
 - [x] Create the Rust Cargo workspace and the specified crates
 - [x] Pin the Rust toolchain and document the MSRV policy
 - [x] Add CI for Linux, macOS, and Windows with formatting, Clippy, tests
@@ -175,8 +196,7 @@
 - [x] Add repeatable network shaping and machine-readable JSON plus Markdown benchmark reports
 - [x] Run the harness end-to-end and save the initial baseline
 
-### Phase 1
-
+### Phase 1 — Core Engine
 - [x] Implement the global flags, command aliases, CI detection, non-interactive/frozen-lockfile behavior
 - [x] Add typo suggestions and graceful SIGINT/SIGTERM cancellation
 - [x] Snapshot-test help and verify cancellation never exposes partial project state
@@ -228,8 +248,7 @@
 - [x] Reject traversal and symlink escapes during both extraction and linking
 - [x] Ensure dependency lifecycle scripts cannot execute in the Phase 1 binary; test the absence of an execution path
 
-### Phase 2
-
+### Phase 2 — Store Management & Safety
 - [x] Select the embedded DB through an ADR; implement transactional project/package references and install metadata
 - [x] Track lockfile hashes, paths/project IDs, package references, size, stored/used timestamps, and reference counts
 - [x] Detect stale, moved, or deleted projects and test randomized add/remove/move/delete sequences against ground truth
@@ -258,8 +277,7 @@
 - [x] Add lock install-merge-driver setup for .gitattributes and Git configuration
 - [x] Test parallel additions, conflicting upgrades, malformed inputs, and merge results against manifests
 
-### Phase 3
-
+### Phase 3 — Performance & Time Travel
 - [x] Start fetches as soon as resolution commits a package version; connect stages with bounded channels and backpressure
 - [x] Add critical-path prioritization and isolated network, CPU/decompression/hash, and I/O scheduling
 - [x] Begin linking as soon as safe dependencies are ready; verify deterministic output independent of schedule
@@ -282,20 +300,10 @@
 - [x] Generate candidate upgrade/downgrade/override/peer-range suggestions without presenting guesses as guaranteed fixes
 - [x] Review 30 real conflict cases for accuracy, clarity, and actionable guidance
 
-### Phase 4
-
+### Phase 4 — Real-World Compatibility (Peer Dependencies Complete)
 - [x] Resolve peer dependencies in dependent context; key virtual instances by resolved peer set and deduplicate identical contexts
 - [x] Implement optional peer metadata, configurable auto-install, strict-peer policy, bounded path names, and actionable warnings/errors
 - [x] Compare behavior against curated React, ESLint, and Babel peer-resolution cases
-- [x] Filter OS/CPU/libc before download; record skipped optional packages and make optional build failures non-fatal
-- [x] Implement clear failures for excluded required packages, configurable engine policy, and cross-platform lockfile selection
-- [x] Test native optional packages and supported architecture selection on all platform CI targets
-- [x] Implement npm: aliases, file:, link:, direct tarball URLs, and canonical specifier validation
-- [x] Implement git+https, git+ssh, and github: with locked commit resolution and isolated, policy-controlled prepare execution
-- [x] Record source integrity/commit in the lockfile/store and prove replay from lockfile is deterministic
-- [x] Implement default-deny dependency lifecycle scripts and configured root-script behavior/--ignore-scripts
-- [x] Implement interactive/non-interactive approve-scripts; bind approvals to package/range and script-content hash
-- [x] Warn with skipped scripts and remediation; test that deny mode cannot run dependency scripts and script changes invalidate prior approval
 
 ---
 
