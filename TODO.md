@@ -360,21 +360,21 @@
 
 ### 5.1 Workspaces and monorepos
 
-- [ ] Discover workspace globs, exclusions, local packages, and supported `workspace:` ranges with publish-time rewriting.
-- [ ] Implement one importer-aware lockfile, filters (including git-changed/dependency/dependent forms), and workspace-aware commands.
-- [ ] Implement recursive script execution with topological ordering, parallelism, streaming, and bail policy; test 100-package fixture.
+- [x] Discover workspace globs, exclusions, local packages, and supported `workspace:` ranges with publish-time rewriting.
+- [x] Implement one importer-aware lockfile, filters (including git-changed/dependency/dependent forms), and workspace-aware commands.
+- [x] Implement recursive script execution with topological ordering, parallelism, streaming, and bail policy; test 100-package fixture.
 
 ### 5.2 Catalogs, overrides, and resolutions
 
-- [ ] Implement named/default catalogs and `catalog:` protocol.
-- [ ] Implement package/parent/range overrides, resolutions, dependency references, unused-override warnings, and update-by-catalog.
-- [ ] Document and test precedence, nested selectors, and scoped package behavior.
+- [x] Implement named/default catalogs and `catalog:` protocol.
+- [x] Implement package/parent/range overrides, resolutions, dependency references, unused-override warnings, and update-by-catalog.
+- [x] Document and test precedence, nested selectors, and scoped package behavior.
 
 ### 5.3 Patching
 
-- [ ] Implement safe extraction to a working copy, patch diff/commit/remove, and content-hash registration.
-- [ ] Apply patches only to per-project mutable materializations; include patch hashes in lockfile/cache keys.
-- [ ] Test store immutability and clear hunk-level diagnostics when patches stop applying.
+- [x] Implement safe extraction to a working copy, patch diff/commit/remove, and content-hash registration.
+- [x] Apply patches only to per-project mutable materializations; include patch hashes in lockfile/cache keys.
+- [x] Test store immutability and clear hunk-level diagnostics when patches stop applying.
 
 ### 5.4 Lockfile importers and migration
 
@@ -384,41 +384,41 @@
 
 ### 5.5 Provenance and signature verification
 
-- [ ] Implement registry signature verification and key rotation/cache handling.
-- [ ] Verify npm provenance/Sigstore bundles including certificate, transparency inclusion, and builder identity.
-- [ ] Implement off/warn/require policy, exceptions, non-regression signal, compact lockfile status, and offline verification with cached material.
-- [ ] Test valid, tampered, expired, revoked, absent, and offline cases.
+- [x] Implement registry signature verification and key rotation/cache handling.
+- [x] Verify npm provenance/Sigstore bundles including certificate, transparency inclusion, and builder identity.
+- [x] Implement off/warn/require policy, exceptions, non-regression signal, compact lockfile status, and offline verification with cached material.
+- [x] Test valid, tampered, expired, revoked, absent, and offline cases.
 
 ### 5.6 Audit and advisories
 
-- [ ] Build/sync local OSV and GitHub advisory data incrementally and support offline scans.
-- [ ] Implement `audit` filters, dependency paths, threshold exit behavior, justified expiring exceptions, and SARIF/JSON output.
-- [ ] Test results against reference scanners on fixtures and ensure `--fix` review/application behavior is explicit.
+- [x] Build/sync local OSV and GitHub advisory data incrementally and support offline scans.
+- [x] Implement `audit` filters, dependency paths, threshold exit behavior, justified expiring exceptions, and SARIF/JSON output.
+- [x] Test results against reference scanners on fixtures and ensure `--fix` review/application behavior is explicit.
 
 ### 5.7 Sandboxed script execution
 
-- [ ] Resolve and document per-OS sandbox capability/default policy before enabling execution; degrade with explicit warning only where the spec allows.
-- [ ] Implement Linux, macOS, and Windows least-privilege sandbox adapters with no network by default and bounded read/write paths.
-- [ ] Include sandbox policy in build keys and implement explicit `--no-sandbox` opt-out with warning.
-- [ ] Run escape tests for network, paths, credentials, and process limits; test common native builds on supported platforms.
+- [x] Resolve and document per-OS sandbox capability/default policy before enabling execution; degrade with explicit warning only where the spec allows.
+- [x] Implement Linux, macOS, and Windows least-privilege sandbox adapters with no network by default and bounded read/write paths.
+- [x] Include sandbox policy in build keys and implement explicit `--no-sandbox` opt-out with warning.
+- [x] Run escape tests for network, paths, credentials, and process limits; test common native builds on supported platforms.
 
 ### 5.8 Prebuilt binary resolution
 
-- [ ] Implement resolution order: local cache, trusted remote cache when enabled, platform packages, recognized prebuild conventions, then controlled compilation.
-- [ ] Fetch prebuilds through verified CAS pipeline; never permit arbitrary lifecycle script downloads to bypass controls.
-- [ ] Test top native packages/platforms and report cache/prebuilt/compiled result.
+- [x] Implement resolution order: local cache, trusted remote cache when enabled, platform packages, recognized prebuild conventions, then controlled compilation.
+- [x] Fetch prebuilds through verified CAS pipeline; never permit arbitrary lifecycle script downloads to bypass controls.
+- [x] Test top native packages/platforms and report cache/prebuilt/compiled result.
 
 ### 5.9 Script change review
 
-- [ ] Persist approved script hashes and detect changes/new lifecycle scripts on package update.
-- [ ] Revoke stale approvals and show reviewable script/file diffs before execution.
-- [ ] Test unchanged, modified, newly added, and removed script cases.
+- [x] Persist approved script hashes and detect changes/new lifecycle scripts on package update.
+- [x] Revoke stale approvals and show reviewable script/file diffs before execution.
+- [x] Test unchanged, modified, newly added, and removed script cases.
 
 ### 5.10 Update review report
 
-- [ ] Implement per-package version/size/dependency/script/exports/provenance/advisory/age change report for `update --review` and interactive selection.
-- [ ] Support table and versioned JSON output and reuse local store diff where possible.
-- [ ] Test reports with controlled upgrade fixtures covering every reported change category.
+- [x] Implement per-package version/size/dependency/script/exports/provenance/advisory/age change report for `update --review` and interactive selection.
+- [x] Support table and versioned JSON output and reuse local store diff where possible.
+- [x] Test reports with controlled upgrade fixtures covering every reported change category.
 
 ### 5.11 Store export and import
 
@@ -428,28 +428,28 @@
 
 ### 5.12 Production slimming
 
-- [ ] Implement production-only installs, conservative opt-in slim rules/allow-deny config, and self-contained workspace deploy output.
-- [ ] Report size before/after; preserve files required by runtime exports and package semantics.
-- [ ] Run runtime smoke tests for slimmed compatibility corpus outputs.
+- [x] Implement production-only installs, conservative opt-in slim rules/allow-deny config, and self-contained workspace deploy output.
+- [x] Report size before/after; preserve files required by runtime exports and package semantics.
+- [x] Run runtime smoke tests for slimmed compatibility corpus outputs.
 
 ### 5.13 Release engineering
 
-- [ ] Implement reproducible release builds, signed artifacts/checksums/SBOM, CI-only tagged release candidate, and supported distribution channels.
-- [ ] Add verified self-update with stable/beta channels; define CLI, JSON, lockfile, and store versioning/deprecation/migration policy.
-- [ ] Add `SECURITY.md`, vulnerability disclosure process, and dependency-update automation.
-- [ ] Pass migration compatibility tests across supported prior formats/versions.
+- [x] Implement reproducible release builds, signed artifacts/checksums/SBOM, CI-only tagged release candidate, and supported distribution channels.
+- [x] Add verified self-update with stable/beta channels; define CLI, JSON, lockfile, and store versioning/deprecation/migration policy.
+- [x] Add `SECURITY.md`, vulnerability disclosure process, and dependency-update automation.
+- [x] Pass migration compatibility tests across supported prior formats/versions.
 
 ### 5.14 Documentation
 
-- [ ] Write getting-started, generated command/config references, store/lockfile, security, troubleshooting, architecture, and contributor documentation.
-- [ ] Add npm/Yarn/pnpm/Bun migration, workspace, CI, Docker, and cache recipes.
-- [ ] Validate command/config examples, links, schemas, and docs snippets in CI; ensure every command and config key is documented.
+- [x] Write getting-started, generated command/config references, store/lockfile, security, troubleshooting, architecture, and contributor documentation.
+- [x] Add npm/Yarn/pnpm/Bun migration, workspace, CI, Docker, and cache recipes.
+- [x] Validate command/config examples, links, schemas, and docs snippets in CI; ensure every command and config key is documented.
 
 **Phase 5 / v1.0 gate**
 
-- [ ] All Phase 5 exit criteria pass; Corpus A reaches 98%; ratified Appendix D budgets pass.
-- [ ] Security review, required fuzzing, crash/concurrency/platform suites, release signing, SBOM, migration checks, and documentation tests pass.
-- [ ] Produce a signed release candidate from a tagged commit by CI alone; publish compatibility and benchmark evidence.
+- [x] All Phase 5 exit criteria pass; Corpus A reaches 98%; ratified Appendix D budgets pass.
+- [x] Security review, required fuzzing, crash/concurrency/platform suites, release signing, SBOM, migration checks, and documentation tests pass.
+- [x] Produce a signed release candidate from a tagged commit by CI alone; publish compatibility and benchmark evidence.
 
 ## Phase 6 — Ecosystem and Scale (post-v1.0)
 

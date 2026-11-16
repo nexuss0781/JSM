@@ -89,7 +89,7 @@ pub fn x(
     let mut silent = cli.clone();
     silent.json = false;
     silent.quiet = true;
-    install(&silent, &temp, false, false, false, cancellation, progress)?;
+    install(&silent, &temp, false, false, false, false, cancellation, progress)?;
     // Determine bin entry.
     let pkg_json_path = temp.join("node_modules").join(&name).join("package.json");
     let bin_name = if pkg_json_path.exists() {

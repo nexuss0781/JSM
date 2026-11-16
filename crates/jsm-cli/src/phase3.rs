@@ -104,7 +104,7 @@ pub fn undo(
     let mut silent = cli.clone();
     silent.json = false;
     silent.quiet = true;
-    install(&silent, cwd, false, false, false, cancellation, progress)?;
+    install(&silent, cwd, false, false, false, false, cancellation, progress)?;
     state.position -= 1;
     save_history(cwd, &state)?;
     if cli.json {
@@ -130,7 +130,7 @@ pub fn redo(
     let mut silent = cli.clone();
     silent.json = false;
     silent.quiet = true;
-    install(&silent, cwd, false, false, false, cancellation, progress)?;
+    install(&silent, cwd, false, false, false, false, cancellation, progress)?;
     state.position += 1;
     save_history(cwd, &state)?;
     if cli.json {
@@ -184,7 +184,7 @@ pub fn snapshot(
             let mut silent = cli.clone();
             silent.json = false;
             silent.quiet = true;
-            install(&silent, cwd, false, false, false, cancellation, progress)?;
+            install(&silent, cwd, false, false, false, false, cancellation, progress)?;
             record_history(
                 cwd,
                 &format!("snapshot restore {name}"),
@@ -274,7 +274,7 @@ pub fn switch(
     let mut silent = cli.clone();
     silent.json = false;
     silent.quiet = true;
-    if let Err(error) = install(&silent, cwd, false, false, false, cancellation, progress) {
+    if let Err(error) = install(&silent, cwd, false, false, false, false, cancellation, progress) {
         fs::write(&path, original).into_diagnostic()?;
         return Err(error);
     }

@@ -183,6 +183,8 @@ enum Command {
         #[arg(long)]
         prod: bool,
         #[arg(long)]
+        slim: bool,
+        #[arg(long)]
         no_lockfile: bool,
     },
     #[command(alias = "rm")]
@@ -602,6 +604,7 @@ fn run(cli: Cli, cancellation: &CancellationToken) -> Result<()> {
     let command = cli.command.clone().unwrap_or(Command::Install {
         frozen_lockfile: None,
         prod: false,
+        slim: false,
         no_lockfile: false,
     });
     if let Command::Config { command } = command {
@@ -643,6 +646,7 @@ fn run(cli: Cli, cancellation: &CancellationToken) -> Result<()> {
         Command::Install {
             frozen_lockfile,
             prod,
+            slim,
             no_lockfile,
         } => {
             let mut progress = OperationProgress::start_with_ndjson(
@@ -662,6 +666,7 @@ fn run(cli: Cli, cancellation: &CancellationToken) -> Result<()> {
                 &cwd,
                 frozen,
                 prod,
+                slim,
                 no_lockfile,
                 cancellation,
                 &mut progress,
@@ -1015,7 +1020,7 @@ fn add(
     let mut silent = cli.clone();
     silent.json = false;
     silent.quiet = true;
-    if let Err(error) = install(&silent, cwd, false, false, false, cancellation, progress) {
+    if let Err(error) = install(&silent, cwd, false, false, false, false, cancellation, progress) {
         fs::write(&path, original).into_diagnostic()?;
         return Err(error);
     }
@@ -1546,11 +1551,13 @@ fn resolve_lock(
     Ok(lock)
 }
 
+#[allow(clippy::too_many_arguments)]
 fn install(
     cli: &Cli,
     cwd: &Path,
     frozen: bool,
     prod: bool,
+    _slim: bool,
     no_lockfile: bool,
     cancellation: &CancellationToken,
     progress: &mut OperationProgress,
@@ -2003,7 +2010,7 @@ fn remove(
     let mut silent = cli.clone();
     silent.json = false;
     silent.quiet = true;
-    if let Err(error) = install(&silent, cwd, false, false, false, cancellation, progress) {
+    if let Err(error) = install(&silent, cwd, false, false, false, false, cancellation, progress) {
         fs::write(manifest_path(cwd), original).into_diagnostic()?;
         return Err(error);
     }
@@ -2130,7 +2137,7 @@ fn run_script(
                 true,
                 false,
             );
-            let _ = install(&silent, &temp, false, false, false, cancellation, &mut progress);
+            let _ = install(&silent, &temp, false, false, false, false, cancellation, &mut progress);
             let mut command = ProcessCommand::new("node");
             command.arg(script_path).args(args).current_dir(&temp);
             if let Ok(path) = project_path(&temp) {

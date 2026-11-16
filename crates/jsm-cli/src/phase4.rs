@@ -23,7 +23,7 @@ pub fn update(
     let mut silent = cli.clone();
     silent.json = false;
     silent.quiet = true;
-    install(&silent, cwd, false, false, false, cancellation, progress)?;
+    install(&silent, cwd, false, false, false, false, cancellation, progress)?;
     let after_lock = Lockfile::read(cwd.join("jsm.lock")).ok();
     phase3::record_history(cwd, "update", before, phase3::lockfile_text(cwd));
     if review {
