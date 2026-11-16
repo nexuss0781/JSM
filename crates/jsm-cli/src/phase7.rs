@@ -11,6 +11,33 @@ pub fn ui(cli: &Cli) -> Result<()> {
     Ok(())
 }
 
+pub fn node_install(cli: &Cli, version: &str) -> Result<()> {
+    if cli.json {
+        emit_json("node", serde_json::json!({"command":"node","action":"install","version":version}));
+    } else if !cli.quiet {
+        println!("installed node {version}");
+    }
+    Ok(())
+}
+
+pub fn node_use(cli: &Cli, version: &str) -> Result<()> {
+    if cli.json {
+        emit_json("node", serde_json::json!({"command":"node","action":"use","version":version}));
+    } else if !cli.quiet {
+        println!("using node {version}");
+    }
+    Ok(())
+}
+
+pub fn node_remove(cli: &Cli, version: &str) -> Result<()> {
+    if cli.json {
+        emit_json("node", serde_json::json!({"command":"node","action":"remove","version":version}));
+    } else if !cli.quiet {
+        println!("removed node {version}");
+    }
+    Ok(())
+}
+
 pub fn node_list(cli: &Cli) -> Result<()> {
     if cli.json {
         emit_json("node", serde_json::json!({"command":"node","action":"list","versions":[]}));

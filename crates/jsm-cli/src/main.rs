@@ -341,7 +341,16 @@ enum DaemonCommand {
 
 #[derive(Debug, Clone, Subcommand)]
 enum NodeCommand {
+    Install {
+        version: String,
+    },
+    Use {
+        version: String,
+    },
     List,
+    Remove {
+        version: String,
+    },
     Which {
         version: String,
     },
@@ -703,7 +712,10 @@ fn run(cli: Cli, cancellation: &CancellationToken) -> Result<()> {
             DaemonCommand::Logs => phase6::daemon_logs(&cli),
         },
         Command::Node { command } => match command {
+            NodeCommand::Install { version } => phase7::node_install(&cli, &version),
+            NodeCommand::Use { version } => phase7::node_use(&cli, &version),
             NodeCommand::List => phase7::node_list(&cli),
+            NodeCommand::Remove { version } => phase7::node_remove(&cli, &version),
             NodeCommand::Which { version } => phase7::node_which(&cli, &version),
         },
         Command::Workspaces { command } => match command {
