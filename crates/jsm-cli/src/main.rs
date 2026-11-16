@@ -238,6 +238,10 @@ enum Command {
         command: CacheCommand,
     },
     Ui,
+    Daemon {
+        #[command(subcommand)]
+        command: DaemonCommand,
+    },
     Node {
         #[command(subcommand)]
         command: NodeCommand,
@@ -325,6 +329,14 @@ enum CacheCommand {
 enum CacheSubcommand {
     List,
     Clear,
+}
+
+#[derive(Debug, Clone, Subcommand)]
+enum DaemonCommand {
+    Start,
+    Stop,
+    Status,
+    Logs,
 }
 
 #[derive(Debug, Clone, Subcommand)]
@@ -684,6 +696,12 @@ fn run(cli: Cli, cancellation: &CancellationToken) -> Result<()> {
             },
         },
         Command::Ui => phase7::ui(&cli),
+        Command::Daemon { command } => match command {
+            DaemonCommand::Start => phase6::daemon_start(&cli),
+            DaemonCommand::Stop => phase6::daemon_stop(&cli),
+            DaemonCommand::Status => phase6::daemon_status(&cli),
+            DaemonCommand::Logs => phase6::daemon_logs(&cli),
+        },
         Command::Node { command } => match command {
             NodeCommand::List => phase7::node_list(&cli),
             NodeCommand::Which { version } => phase7::node_which(&cli, &version),

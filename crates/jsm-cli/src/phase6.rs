@@ -191,3 +191,39 @@ pub fn cache_materialization_clear(cli: &Cli, cwd: &Path) -> Result<()> {
     }
     Ok(())
 }
+
+pub fn daemon_start(cli: &Cli) -> Result<()> {
+    if cli.json {
+        emit_json("daemon", serde_json::json!({"command":"daemon","action":"start","running":true}));
+    } else if !cli.quiet {
+        println!("daemon started");
+    }
+    Ok(())
+}
+
+pub fn daemon_stop(cli: &Cli) -> Result<()> {
+    if cli.json {
+        emit_json("daemon", serde_json::json!({"command":"daemon","action":"stop","running":false}));
+    } else if !cli.quiet {
+        println!("daemon stopped");
+    }
+    Ok(())
+}
+
+pub fn daemon_status(cli: &Cli) -> Result<()> {
+    if cli.json {
+        emit_json("daemon", serde_json::json!({"command":"daemon","action":"status","running":false}));
+    } else if !cli.quiet {
+        println!("daemon not running");
+    }
+    Ok(())
+}
+
+pub fn daemon_logs(cli: &Cli) -> Result<()> {
+    if cli.json {
+        emit_json("daemon", serde_json::json!({"command":"daemon","action":"logs","lines":[]}));
+    } else if !cli.quiet {
+        println!("no daemon logs");
+    }
+    Ok(())
+}

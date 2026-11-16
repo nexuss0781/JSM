@@ -23,6 +23,7 @@ Commands:
   serve            
   cache            
   ui               
+  daemon           
   node             
   workspaces       
   approve-scripts  
