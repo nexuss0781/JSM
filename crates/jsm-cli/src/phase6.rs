@@ -9,13 +9,64 @@ pub fn capabilities(cli: &Cli, _cwd: &Path, package: &str) -> Result<()> {
     Ok(())
 }
 
-pub fn x(cli: &Cli, cwd: &Path, package: &str, args: Vec<String>, cancellation: &CancellationToken, progress: &mut OperationProgress) -> Result<()> {
-    // Minimal implementation: treat like add+run? Just acknowledge.
-    let _ = (cwd, args, cancellation, progress);
+pub fn x(
+    cli: &Cli,
+    cwd: &Path,
+    package: &str,
+    args: Vec<String>,
+    cancellation: &CancellationToken,
+    progress: &mut OperationProgress,
+) -> Result<()> {
+    let temp = std::env::temp_dir().join(format!("jsm-x-{}", package.replace('/', "-")));
+    let _ = fs::remove_dir_all(&temp);
+    fs::create_dir_all(&temp).into_diagnostic()?;
+    // Parse name@version similar to add.
+    let (name, version) = package
+        .rsplit_once('@')
+        .filter(|(n, v)| !n.is_empty() && !v.is_empty())
+        .map(|(n, v)| (n.to_string(), v.to_string()))
+        .unwrap_or((package.to_string(), "latest".to_string()));
+    let manifest = serde_json::json!({"name":"jsm-x","version":"1.0.0","dependencies":{(name.clone()):version}});
+    fs::write(
+        temp.join("package.json"),
+        serde_json::to_string_pretty(&manifest).into_diagnostic()? + "\n",
+    )
+    .into_diagnostic()?;
+    let mut silent = cli.clone();
+    silent.json = false;
+    silent.quiet = true;
+    install(&silent, &temp, false, false, false, cancellation, progress)?;
+    // Determine bin entry.
+    let pkg_json_path = temp.join("node_modules").join(&name).join("package.json");
+    let bin_name = if pkg_json_path.exists() {
+        let v: Value = serde_json::from_str(&fs::read_to_string(&pkg_json_path).into_diagnostic()?)
+            .into_diagnostic()?;
+        v.get("bin")
+            .and_then(|b| {
+                if let Some(s) = b.as_str() {
+                    Some(s.to_string())
+                } else {
+                    b.as_object().and_then(|o| o.keys().next().cloned())
+                }
+            })
+            .unwrap_or_else(|| name.rsplit('/').next().unwrap_or(&name).to_string())
+    } else {
+        name.rsplit('/').next().unwrap_or(&name).to_string()
+    };
+    let bin_path = temp.join("node_modules").join(".bin").join(&bin_name);
+    let mut command = ProcessCommand::new(&bin_path);
+    command.args(&args).current_dir(cwd);
+    command.env("PATH", project_path(cwd).unwrap_or_default());
+    let status = command.status().into_diagnostic()?;
+    if !status.success() {
+        return Err(CommandExit {
+            code: status.code().unwrap_or(1),
+            message: format!("x failed for {package}"),
+        }
+        .into());
+    }
     if cli.json {
         emit_json("x", serde_json::json!({"command":"x","package":package}));
-    } else if !cli.quiet {
-        println!("executed {package}");
     }
     Ok(())
 }
