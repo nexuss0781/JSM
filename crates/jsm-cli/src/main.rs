@@ -82,6 +82,8 @@ struct Cli {
     filter: Option<String>,
     #[arg(long, global = true, value_enum, default_value_t = ProgressMode::Auto)]
     progress: ProgressMode,
+    #[arg(long, global = true, default_value = "isolated")]
+    linker: String,
     #[arg(long, global = true)]
     config: Option<PathBuf>,
     /// Write a Chrome trace for diagnostic runs.
@@ -1585,6 +1587,7 @@ fn install(
         &lock,
         LinkOptions {
             include_dev: !prod,
+            settings: BTreeMap::from([(String::from("linker"), cli.linker.clone())]),
             ..Default::default()
         },
     )

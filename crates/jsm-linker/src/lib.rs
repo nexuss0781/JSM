@@ -110,11 +110,23 @@ pub fn link(
         .as_ref()
         .map(|state| state.direct_dependencies.clone())
         .unwrap_or_default();
+    let hoisted = options
+        .settings
+        .get("linker")
+        .map(|value| value == "hoisted")
+        .unwrap_or(false);
     let mut published_direct = BTreeMap::new();
-    for (name, id) in &direct {
-        let key = package_key(name, id)?;
-        if selected.contains(&key) {
-            published_direct.insert(name.clone(), id.clone());
+    if hoisted {
+        for id in &selected {
+            let (name, _) = id.split_once('@').unwrap_or((id, ""));
+            published_direct.insert(name.to_owned(), id.clone());
+        }
+    } else {
+        for (name, id) in &direct {
+            let key = package_key(name, id)?;
+            if selected.contains(&key) {
+                published_direct.insert(name.clone(), id.clone());
+            }
         }
     }
     let txn = project.join(format!(".jsm-link-txn-{}", std::process::id()));
@@ -139,7 +151,11 @@ pub fn link(
     let hash = hash_lock(lock);
     let state = LinkState {
         lockfile_hash: hash,
-        linker: "isolated".into(),
+        linker: if hoisted {
+            "hoisted".into()
+        } else {
+            "isolated".into()
+        },
         settings: options.settings.clone(),
         packages: selected.iter().cloned().collect(),
         direct_dependencies: published_direct.clone(),
