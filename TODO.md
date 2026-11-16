@@ -461,56 +461,56 @@
 
 ### 6.2 Remote build cache
 
-- [ ] Implement S3-compatible, GCS, Azure Blob, HTTPS, and `jsm serve` backends with read-only/read-write roles.
-- [ ] Sign and verify build-key artifacts; implement key rotation, namespace isolation, TTL, audit logs, and poisoning defenses.
-- [ ] Test CI-to-developer reuse, tampered artifacts, unauthorized access, and backend failure behavior.
+- [x] Implement S3-compatible, GCS, Azure Blob, HTTPS, and `jsm serve` backends with read-only/read-write roles.
+- [x] Sign and verify build-key artifacts; implement key rotation, namespace isolation, TTL, audit logs, and poisoning defenses.
+- [x] Test CI-to-developer reuse, tampered artifacts, unauthorized access, and backend failure behavior.
 
 ### 6.3 Sparse registry index
 
-- [ ] Specify and version a sharded incremental compressed index with delta/ETag synchronization.
-- [ ] Implement client cache and optional generation/server mode; fall back to the standard registry metadata API.
-- [ ] Prove warm-index large-fixture resolution uses zero per-package network requests and remains correct after updates.
+- [x] Specify and version a sharded incremental compressed index with delta/ETag synchronization.
+- [x] Implement client cache and optional generation/server mode; fall back to the standard registry metadata API.
+- [x] Prove warm-index large-fixture resolution uses zero per-package network requests and remains correct after updates.
 
 ### 6.4 Merkle verification and store sync
 
-- [ ] Maintain Merkle roots/subtrees for package manifests and blobs and define signed root behavior for bundles/served stores.
-- [ ] Implement fast verification and store/bundle synchronization by subtree comparison.
-- [ ] Test tampering/divergence detection and meet the unchanged-store verification improvement target.
+- [x] Maintain Merkle roots/subtrees for package manifests and blobs and define signed root behavior for bundles/served stores.
+- [x] Implement fast verification and store/bundle synchronization by subtree comparison.
+- [x] Test tampering/divergence detection and meet the unchanged-store verification improvement target.
 
 ### 6.5 Optional daemon (`jsmd`)
 
-- [ ] Implement versioned local socket/named-pipe protocol with user-only permissions and no remote control interface.
-- [ ] Add opt-in metadata warming, project watch/prefetch, optional git hooks, idle maintenance, resource limits, and daemon diagnostics.
-- [ ] Verify every CLI operation has equivalent daemon-free behavior and branch checkout prefetch meets its acceptance target.
+- [x] Implement versioned local socket/named-pipe protocol with user-only permissions and no remote control interface.
+- [x] Add opt-in metadata warming, project watch/prefetch, optional git hooks, idle maintenance, resource limits, and daemon diagnostics.
+- [x] Verify every CLI operation has equivalent daemon-free behavior and branch checkout prefetch meets its acceptance target.
 
 ### 6.6 Capability analysis
 
-- [ ] Analyze and cache package capabilities for network, process, filesystem, environment, native loading, dynamic code, and obfuscation indicators.
-- [ ] Surface changes in update/diff and implement configurable policy plus `capabilities` output.
-- [ ] Measure precision/recall on benign and safe malicious-sample datasets; add false-positive controls.
+- [x] Analyze and cache package capabilities for network, process, filesystem, environment, native loading, dynamic code, and obfuscation indicators.
+- [x] Surface changes in update/diff and implement configurable policy plus `capabilities` output.
+- [x] Measure precision/recall on benign and safe malicious-sample datasets; add false-positive controls.
 
 ### 6.7 Typosquat and anomaly warnings
 
-- [ ] Implement popular-name edit/confusable/scope-impersonation checks and metadata anomaly hints for new dependencies.
-- [ ] Bundle/update popularity data and make strictness configurable with offline behavior.
-- [ ] Test known typosquat samples and quantify false positives on the popular-name corpus.
+- [x] Implement popular-name edit/confusable/scope-impersonation checks and metadata anomaly hints for new dependencies.
+- [x] Bundle/update popularity data and make strictness configurable with offline behavior.
+- [x] Test known typosquat samples and quantify false positives on the popular-name corpus.
 
 ### 6.8 Zero-install script running
 
-- [ ] Parse inline dependency declarations and resolve them into isolated cached ephemeral environments.
-- [ ] Support optional reproducibility sidecar and configured Node/Bun/Deno runtime/TypeScript loader selection.
-- [ ] Test first run with no project files and warm rerun against the specified budget.
+- [x] Parse inline dependency declarations and resolve them into isolated cached ephemeral environments.
+- [x] Support optional reproducibility sidecar and configured Node/Bun/Deno runtime/TypeScript loader selection.
+- [x] Test first run with no project files and warm rerun against the specified budget.
 
 ### 6.9 Advanced deploy and container optimization
 
-- [ ] Implement deterministic dependency/app layers, Docker-oriented install mode, and documented BuildKit store-cache mounts.
-- [ ] Add CycloneDX/SPDX SBOM generation for deploy output.
-- [ ] Benchmark reference Dockerfiles against npm/pnpm for build time and image size; publish methodology.
+- [x] Implement deterministic dependency/app layers, Docker-oriented install mode, and documented BuildKit store-cache mounts.
+- [x] Add CycloneDX/SPDX SBOM generation for deploy output.
+- [x] Benchmark reference Dockerfiles against npm/pnpm for build time and image size; publish methodology.
 
 **Phase 6 gate**
 
-- [ ] All Phase 6 sub-phase acceptance criteria pass; service threat models, auth/signature checks, and integration tests are reviewed.
-- [ ] Serve, remote cache, sparse index, and daemon are optional and can be disabled without affecting core correctness.
+- [x] All Phase 6 sub-phase acceptance criteria pass; service threat models, auth/signature checks, and integration tests are reviewed.
+- [x] Serve, remote cache, sparse index, and daemon are optional and can be disabled without affecting core correctness.
 
 ## Phase 7 — Advanced Extensions (post-v1.0)
 

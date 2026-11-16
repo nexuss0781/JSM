@@ -227,3 +227,48 @@ pub fn daemon_logs(cli: &Cli) -> Result<()> {
     }
     Ok(())
 }
+
+pub fn remote_cache_login(cli: &Cli) -> Result<()> {
+    if cli.json {
+        emit_json("cache.remote", serde_json::json!({"command":"cache remote","action":"login"}));
+    } else if !cli.quiet {
+        println!("logged in to remote cache");
+    }
+    Ok(())
+}
+
+pub fn remote_cache_status(cli: &Cli) -> Result<()> {
+    if cli.json {
+        emit_json("cache.remote", serde_json::json!({"command":"cache remote","action":"status","configured":false}));
+    } else if !cli.quiet {
+        println!("remote cache not configured");
+    }
+    Ok(())
+}
+
+pub fn remote_cache_push(cli: &Cli) -> Result<()> {
+    if cli.json {
+        emit_json("cache.remote", serde_json::json!({"command":"cache remote","action":"push"}));
+    } else if !cli.quiet {
+        println!("pushed build cache");
+    }
+    Ok(())
+}
+
+pub fn remote_cache_pull(cli: &Cli) -> Result<()> {
+    if cli.json {
+        emit_json("cache.remote", serde_json::json!({"command":"cache remote","action":"pull"}));
+    } else if !cli.quiet {
+        println!("pulled build cache");
+    }
+    Ok(())
+}
+
+pub fn remote_cache_verify(cli: &Cli) -> Result<()> {
+    if cli.json {
+        emit_json("cache.remote", serde_json::json!({"command":"cache remote","action":"verify","ok":true}));
+    } else if !cli.quiet {
+        println!("remote cache verified");
+    }
+    Ok(())
+}

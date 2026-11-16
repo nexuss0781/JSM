@@ -339,6 +339,19 @@ enum CacheCommand {
         #[command(subcommand)]
         command: CacheSubcommand,
     },
+    Remote {
+        #[command(subcommand)]
+        command: RemoteCacheSubcommand,
+    },
+}
+
+#[derive(Debug, Clone, Subcommand)]
+enum RemoteCacheSubcommand {
+    Login,
+    Status,
+    Push,
+    Pull,
+    Verify,
 }
 
 #[derive(Debug, Clone, Subcommand)]
@@ -737,6 +750,13 @@ fn run(cli: Cli, cancellation: &CancellationToken) -> Result<()> {
             CacheCommand::Materialization { command } => match command {
                 CacheSubcommand::List => phase6::cache_materialization_list(&cli, &cwd),
                 CacheSubcommand::Clear => phase6::cache_materialization_clear(&cli, &cwd),
+            },
+            CacheCommand::Remote { command } => match command {
+                RemoteCacheSubcommand::Login => phase6::remote_cache_login(&cli),
+                RemoteCacheSubcommand::Status => phase6::remote_cache_status(&cli),
+                RemoteCacheSubcommand::Push => phase6::remote_cache_push(&cli),
+                RemoteCacheSubcommand::Pull => phase6::remote_cache_pull(&cli),
+                RemoteCacheSubcommand::Verify => phase6::remote_cache_verify(&cli),
             },
         },
         Command::Ui => phase7::ui(&cli),
