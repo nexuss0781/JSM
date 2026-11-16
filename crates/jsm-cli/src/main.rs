@@ -405,6 +405,13 @@ enum StoreCommand {
         #[arg(long)]
         fix: bool,
     },
+    Export {
+        lockfile: PathBuf,
+        out: PathBuf,
+    },
+    Import {
+        bundle: PathBuf,
+    },
 }
 
 #[derive(Debug, Clone, Subcommand)]

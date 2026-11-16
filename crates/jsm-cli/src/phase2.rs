@@ -682,7 +682,48 @@ pub(super) fn store_command(
             }
             Ok(())
         }
+        StoreCommand::Export { lockfile: _, out } => {
+            // Minimal bundle: copy store root to output directory.
+            let _lease = store.maintenance_lease(true).into_diagnostic()?;
+            let _ = fs::remove_dir_all(&out);
+            fs::create_dir_all(&out).into_diagnostic()?;
+            copy_dir_recursive(store.root(), &out)?;
+            if cli.json {
+                emit_json("store.export", json!({"command":"store export","out":out}));
+            } else if !cli.quiet {
+                println!("exported store to {}", out.display());
+            }
+            Ok(())
+        }
+        StoreCommand::Import { bundle } => {
+            let _lease = store.maintenance_lease(true).into_diagnostic()?;
+            copy_dir_recursive(&bundle, store.root())?;
+            if cli.json {
+                emit_json("store.import", json!({"command":"store import","bundle":bundle}));
+            } else if !cli.quiet {
+                println!("imported bundle from {}", bundle.display());
+            }
+            Ok(())
+        }
     }
+}
+
+fn copy_dir_recursive(src: &Path, dst: &Path) -> Result<()> {
+    fs::create_dir_all(dst).into_diagnostic()?;
+    for entry in fs::read_dir(src).into_diagnostic()? {
+        let entry = entry.into_diagnostic()?;
+        let path = entry.path();
+        let target = dst.join(entry.file_name());
+        if path.is_dir() && !path.is_symlink() {
+            copy_dir_recursive(&path, &target)?;
+        } else {
+            if let Some(parent) = target.parent() {
+                fs::create_dir_all(parent).into_diagnostic()?;
+            }
+            fs::copy(&path, &target).into_diagnostic()?;
+        }
+    }
+    Ok(())
 }
 
 pub(super) fn remote_versions(cli: &Cli, cwd: &Path, package: &str) -> Result<()> {
