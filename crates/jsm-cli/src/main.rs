@@ -93,6 +93,10 @@ struct Cli {
     #[arg(long, global = true)]
     ignore_scripts: bool,
     #[arg(long, global = true)]
+    explain: bool,
+    #[arg(long, global = true)]
+    network_concurrency: Option<usize>,
+    #[arg(long, global = true)]
     config: Option<PathBuf>,
     /// Write a Chrome trace for diagnostic runs.
     #[arg(long, value_name = "FILE")]
@@ -2164,6 +2168,8 @@ fn run_script(
                 resolution: "highest".into(),
                 before: None,
                 ignore_scripts: false,
+                explain: false,
+                network_concurrency: None,
             };
             // reuse effective? simpler: call install via a minimal Cli
             let mut progress = OperationProgress::start_with_ndjson(

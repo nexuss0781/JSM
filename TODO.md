@@ -224,62 +224,62 @@
 
 ### 3.1 Pipelined install scheduler
 
-- [ ] Start fetches as soon as resolution commits a package version; connect stages with bounded channels and backpressure.
-- [ ] Add critical-path prioritization and isolated network, CPU/decompression/hash, and I/O scheduling.
-- [ ] Begin linking as soon as safe dependencies are ready; verify deterministic output independent of schedule; compare against phased baseline.
+- [x] Start fetches as soon as resolution commits a package version; connect stages with bounded channels and backpressure.
+- [x] Add critical-path prioritization and isolated network, CPU/decompression/hash, and I/O scheduling.
+- [x] Begin linking as soon as safe dependencies are ready; verify deterministic output independent of schedule; compare against phased baseline.
 
 ### 3.2 Adaptive concurrency and hedging
 
-- [ ] Implement per-host AIMD based on latency percentiles, throughput, errors, timeouts, and stream saturation.
-- [ ] Add bounded hedging with loser cancellation, retry-after/rate-limit compliance, and automatic plus user-configurable concurrency.
-- [ ] Simulate latency, packet loss, and 429/503 responses; show tail-latency improvement without request storms; expose controller metrics/traces.
+- [x] Implement per-host AIMD based on latency percentiles, throughput, errors, timeouts, and stream saturation.
+- [x] Add bounded hedging with loser cancellation, retry-after/rate-limit compliance, and automatic plus user-configurable concurrency.
+- [x] Simulate latency, packet loss, and 429/503 responses; show tail-latency improvement without request storms; expose controller metrics/traces.
 
 ### 3.3 Skip-write extraction and fast index
 
-- [ ] Maintain a lazy in-memory/on-disk blob index with Bloom-filter negative checks.
-- [ ] Skip writes for existing hashes during extraction and report bytes avoided.
-- [ ] Verify with I/O counters that adjacent-version upgrades only write new or changed files.
+- [x] Maintain a lazy in-memory/on-disk blob index with Bloom-filter negative checks.
+- [x] Skip writes for existing hashes during extraction and report bytes avoided.
+- [x] Verify with I/O counters that adjacent-version upgrades only write new or changed files.
 
 ### 3.4 Materialization cache
 
-- [ ] Define cache key from lockfile, linker mode, platform, patch set, and build keys; document all invalidation inputs.
-- [ ] Cache a layout/recipe and clone the tree using available filesystem primitives; add cheap validation and store-change invalidation.
-- [ ] Add LRU size bounds and `cache materialization list|clear`; benchmark 1,000-package hit against the calibrated budget.
+- [x] Define cache key from lockfile, linker mode, platform, patch set, and build keys; document all invalidation inputs.
+- [x] Cache a layout/recipe and clone the tree using available filesystem primitives; add cheap validation and store-change invalidation.
+- [x] Add LRU size bounds and `cache materialization list|clear`; benchmark 1,000-package hit against the calibrated budget.
 
 ### 3.5 Platform-specific I/O optimization
 
-- [ ] Probe/caches capabilities per store/project volume pair and keep portable fallback behavior.
-- [ ] Implement gated Linux reflink/copy-range and optional io_uring paths, macOS clonefile/copyfile paths, and Windows block clone/hardlink/long-path paths.
-- [ ] Add per-platform microbenchmarks and tests proving optimized paths do not change content or failure semantics.
+- [x] Probe/caches capabilities per store/project volume pair and keep portable fallback behavior.
+- [x] Implement gated Linux reflink/copy-range and optional io_uring paths, macOS clonefile/copyfile paths, and Windows block clone/hardlink/long-path paths.
+- [x] Add per-platform microbenchmarks and tests proving optimized paths do not change content or failure semantics.
 
 ### 3.6 Store-aware resolution
 
-- [ ] Add `--prefer-store` and config behavior that selects the highest eligible local version without violating ranges, explicit pins, or lockfile.
-- [ ] Define offline, update, and store-preference interactions; make offline use cached metadata/store only.
-- [ ] Test identical store state yields deterministic choices and report packages satisfied locally.
+- [x] Add `--prefer-store` and config behavior that selects the highest eligible local version without violating ranges, explicit pins, or lockfile.
+- [x] Define offline, update, and store-preference interactions; make offline use cached metadata/store only.
+- [x] Test identical store state yields deterministic choices and report packages satisfied locally.
 
 ### 3.7 History, undo, snapshots, and switch
 
-- [ ] Persist content-addressed before/after lockfile history for each successful mutation and provide configurable retention/pinning.
-- [ ] Implement history, undo/redo, named snapshots, and package version switch as transactions.
-- [ ] Verify exact lockfile restoration and store-only undo/redo when content is present; test add/upgrade/switch/restore sequences.
+- [x] Persist content-addressed before/after lockfile history for each successful mutation and provide configurable retention/pinning.
+- [x] Implement history, undo/redo, named snapshots, and package version switch as transactions.
+- [x] Verify exact lockfile restoration and store-only undo/redo when content is present; test add/upgrade/switch/restore sequences.
 
 ### 3.8 Hoisted linker
 
-- [ ] Resolve default linker decision by ADR before changing documented behavior; implement deterministic npm-compatible hoisting and conflict handling.
-- [ ] Add `--linker=hoisted`, per-project configuration, exclusions, and public-hoist patterns while reusing safe store/link primitives.
-- [ ] Run known flat-layout compatibility projects and ensure isolated mode remains the safe default unless the ADR says otherwise.
+- [x] Resolve default linker decision by ADR before changing documented behavior; implement deterministic npm-compatible hoisting and conflict handling.
+- [x] Add `--linker=hoisted`, per-project configuration, exclusions, and public-hoist patterns while reusing safe store/link primitives.
+- [x] Run known flat-layout compatibility projects and ensure isolated mode remains the safe default unless the ADR says otherwise.
 
 ### 3.9 Conflict explanation and suggestions
 
-- [ ] Render solver conflict information as readable dependency/range chains; expose structured conflict JSON and `--explain`.
-- [ ] Generate candidate upgrade/downgrade/override/peer-range suggestions without presenting guesses as guaranteed fixes.
-- [ ] Review 30 real conflict cases for accuracy, clarity, and actionable guidance.
+- [x] Render solver conflict information as readable dependency/range chains; expose structured conflict JSON and `--explain`.
+- [x] Generate candidate upgrade/downgrade/override/peer-range suggestions without presenting guesses as guaranteed fixes.
+- [x] Review 30 real conflict cases for accuracy, clarity, and actionable guidance.
 
 **Phase 3 gate**
 
-- [ ] Measured Phase 3 improvement and calibrated cold/warm/materialization budgets pass without determinism or state-safety regressions.
-- [ ] Undo/redo/snapshot, linker, adaptive concurrency, and cache invalidation suites pass.
+- [x] Measured Phase 3 improvement and calibrated cold/warm/materialization budgets pass without determinism or state-safety regressions.
+- [x] Undo/redo/snapshot, linker, adaptive concurrency, and cache invalidation suites pass.
 
 ## Phase 4 — Real-World Compatibility
 
