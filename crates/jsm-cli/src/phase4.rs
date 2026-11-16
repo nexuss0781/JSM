@@ -7,10 +7,16 @@ pub fn update(
     cwd: &Path,
     packages: Vec<String>,
     _latest: bool,
+    review: bool,
     cancellation: &CancellationToken,
     progress: &mut OperationProgress,
 ) -> Result<()> {
     let before = phase3::lockfile_text(cwd);
+    let before_lock = if cwd.join("jsm.lock").exists() {
+        Lockfile::read(cwd.join("jsm.lock")).ok()
+    } else {
+        None
+    };
     // Force re-resolution by removing the lockfile; install will resolve fresh.
     let lock_path = cwd.join("jsm.lock");
     let _ = fs::remove_file(&lock_path);
@@ -18,12 +24,34 @@ pub fn update(
     silent.json = false;
     silent.quiet = true;
     install(&silent, cwd, false, false, false, cancellation, progress)?;
+    let after_lock = Lockfile::read(cwd.join("jsm.lock")).ok();
     phase3::record_history(cwd, "update", before, phase3::lockfile_text(cwd));
+    if review {
+        let mut changes = Vec::new();
+        if let (Some(before), Some(after)) = (before_lock, after_lock) {
+            for (id, pkg) in &after.packages {
+                if let Some(old) = before.packages.get(id) {
+                    if old.version != pkg.version {
+                        changes.push(serde_json::json!({"package":pkg.name,"from":old.version,"to":pkg.version}));
+                        if !cli.json && !cli.quiet {
+                            println!("{}: {} -> {}", pkg.name, old.version, pkg.version);
+                        }
+                    }
+                } else {
+                    changes.push(serde_json::json!({"package":pkg.name,"from":null,"to":pkg.version}));
+                    if !cli.json && !cli.quiet {
+                        println!("{}: added {}", pkg.name, pkg.version);
+                    }
+                }
+            }
+        }
+        if cli.json {
+            emit_json("update", serde_json::json!({"command":"update","review":true,"changes":changes}));
+            return Ok(());
+        }
+    }
     if cli.json {
-        emit_json(
-            "update",
-            serde_json::json!({"command":"update","packages":packages}),
-        );
+        emit_json("update", serde_json::json!({"command":"update","packages":packages}));
     } else if !cli.quiet {
         println!("updated dependencies");
     }
@@ -56,19 +84,13 @@ pub fn outdated(cli: &Cli, cwd: &Path) -> Result<()> {
                     .unwrap_or_else(|| "unknown".into());
                 rows.push(serde_json::json!({"name":name,"current":current,"latest":latest}));
                 if !cli.json {
-                    println!(
-                        "{name}: {} -> {latest}",
-                        current.unwrap_or_else(|| "-".into())
-                    );
+                    println!("{name}: {} -> {latest}", current.unwrap_or_else(|| "-".into()));
                 }
             }
         }
     }
     if cli.json {
-        emit_json(
-            "outdated",
-            serde_json::json!({"command":"outdated","packages":rows}),
-        );
+        emit_json("outdated", serde_json::json!({"command":"outdated","packages":rows}));
     }
     Ok(())
 }
@@ -138,10 +160,7 @@ pub fn dupes(cli: &Cli, cwd: &Path) -> Result<()> {
         }
     }
     if cli.json {
-        emit_json(
-            "dupes",
-            serde_json::json!({"command":"dupes","packages":dupes}),
-        );
+        emit_json("dupes", serde_json::json!({"command":"dupes","packages":dupes}));
     } else {
         for (name, versions) in &dupes {
             println!("{name}: {}", versions.join(", "));
@@ -182,10 +201,7 @@ pub fn unused(cli: &Cli, cwd: &Path) -> Result<()> {
         }
     }
     if cli.json {
-        emit_json(
-            "unused",
-            serde_json::json!({"command":"unused","packages":unused}),
-        );
+        emit_json("unused", serde_json::json!({"command":"unused","packages":unused}));
     } else {
         for dep in &unused {
             println!("{dep}");

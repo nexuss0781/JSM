@@ -700,7 +700,7 @@ fn run(cli: Cli, cancellation: &CancellationToken) -> Result<()> {
         Command::Update {
             packages,
             latest,
-            review: _,
+            review,
         } => {
             let mut progress = OperationProgress::start_with_ndjson(
                 "Updating dependencies",
@@ -709,7 +709,7 @@ fn run(cli: Cli, cancellation: &CancellationToken) -> Result<()> {
                 cli.non_interactive || ci_enabled(),
                 cli.progress == ProgressMode::Ndjson,
             );
-            phase4::update(&cli, &cwd, packages, latest, cancellation, &mut progress)
+            phase4::update(&cli, &cwd, packages, latest, review, cancellation, &mut progress)
         }
         Command::Outdated => phase4::outdated(&cli, &cwd),
         Command::Diff { left, right } => phase4::diff(&cli, &cwd, &left, &right),
