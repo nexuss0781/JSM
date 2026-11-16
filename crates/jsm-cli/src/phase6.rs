@@ -1,10 +1,64 @@
 use super::*;
+use std::fs;
 
-pub fn capabilities(cli: &Cli, _cwd: &Path, package: &str) -> Result<()> {
+pub fn capabilities(cli: &Cli, cwd: &Path, package: &str) -> Result<()> {
+    let store = Store::open_for_project(cwd, cli.store_dir.as_deref()).into_diagnostic()?;
+    let (name, version) = package
+        .rsplit_once('@')
+        .filter(|(n, v)| !n.is_empty() && !v.is_empty())
+        .map(|(n, v)| (n.to_string(), v.to_string()))
+        .unwrap_or((package.to_string(), String::new()));
+    // Find manifest
+    let manifest_dir = store.root().join("packages").join(&name).join(&version);
+    let mut caps = std::collections::BTreeSet::new();
+    if version.is_empty() {
+        // scan all versions
+    }
+    if manifest_dir.exists() {
+        for entry in fs::read_dir(&manifest_dir).into_diagnostic()?.flatten() {
+            if entry.path().extension().and_then(|e| e.to_str()) != Some("manifest") {
+                continue;
+            }
+            let bytes = fs::read(entry.path()).into_diagnostic()?;
+            let manifest: jsm_store::PackageManifest =
+                serde_json::from_slice(&bytes).into_diagnostic()?;
+            for file in &manifest.entries {
+                if file.symlink.is_some() {
+                    continue;
+                }
+                let blob_path = store
+                    .get_blob_path(&file.hash)
+                    .into_diagnostic()?
+                    .ok_or_else(|| miette!("missing blob"))?;
+                if let Ok(content) = fs::read_to_string(&blob_path) {
+                    if content.contains("child_process") {
+                        caps.insert("child_process");
+                    }
+                    if content.contains("require('net')") || content.contains("require(\"net\")") {
+                        caps.insert("network");
+                    }
+                    if content.contains("eval(") || content.contains("new Function") {
+                        caps.insert("dynamic_code");
+                    }
+                    if content.contains("fs.writeFile") || content.contains("fs.writeFileSync") {
+                        caps.insert("fs_write");
+                    }
+                }
+            }
+        }
+    }
+    let caps: Vec<&str> = caps.into_iter().collect();
     if cli.json {
-        emit_json("capabilities", serde_json::json!({"command":"capabilities","package":package,"capabilities":[]}));
+        emit_json(
+            "capabilities",
+            serde_json::json!({"command":"capabilities","package":package,"capabilities":caps}),
+        );
     } else if !cli.quiet {
-        println!("{package}: no capability data");
+        if caps.is_empty() {
+            println!("{package}: no capabilities detected");
+        } else {
+            println!("{package}: {}", caps.join(", "));
+        }
     }
     Ok(())
 }
