@@ -185,11 +185,36 @@ pub fn audit(cli: &Cli, _cwd: &Path) -> Result<()> {
 
 pub fn deploy(cli: &Cli, cwd: &Path, dir: &Path) -> Result<()> {
     // Produce a simple copy of the project directory (excluding node_modules/.git) as a deploy tree.
-    let _ = (cwd, dir);
+    let _ = fs::remove_dir_all(dir);
+    fs::create_dir_all(dir).into_diagnostic()?;
+    copy_dir_filtered(cwd, dir)?;
     if cli.json {
         emit_json("deploy", serde_json::json!({"command":"deploy","dir":dir}));
     } else if !cli.quiet {
         println!("deployed to {}", dir.display());
+    }
+    Ok(())
+}
+
+fn copy_dir_filtered(src: &Path, dst: &Path) -> Result<()> {
+    fs::create_dir_all(dst).into_diagnostic()?;
+    for entry in fs::read_dir(src).into_diagnostic()? {
+        let entry = entry.into_diagnostic()?;
+        let name = entry.file_name();
+        let name = name.to_string_lossy();
+        if name == "node_modules" || name == ".git" {
+            continue;
+        }
+        let path = entry.path();
+        let target = dst.join(entry.file_name());
+        if path.is_dir() && !path.is_symlink() {
+            copy_dir_filtered(&path, &target)?;
+        } else {
+            if let Some(parent) = target.parent() {
+                fs::create_dir_all(parent).into_diagnostic()?;
+            }
+            fs::copy(&path, &target).into_diagnostic()?;
+        }
     }
     Ok(())
 }
