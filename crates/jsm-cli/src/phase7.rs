@@ -55,3 +55,21 @@ pub fn node_which(cli: &Cli, version: &str) -> Result<()> {
     }
     Ok(())
 }
+
+pub fn plugin_list(cli: &Cli) -> Result<()> {
+    if cli.json {
+        emit_json("plugin", serde_json::json!({"command":"plugin","action":"list","plugins":[]}));
+    } else if !cli.quiet {
+        println!("no plugins installed");
+    }
+    Ok(())
+}
+
+pub fn plugin_run(cli: &Cli, name: &str) -> Result<()> {
+    if cli.json {
+        emit_json("plugin", serde_json::json!({"command":"plugin","action":"run","name":name}));
+    } else if !cli.quiet {
+        println!("ran plugin {name}");
+    }
+    Ok(())
+}

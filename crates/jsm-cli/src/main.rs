@@ -254,6 +254,10 @@ enum Command {
         command: CacheCommand,
     },
     Ui,
+    Plugin {
+        #[command(subcommand)]
+        command: PluginCommand,
+    },
     Daemon {
         #[command(subcommand)]
         command: DaemonCommand,
@@ -358,6 +362,14 @@ enum RemoteCacheSubcommand {
 enum CacheSubcommand {
     List,
     Clear,
+}
+
+#[derive(Debug, Clone, Subcommand)]
+enum PluginCommand {
+    List,
+    Run {
+        name: String,
+    },
 }
 
 #[derive(Debug, Clone, Subcommand)]
@@ -760,6 +772,10 @@ fn run(cli: Cli, cancellation: &CancellationToken) -> Result<()> {
             },
         },
         Command::Ui => phase7::ui(&cli),
+        Command::Plugin { command } => match command {
+            PluginCommand::List => phase7::plugin_list(&cli),
+            PluginCommand::Run { name } => phase7::plugin_run(&cli, &name),
+        },
         Command::Daemon { command } => match command {
             DaemonCommand::Start => phase6::daemon_start(&cli),
             DaemonCommand::Stop => phase6::daemon_stop(&cli),

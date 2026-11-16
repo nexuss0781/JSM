@@ -25,6 +25,7 @@ Commands:
   serve            
   cache            
   ui               
+  plugin           
   daemon           
   node             
   workspaces       

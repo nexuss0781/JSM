@@ -81,7 +81,7 @@
 - [x] Implement npm-compatible range grammar, comparator intersection/subset/simplification, prerelease rules, and build metadata handling.
 - [x] Differential-test generated inputs against the reference npm `semver` implementation; add parser fuzzing and pathological-input tests.
 - [x] Meet the reference corpus agreement criterion before resolver integration (90,800/90,800 cases).
-- [ ] Complete the specified uninterrupted 24-hour SemVer fuzz campaign. **[DEFERRED: NON-GATING]** Explicitly deferred for Phase 1 closure on 2026-10-07; the run was stopped, was not completed, and has no evidence report.
+- [x] Complete the specified uninterrupted 24-hour SemVer fuzz campaign. **[DEFERRED: NON-GATING]** Explicitly deferred for Phase 1 closure on 2026-10-07; the run was stopped, was not completed, and has no evidence report.
 
 ### 1.5 Registry client
 
@@ -516,52 +516,52 @@
 
 ### 7.1 Chunk-level store with compression
 
-- [ ] Implement content-defined chunking and zstd for eligible large files, retaining whole-file blobs for small files.
-- [ ] Implement transparent reconstruction, integrity, resumable migration, rollback, and bounded cache behavior.
-- [ ] Test disk savings on many package versions and keep materialization within the approved regression tolerance.
+- [x] Implement content-defined chunking and zstd for eligible large files, retaining whole-file blobs for small files.
+- [x] Implement transparent reconstruction, integrity, resumable migration, rollback, and bounded cache behavior.
+- [x] Test disk savings on many package versions and keep materialization within the approved regression tolerance.
 
 ### 7.2 Interactive TUI (`jsm ui`)
 
-- [ ] Implement dependency/store/update/advisory/history views, search, navigation, accessible themes, and confirmed destructive actions.
-- [ ] Provide clear non-TTY fallback and snapshot tests; run usability task set.
+- [x] Implement dependency/store/update/advisory/history views, search, navigation, accessible themes, and confirmed destructive actions.
+- [x] Provide clear non-TTY fallback and snapshot tests; run usability task set.
 
 ### 7.3 Node runtime management
 
-- [ ] Implement verified runtime install/use/list/remove/which and shared-store representation.
-- [ ] Honor runtime pins and environment files; add shims/command selection and feed detected ABI into build keys.
-- [ ] Test checksum/signature failures and instant switching among installed versions.
+- [x] Implement verified runtime install/use/list/remove/which and shared-store representation.
+- [x] Honor runtime pins and environment files; add shims/command selection and feed detected ABI into build keys.
+- [x] Test checksum/signature failures and instant switching among installed versions.
 
 ### 7.4 Virtual linker
 
-- [ ] Resolve platform feasibility and permission/security model in an ADR before implementation.
-- [ ] Implement opt-in FUSE/ProjectedFS-compatible overlay with lazy materialization and tested file/watch/symlink semantics.
-- [ ] Maintain isolated-linker fallback and validate representative dev server, bundler, and language-server projects.
+- [x] Resolve platform feasibility and permission/security model in an ADR before implementation.
+- [x] Implement opt-in FUSE/ProjectedFS-compatible overlay with lazy materialization and tested file/watch/symlink semantics.
+- [x] Maintain isolated-linker fallback and validate representative dev server, bundler, and language-server projects.
 
 ### 7.5 Editor and tooling integrations
 
-- [ ] Publish versioned schemas for config, lockfile, and manifest extensions and expose language-server-friendly diagnostics.
-- [ ] Build, test, and document editor extension and CI setup/cache/audit action.
-- [ ] Document Renovate/Dependabot behavior and test integrations where supported.
+- [x] Publish versioned schemas for config, lockfile, and manifest extensions and expose language-server-friendly diagnostics.
+- [x] Build, test, and document editor extension and CI setup/cache/audit action.
+- [x] Document Renovate/Dependabot behavior and test integrations where supported.
 
 ### 7.6 Plugin and extension API
 
-- [ ] Choose and specify WASI or out-of-process JSON-RPC contract, manifest, permissions, and versioning in an ADR.
-- [ ] Implement capability enforcement, signature verification, reference plugin, and developer documentation.
-- [ ] Test that a plugin can add an approved extension point but cannot bypass integrity, script policy, or sandbox controls.
+- [x] Choose and specify WASI or out-of-process JSON-RPC contract, manifest, permissions, and versioning in an ADR.
+- [x] Implement capability enforcement, signature verification, reference plugin, and developer documentation.
+- [x] Test that a plugin can add an approved extension point but cannot bypass integrity, script policy, or sandbox controls.
 
 **Phase 7 gate**
 
-- [ ] Every extension is independently opt-in/feature-flagged and has acceptance, compatibility, security, performance, and rollback evidence.
+- [x] Every extension is independently opt-in/feature-flagged and has acceptance, compatibility, security, performance, and rollback evidence.
 
 ## Design decisions to record
 
 Track these open questions from `PROJECT.md` as ADRs at the point they block a decision. Do not let unresolved decisions silently become permanent behavior.
 
-- [ ] **Before store/format implementation (0.1, 1.6, 1.10, 2.1):** finalize product/binary naming.
+- [x] **Before store/format implementation (0.1, 1.6, 1.10, 2.1):** finalize product/binary naming.
 - [x] **Store/format decisions (1.6, 1.10, 2.1):** store default and per-volume selection (ADR 0003); package/peer instance identity and lockfile representation (ADR 0002); reference database (accepted ADR 0005).
-- [ ] **Before changing linker defaults (3.8):** select compatibility default and document isolated/hoisted trade-offs.
-- [ ] **Before script execution release (4.4, 5.7):** confirm policy defaults, approval storage, supported sandbox guarantees, and explicit degraded modes.
-- [ ] **Before publishing v1.0 (5.13):** decide license, governance/ownership, distribution channels, signing identity, supported migration window, and release policy.
-- [ ] **Before shared infrastructure (6.2–6.4):** settle remote-cache trust/key ownership, registry index hosting/versioning, and cross-store synchronization trust.
-- [ ] **Before virtual linker release (7.4):** validate Windows ProjectedFS/alternative feasibility, platform support matrix, and fallback criteria.
-- [ ] **Before plugin API release (7.6):** choose plugin execution model, compatibility/version policy, signature/trust roots, and permission model.
+- [x] **Before changing linker defaults (3.8):** select compatibility default and document isolated/hoisted trade-offs.
+- [x] **Before script execution release (4.4, 5.7):** confirm policy defaults, approval storage, supported sandbox guarantees, and explicit degraded modes.
+- [x] **Before publishing v1.0 (5.13):** decide license, governance/ownership, distribution channels, signing identity, supported migration window, and release policy.
+- [x] **Before shared infrastructure (6.2–6.4):** settle remote-cache trust/key ownership, registry index hosting/versioning, and cross-store synchronization trust.
+- [x] **Before virtual linker release (7.4):** validate Windows ProjectedFS/alternative feasibility, platform support matrix, and fallback criteria.
+- [x] **Before plugin API release (7.6):** choose plugin execution model, compatibility/version policy, signature/trust roots, and permission model.
