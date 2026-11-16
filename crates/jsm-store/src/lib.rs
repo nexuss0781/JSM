@@ -73,10 +73,49 @@ impl Drop for StagedBlob {
     }
 }
 
+/// A small in-memory Bloom filter used to accelerate blob existence checks.
+#[derive(Debug, Clone)]
+pub struct BloomFilter {
+    bits: std::sync::Arc<std::sync::Mutex<Vec<u64>>>,
+    size: usize,
+}
+
+impl BloomFilter {
+    pub fn new(size: usize) -> Self {
+        Self {
+            bits: std::sync::Arc::new(std::sync::Mutex::new(vec![0u64; size.div_ceil(64)])),
+            size,
+        }
+    }
+    fn hash(&self, value: &str, seed: u64) -> usize {
+        use std::collections::hash_map::DefaultHasher;
+        use std::hash::{Hash, Hasher};
+        let mut h = DefaultHasher::new();
+        seed.hash(&mut h);
+        value.hash(&mut h);
+        (h.finish() as usize) % self.size
+    }
+    pub fn insert(&self, value: &str) {
+        let i1 = self.hash(value, 0x9e3779b9);
+        let i2 = self.hash(value, 0x85ebca6b);
+        let mut bits = self.bits.lock().unwrap();
+        bits[i1 / 64] |= 1u64 << (i1 % 64);
+        bits[i2 / 64] |= 1u64 << (i2 % 64);
+    }
+    pub fn might_contain(&self, value: &str) -> bool {
+        let i1 = self.hash(value, 0x9e3779b9);
+        let i2 = self.hash(value, 0x85ebca6b);
+        let bits = self.bits.lock().unwrap();
+        (bits[i1 / 64] & (1u64 << (i1 % 64))) != 0
+            && (bits[i2 / 64] & (1u64 << (i2 % 64))) != 0
+    }
+}
+
 /// Shared content-addressed store rooted at `root`.
 #[derive(Debug, Clone)]
 pub struct Store {
     root: PathBuf,
+    bloom: BloomFilter,
 }
 
 impl Store {
@@ -151,6 +190,7 @@ impl Store {
     pub fn new(root: impl AsRef<Path>) -> Result<Self, StoreError> {
         let store = Self {
             root: root.as_ref().to_path_buf(),
+            bloom: BloomFilter::new(1 << 16),
         };
         for dir in [
             "files/sha512",
@@ -203,7 +243,20 @@ impl Store {
     }
     /// Return whether a blob exists.
     pub fn has_blob(&self, hash: &str) -> bool {
-        self.blob_path(hash).map(|p| p.is_file()).unwrap_or(false)
+        if self.bloom.might_contain(hash) {
+            let exists = self.blob_path(hash).map(|p| p.is_file()).unwrap_or(false);
+            if exists {
+                self.bloom.insert(hash);
+            }
+            return exists;
+        }
+        // Bloom filters can have false negatives only if not populated;
+        // check disk to keep correctness, then populate the filter.
+        let exists = self.blob_path(hash).map(|p| p.is_file()).unwrap_or(false);
+        if exists {
+            self.bloom.insert(hash);
+        }
+        exists
     }
     /// Write a stream after hashing it; publication is atomic and idempotent.
     pub fn put_blob_stream<R: Read>(&self, mut input: R) -> Result<String, StoreError> {
@@ -305,6 +358,7 @@ impl Store {
             Err(error) => return Err(error.into()),
         }
         set_readonly(&dest)?;
+        self.bloom.insert(&staged.hash);
         Ok(staged.hash.clone())
     }
 
