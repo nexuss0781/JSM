@@ -3,31 +3,44 @@ Rust JavaScript package manager
 Usage: jsm [OPTIONS] [COMMAND]
 
 Commands:
-  init        
-  add         
-  install     
-  remove      
-  run         
-  exec        
-  list        
-  why         
-  config      
-  store       
-  versions    
-  doctor      
-  lock        
-  completion  
-  help        
-  update      
-  outdated    
-  diff        
-  dupes       
-  unused      
-  history     
-  undo        
-  redo        
-  snapshot    
-  switch      
+  init             
+  add              
+  install          
+  remove           
+  run              
+  exec             
+  list             
+  why              
+  config           
+  store            
+  versions         
+  doctor           
+  lock             
+  completion       
+  help             
+  capabilities     
+  x                
+  serve            
+  cache            
+  ui               
+  node             
+  workspaces       
+  approve-scripts  
+  patch            
+  patch-commit     
+  migrate          
+  audit            
+  deploy           
+  update           
+  outdated         
+  diff             
+  dupes            
+  unused           
+  history          
+  undo             
+  redo             
+  snapshot         
+  switch           
 
 Options:
       --cwd <CWD>              [default: .]

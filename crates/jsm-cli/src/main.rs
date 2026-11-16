@@ -42,6 +42,9 @@ use jsm_core::{DependencySpec, DistTag, Integrity, PackageName, Range, Spec, Ver
 mod phase2;
 mod phase3;
 mod phase4;
+mod phase5;
+mod phase6;
+mod phase7;
 
 #[derive(Debug, Parser, Clone)]
 #[command(
@@ -211,6 +214,50 @@ enum Command {
     Help {
         topic: String,
     },
+    Capabilities {
+        package: String,
+    },
+    X {
+        package: String,
+        args: Vec<String>,
+    },
+    Serve {
+        #[arg(long, default_value_t = 4873)]
+        port: u16,
+    },
+    Cache {
+        #[command(subcommand)]
+        command: CacheCommand,
+    },
+    Ui,
+    Node {
+        #[command(subcommand)]
+        command: NodeCommand,
+    },
+    Workspaces {
+        #[command(subcommand)]
+        command: WorkspacesCommand,
+    },
+    ApproveScripts {
+        packages: Vec<String>,
+    },
+    Patch {
+        package: String,
+    },
+    PatchCommit {
+        dir: PathBuf,
+    },
+    Migrate {
+        #[arg(long)]
+        from: Option<String>,
+    },
+    Audit {
+        #[arg(long)]
+        prod: bool,
+    },
+    Deploy {
+        dir: PathBuf,
+    },
     Update {
         packages: Vec<String>,
         #[arg(long)]
@@ -247,6 +294,37 @@ enum SnapshotCommand {
     Restore { name: String },
     List,
     Delete { name: String },
+}
+
+#[derive(Debug, Clone, Subcommand)]
+enum WorkspacesCommand {
+    List,
+}
+
+#[derive(Debug, Clone, Subcommand)]
+enum CacheCommand {
+    Build {
+        #[command(subcommand)]
+        command: CacheSubcommand,
+    },
+    Materialization {
+        #[command(subcommand)]
+        command: CacheSubcommand,
+    },
+}
+
+#[derive(Debug, Clone, Subcommand)]
+enum CacheSubcommand {
+    List,
+    Clear,
+}
+
+#[derive(Debug, Clone, Subcommand)]
+enum NodeCommand {
+    List,
+    Which {
+        version: String,
+    },
 }
 
 #[derive(Debug, Clone, Subcommand)]
@@ -562,6 +640,42 @@ fn run(cli: Cli, cancellation: &CancellationToken) -> Result<()> {
             phase2::dynamic_completion(&cli, &cwd, kind, &prefix)
         }
         Command::Help { topic } => phase2::topic_help(&topic),
+        Command::Capabilities { package } => phase6::capabilities(&cli, &cwd, &package),
+        Command::X { package, args } => {
+            let mut progress = OperationProgress::start_with_ndjson(
+                "Running package",
+                cli.quiet,
+                cli.json,
+                cli.non_interactive || ci_enabled(),
+                cli.progress == ProgressMode::Ndjson,
+            );
+            phase6::x(&cli, &cwd, &package, args, cancellation, &mut progress)
+        }
+        Command::Serve { port } => phase6::serve(&cli, port),
+        Command::Cache { command } => match command {
+            CacheCommand::Build { command } => match command {
+                CacheSubcommand::List => phase6::cache_build_list(&cli),
+                CacheSubcommand::Clear => phase6::cache_build_clear(&cli),
+            },
+            CacheCommand::Materialization { command } => match command {
+                CacheSubcommand::List => phase6::cache_materialization_list(&cli),
+                CacheSubcommand::Clear => phase6::cache_materialization_clear(&cli),
+            },
+        },
+        Command::Ui => phase7::ui(&cli),
+        Command::Node { command } => match command {
+            NodeCommand::List => phase7::node_list(&cli),
+            NodeCommand::Which { version } => phase7::node_which(&cli, &version),
+        },
+        Command::Workspaces { command } => match command {
+            WorkspacesCommand::List => phase5::workspaces_list(&cli, &cwd),
+        },
+        Command::ApproveScripts { packages } => phase5::approve_scripts(&cli, &cwd, packages),
+        Command::Patch { package } => phase5::patch(&cli, &cwd, &package),
+        Command::PatchCommit { dir } => phase5::patch_commit(&cli, &cwd, &dir),
+        Command::Migrate { from } => phase5::migrate(&cli, &cwd, from),
+        Command::Audit { prod } => phase5::audit(&cli, &cwd),
+        Command::Deploy { dir } => phase5::deploy(&cli, &cwd, &dir),
         Command::Update {
             packages,
             latest,
