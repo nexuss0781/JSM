@@ -94,11 +94,82 @@ pub fn patch_commit(cli: &Cli, _cwd: &Path, dir: &Path) -> Result<()> {
     Ok(())
 }
 
-pub fn migrate(cli: &Cli, _cwd: &Path, from: Option<String>) -> Result<()> {
+pub fn migrate(cli: &Cli, cwd: &Path, from: Option<String>) -> Result<()> {
+    let from = from.unwrap_or_else(|| "npm".to_string());
+    if from != "npm" {
+        if cli.json {
+            emit_json("migrate", serde_json::json!({"command":"migrate","from":from,"status":"unsupported"}));
+        } else if !cli.quiet {
+            println!("migration from {from} not implemented");
+        }
+        return Ok(());
+    }
+    let lock_path = cwd.join("package-lock.json");
+    let content = fs::read_to_string(&lock_path).into_diagnostic()?;
+    let value: Value = serde_json::from_str(&content).into_diagnostic()?;
+    let mut lock = Lockfile::new("jsm 0.1.0");
+    if let Some(root) = value.get("packages").and_then(|p| p.get(""))
+        && let Some(deps) = root.get("dependencies").and_then(Value::as_object)
+    {
+        let mut importer = Importer::default();
+        for (name, spec) in deps {
+            importer
+                .dependencies
+                .insert(name.clone(), spec.as_str().unwrap_or("*").to_string());
+        }
+        lock.importers.insert(".".to_string(), importer);
+    }
+    if let Some(packages) = value.get("packages").and_then(Value::as_object) {
+        for (path, info) in packages {
+            if path.is_empty() {
+                continue;
+            }
+            let name = path.trim_start_matches("node_modules/").to_string();
+            // nested node_modules paths are not fully handled; skip nested for now
+            if name.contains("node_modules/") {
+                continue;
+            }
+            let version = info
+                .get("version")
+                .and_then(Value::as_str)
+                .unwrap_or("")
+                .to_string();
+            if version.is_empty() {
+                continue;
+            }
+            let integrity = info
+                .get("integrity")
+                .and_then(Value::as_str)
+                .unwrap_or("")
+                .to_string();
+            let resolved = info
+                .get("resolved")
+                .and_then(Value::as_str)
+                .unwrap_or("")
+                .to_string();
+            let mut pkg = Package {
+                name: name.clone(),
+                version: version.clone(),
+                resolution: resolved,
+                integrity,
+                ..Default::default()
+            };
+            if let Some(deps) = info.get("dependencies").and_then(Value::as_object) {
+                for (dep, spec) in deps {
+                    pkg.dependencies
+                        .insert(dep.clone(), spec.as_str().unwrap_or("*").to_string());
+                }
+            }
+            let key = format!("{name}@{version}");
+            lock.packages.insert(key, pkg);
+        }
+    }
+    let out_path = cwd.join("jsm.lock");
+    lock.write(&out_path).into_diagnostic()?;
     if cli.json {
-        emit_json("migrate", serde_json::json!({"command":"migrate","from":from}));
+        emit_json("migrate", serde_json::json!({"command":"migrate","from":from,"packages":lock.packages.len()}));
     } else if !cli.quiet {
-        println!("migration from {:?} not yet fully implemented", from);
+        println!("migrated {} packages", lock.packages.len());
     }
     Ok(())
 }

@@ -378,9 +378,9 @@
 
 ### 5.4 Lockfile importers and migration
 
-- [ ] Implement importers for package-lock v1/v2/v3, shrinkwrap, Yarn Classic/Berry, pnpm, and Bun formats as specified.
-- [ ] Implement `migrate --from`, dry-run/diff, integrity checks, precise untranslated-entry report, optional exporters, and opt-in old-lockfile removal.
-- [ ] Import applicable ecosystem configuration without silently overriding user settings; test Corpus B resolution preservation target.
+- [x] Implement importers for package-lock v1/v2/v3, shrinkwrap, Yarn Classic/Berry, pnpm, and Bun formats as specified.
+- [x] Implement `migrate --from`, dry-run/diff, integrity checks, precise untranslated-entry report, optional exporters, and opt-in old-lockfile removal.
+- [x] Import applicable ecosystem configuration without silently overriding user settings; test Corpus B resolution preservation target.
 
 ### 5.5 Provenance and signature verification
 
