@@ -163,62 +163,62 @@
 
 ### 2.1 Reference registry
 
-- [ ] Select the embedded DB through an ADR; implement transactional project/package references and install metadata.
-- [ ] Track lockfile hashes, paths/project IDs, package references, size, stored/used timestamps, and reference counts.
-- [ ] Detect stale, moved, or deleted projects and test randomized add/remove/move/delete sequences against ground truth.
+- [x] Select the embedded DB through an ADR; implement transactional project/package references and install metadata.
+- [x] Track lockfile hashes, paths/project IDs, package references, size, stored/used timestamps, and reference counts.
+- [x] Detect stale, moved, or deleted projects and test randomized add/remove/move/delete sequences against ground truth.
 
 ### 2.2 Store CLI
 
-- [ ] Implement `store path|status|list|versions|info|add|remove|usage` and remote `versions` with sorting/filtering and reference/build metadata.
-- [ ] Add JSON output to every command; implement destructive `--dry-run`, confirmation prompts, and `--yes` behavior.
-- [ ] Test referenced-version refusal, actionable usage output, and equality of dry-run prediction and actual removal effect.
+- [x] Implement `store path|status|list|versions|info|add|remove|usage` and remote `versions` with sorting/filtering and reference/build metadata.
+- [x] Add JSON output to every command; implement destructive `--dry-run`, confirmation prompts, and `--yes` behavior.
+- [x] Test referenced-version refusal, actionable usage output, and equality of dry-run prediction and actual removal effect.
 
 ### 2.3 Garbage collection and pinning
 
-- [ ] Implement `store prune`, policy/LRU `store gc`, pin/unpin/list, and logical/physical reclaimed-byte reporting.
-- [ ] Implement blob mark-and-sweep under a maintenance lease; protect installs with package/read leases and preserve all referenced/pinned content.
-- [ ] Stress concurrent install and GC and verify no referenced manifest/blob or materialized tree is lost.
+- [x] Implement `store prune`, policy/LRU `store gc`, pin/unpin/list, and logical/physical reclaimed-byte reporting.
+- [x] Implement blob mark-and-sweep under a maintenance lease; protect installs with package/read leases and preserve all referenced/pinned content.
+- [x] Stress concurrent install and GC and verify no referenced manifest/blob or materialized tree is lost.
 
 ### 2.4 Verify and repair
 
-- [ ] Implement metadata-only and full verification for blobs/manifests, missing/extra/mismatched files, and progress/parallelism.
-- [ ] Implement quarantine and repair/re-fetch behavior; detect linked-file mutation and avoid unsafe hardlink assumptions.
-- [ ] Inject bit flips, truncation, and deletion; prove detection, repair, and subsequent install recovery.
+- [x] Implement metadata-only and full verification for blobs/manifests, missing/extra/mismatched files, and progress/parallelism.
+- [x] Implement quarantine and repair/re-fetch behavior; detect linked-file mutation and avoid unsafe hardlink assumptions.
+- [x] Inject bit flips, truncation, and deletion; prove detection, repair, and subsequent install recovery.
 
 ### 2.5 Cross-process concurrency
 
-- [ ] Choose and document the lock primitive and lock hierarchy; implement fine-grained package and maintenance locks with timeout/fairness diagnostics.
-- [ ] Implement per-identity single-flight tarball downloads and stale-owner detection/recovery.
-- [ ] Detect or warn on filesystems with weaker locking guarantees; stress 50+ processes with overlapping dependency sets and verify one download per identical tarball.
+- [x] Choose and document the lock primitive and lock hierarchy; implement fine-grained package and maintenance locks with timeout/fairness diagnostics.
+- [x] Implement per-identity single-flight tarball downloads and stale-owner detection/recovery.
+- [x] Detect or warn on filesystems with weaker locking guarantees; stress 50+ processes with overlapping dependency sets and verify one download per identical tarball.
 
 ### 2.6 Transactional installs and crash recovery
 
-- [ ] Implement project staging and atomic swap where supported; provide journaled rollback on platforms without atomic directory replacement.
-- [ ] Recover incomplete journals on next invocation and remove aged orphan temp data without touching live operations.
-- [ ] Add crash injection at every transaction/pipeline boundary and verify the last good state survives and the next install converges.
+- [x] Implement project staging and atomic swap where supported; provide journaled rollback on platforms without atomic directory replacement.
+- [x] Recover incomplete journals on next invocation and remove aged orphan temp data without touching live operations.
+- [x] Add crash injection at every transaction/pipeline boundary and verify the last good state survives and the next install converges.
 
 ### 2.7 Machine-readable output and shell support
 
-- [ ] Define and document stable `jsm.v1.<command>` schemas and NDJSON progress/event streams.
-- [ ] Add schemas for every command and automated compatibility/snapshot checks that block accidental breaking changes.
-- [ ] Generate bash, zsh, fish, PowerShell, and elvish completions, including dynamic local package/project completions; add topic help pages.
+- [x] Define and document stable `jsm.v1.<command>` schemas and NDJSON progress/event streams.
+- [x] Add schemas for every command and automated compatibility/snapshot checks that block accidental breaking changes.
+- [x] Generate bash, zsh, fish, PowerShell, and elvish completions, including dynamic local package/project completions; add topic help pages.
 
 ### 2.8 Doctor
 
-- [ ] Implement checks for store integrity, link capabilities, volumes, paths/case behavior, locks, proxy/CA, registry reachability, clock, disk, platform-specific environment, and installed Node/jsm versions.
-- [ ] Return status, explanation, and remedy for every check; add safe `--fix` and redacted `--report`.
-- [ ] Give each check positive and negative fault-injection tests; verify report redaction.
+- [x] Implement checks for store integrity, link capabilities, volumes, paths/case behavior, locks, proxy/CA, registry reachability, clock, disk, platform-specific environment, and installed Node/jsm versions.
+- [x] Return status, explanation, and remedy for every check; add safe `--fix` and redacted `--report`.
+- [x] Give each check positive and negative fault-injection tests; verify report redaction.
 
 ### 2.9 Merge-friendly lockfile
 
-- [ ] Confirm merge-oriented lockfile layout and implement `lock verify` and a parser-based three-way `lock merge`.
-- [ ] Add `lock install-merge-driver` setup for `.gitattributes` and Git configuration with safe, documented behavior.
-- [ ] Test parallel additions, conflicting upgrades, malformed inputs, and merge results against manifests.
+- [x] Confirm merge-oriented lockfile layout and implement `lock verify` and a parser-based three-way `lock merge`.
+- [x] Add `lock install-merge-driver` setup for `.gitattributes` and Git configuration with safe, documented behavior.
+- [x] Test parallel additions, conflicting upgrades, malformed inputs, and merge results against manifests.
 
 **Phase 2 gate**
 
-- [ ] All store commands, JSON contracts, diagnostics, and lock merge tests pass.
-- [ ] Multi-process stress and crash-injection criteria in `PHASE.md` pass; GC never removes live/in-flight data.
+- [x] All store commands, JSON contracts, diagnostics, and lock merge tests pass.
+- [x] Multi-process stress and crash-injection criteria in `PHASE.md` pass; GC never removes live/in-flight data.
 
 ## Phase 3 — Performance and Time Travel
 
@@ -260,9 +260,9 @@
 
 ### 3.7 History, undo, snapshots, and switch
 
-- [ ] Persist content-addressed before/after lockfile history for each successful mutation and provide configurable retention/pinning.
-- [ ] Implement history, undo/redo, named snapshots, and package version switch as transactions.
-- [ ] Verify exact lockfile restoration and store-only undo/redo when content is present; test add/upgrade/switch/restore sequences.
+- [x] Persist content-addressed before/after lockfile history for each successful mutation and provide configurable retention/pinning.
+- [x] Implement history, undo/redo, named snapshots, and package version switch as transactions.
+- [x] Verify exact lockfile restoration and store-only undo/redo when content is present; test add/upgrade/switch/restore sequences.
 
 ### 3.8 Hoisted linker
 
@@ -321,8 +321,8 @@
 
 ### 4.7 Insight and diff commands
 
-- [ ] Implement store-backed file/dependency/script/exports/size diff for versions and optional content diff.
-- [ ] Add dependency-path and size explanation, duplicate reports with safe suggestions, unused-dependency analysis with ignore/config references, and outdated views.
+- [x] Implement store-backed file/dependency/script/exports/size diff for versions and optional content diff.
+- [x] Add dependency-path and size explanation, duplicate reports with safe suggestions, unused-dependency analysis with ignore/config references, and outdated views.
 - [ ] Compare diff against extracted tarballs and measure `unused` precision on a labeled corpus.
 
 ### 4.8 Package executor (`jsm x`)

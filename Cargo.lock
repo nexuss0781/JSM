@@ -1116,6 +1116,7 @@ dependencies = [
  "jsm-testkit",
  "miette",
  "semver",
+ "serde",
  "serde_json",
  "tempfile",
  "thiserror",

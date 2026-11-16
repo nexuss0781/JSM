@@ -40,6 +40,8 @@ use tracing_subscriber::{
 use jsm_core::{DependencySpec, DistTag, Integrity, PackageName, Range, Spec, Version, redact};
 
 mod phase2;
+mod phase3;
+mod phase4;
 
 #[derive(Debug, Parser, Clone)]
 #[command(
@@ -209,6 +211,42 @@ enum Command {
     Help {
         topic: String,
     },
+    Update {
+        packages: Vec<String>,
+        #[arg(long)]
+        latest: bool,
+        #[arg(long)]
+        review: bool,
+    },
+    Outdated,
+    Diff {
+        left: String,
+        right: String,
+    },
+    Dupes,
+    Unused,
+    History {
+        #[arg(long, default_value_t = 20)]
+        limit: usize,
+    },
+    Undo,
+    Redo,
+    Snapshot {
+        #[command(subcommand)]
+        command: SnapshotCommand,
+    },
+    Switch {
+        package: String,
+        version: String,
+    },
+}
+
+#[derive(Debug, Clone, Subcommand)]
+enum SnapshotCommand {
+    Save { name: String },
+    Restore { name: String },
+    List,
+    Delete { name: String },
 }
 
 #[derive(Debug, Clone, Subcommand)]
@@ -524,6 +562,75 @@ fn run(cli: Cli, cancellation: &CancellationToken) -> Result<()> {
             phase2::dynamic_completion(&cli, &cwd, kind, &prefix)
         }
         Command::Help { topic } => phase2::topic_help(&topic),
+        Command::Update {
+            packages,
+            latest,
+            review,
+        } => {
+            let mut progress = OperationProgress::start_with_ndjson(
+                "Updating dependencies",
+                cli.quiet,
+                cli.json,
+                cli.non_interactive || ci_enabled(),
+                cli.progress == ProgressMode::Ndjson,
+            );
+            phase4::update(&cli, &cwd, packages, latest, cancellation, &mut progress)
+        }
+        Command::Outdated => phase4::outdated(&cli, &cwd),
+        Command::Diff { left, right } => phase4::diff(&cli, &cwd, &left, &right),
+        Command::Dupes => phase4::dupes(&cli, &cwd),
+        Command::Unused => phase4::unused(&cli, &cwd),
+        Command::History { limit } => phase3::history(&cwd, Some(limit), cli.json),
+        Command::Undo => {
+            let mut progress = OperationProgress::start_with_ndjson(
+                "Undoing last change",
+                cli.quiet,
+                cli.json,
+                cli.non_interactive || ci_enabled(),
+                cli.progress == ProgressMode::Ndjson,
+            );
+            phase3::undo(&cli, &cwd, cancellation, &mut progress)
+        }
+        Command::Redo => {
+            let mut progress = OperationProgress::start_with_ndjson(
+                "Redoing change",
+                cli.quiet,
+                cli.json,
+                cli.non_interactive || ci_enabled(),
+                cli.progress == ProgressMode::Ndjson,
+            );
+            phase3::redo(&cli, &cwd, cancellation, &mut progress)
+        }
+        Command::Snapshot { command } => {
+            let mut progress = OperationProgress::start_with_ndjson(
+                "Managing snapshot",
+                cli.quiet,
+                cli.json,
+                cli.non_interactive || ci_enabled(),
+                cli.progress == ProgressMode::Ndjson,
+            );
+            let (kind, name) = match command {
+                SnapshotCommand::Save { name } => (phase3::SnapshotCommandKind::Save, Some(name)),
+                SnapshotCommand::Restore { name } => {
+                    (phase3::SnapshotCommandKind::Restore, Some(name))
+                }
+                SnapshotCommand::List => (phase3::SnapshotCommandKind::List, None),
+                SnapshotCommand::Delete { name } => {
+                    (phase3::SnapshotCommandKind::Delete, Some(name))
+                }
+            };
+            phase3::snapshot(&cli, &cwd, kind, name, cancellation, &mut progress)
+        }
+        Command::Switch { package, version } => {
+            let mut progress = OperationProgress::start_with_ndjson(
+                "Switching package version",
+                cli.quiet,
+                cli.json,
+                cli.non_interactive || ci_enabled(),
+                cli.progress == ProgressMode::Ndjson,
+            );
+            phase3::switch(&cli, &cwd, &package, &version, cancellation, &mut progress)
+        }
         Command::Config { .. } => unreachable!(),
     }
 }
@@ -627,6 +734,7 @@ fn add(
     if packages.is_empty() {
         return Err(miette!("add requires at least one package spec"));
     }
+    let before_history = phase3::lockfile_text(cwd);
     let path = manifest_path(cwd);
     let original = fs::read_to_string(&path).into_diagnostic()?;
     let mut manifest =
@@ -680,6 +788,7 @@ fn add(
         fs::write(&path, original).into_diagnostic()?;
         return Err(error);
     }
+    phase3::record_history(cwd, "add", before_history, phase3::lockfile_text(cwd));
     if cli.json {
         emit_json(
             "add",
@@ -1625,6 +1734,7 @@ fn remove(
     if packages.is_empty() {
         return Err(miette!("remove requires at least one package name"));
     }
+    let before_history = phase3::lockfile_text(cwd);
     let path = manifest_path(cwd);
     let original = fs::read_to_string(&path).into_diagnostic()?;
     let mut manifest =
@@ -1649,6 +1759,7 @@ fn remove(
         fs::write(manifest_path(cwd), original).into_diagnostic()?;
         return Err(error);
     }
+    phase3::record_history(cwd, "remove", before_history, phase3::lockfile_text(cwd));
     if out {
         emit_json("remove", json!({"command":"remove","packages":packages}));
     } else {
