@@ -470,6 +470,8 @@ where
 
         let mut requirements = Vec::new();
         let mut edges = BTreeMap::new();
+        
+        // Regular dependencies
         for (dependency, spec) in &candidate.dependencies {
             let child = match self.child_node(name, dependency) {
                 Ok(child) => child,
@@ -491,6 +493,31 @@ where
             };
             requirements.push(version_set.into());
             edges.insert(dependency.clone(), child);
+        }
+        
+        // Peer dependencies - resolve them in the context of the dependent
+        // Peer dependencies create a virtual instance keyed by the peer set
+        for (peer, spec) in &candidate.peer_dependencies {
+            let child = match self.child_node(name, peer) {
+                Ok(child) => child,
+                Err(error) => {
+                    let message = error.to_string();
+                    let mapped = self.map_dependency_error(&parent, &candidate, error);
+                    self.set_pending_error(mapped);
+                    return Dependencies::Unknown(self.pool.intern_string(message));
+                }
+            };
+            let version_set = match self.version_set_for(child, spec) {
+                Ok(version_set) => version_set,
+                Err(error) => {
+                    let message = error.to_string();
+                    let mapped = self.map_dependency_error(&parent, &candidate, error);
+                    self.set_pending_error(mapped);
+                    return Dependencies::Unknown(self.pool.intern_string(message));
+                }
+            };
+            requirements.push(version_set.into());
+            edges.insert(peer.clone(), child);
         }
         self.edges
             .borrow_mut()

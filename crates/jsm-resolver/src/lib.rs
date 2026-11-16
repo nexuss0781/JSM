@@ -20,6 +20,7 @@ pub struct Candidate {
     pub version: Version,
     pub dependencies: BTreeMap<PackageName, Spec>,
     pub optional_dependencies: BTreeMap<PackageName, Spec>,
+    pub peer_dependencies: BTreeMap<PackageName, Spec>,
     /// Dist-tags are repeated on candidates because registries return them with metadata.
     pub dist_tags: BTreeMap<DistTag, Version>,
     /// A deprecation message. Deprecated versions remain usable but are a soft preference.
@@ -34,6 +35,7 @@ impl Candidate {
             version,
             dependencies: BTreeMap::new(),
             optional_dependencies: BTreeMap::new(),
+            peer_dependencies: BTreeMap::new(),
             dist_tags: BTreeMap::new(),
             deprecated: None,
             in_store: false,
@@ -60,6 +62,12 @@ fn sort_candidates(candidates: &mut [Candidate]) {
 pub trait Provider {
     type Error: fmt::Display;
     fn candidates(&self, package: &PackageName) -> Result<Vec<Candidate>, Self::Error>;
+
+    /// Fetch peer dependency candidates for a package.
+    /// Returns optional peer dependency specifiers that the package declares.
+    fn peer_candidates(&self, package: &PackageName) -> Result<BTreeMap<PackageName, Spec>, Self::Error> {
+        Ok(BTreeMap::new())
+    }
 
     /// Fetch several distinct packuments concurrently while preserving input order.
     /// The default has an eight-worker cap; providers may override it when they have

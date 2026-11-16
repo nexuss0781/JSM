@@ -1307,20 +1307,24 @@ impl Provider for RegistryProvider {
             for optional in optional_dependencies.keys() {
                 dependencies.remove(optional);
             }
-            for (peer, spec) in peer_dependencies {
+            // Filter peer dependencies: only include non-optional ones in candidate.peer_dependencies
+            let mut filtered_peer_deps = BTreeMap::new();
+            for (peer, spec) in &peer_dependencies {
                 let optional_peer = metadata
                     .peer_dependencies_meta
                     .get(peer.as_str())
                     .is_some_and(|meta| meta.optional);
                 // npm does not automatically install optional peer dependencies.
                 if !optional_peer {
-                    dependencies.entry(peer).or_insert(spec);
+                    dependencies.entry(peer.clone()).or_insert(spec.clone());
+                    filtered_peer_deps.insert(peer.clone(), spec.clone());
                 }
             }
             optional_dependencies.retain(|name, _| !dependencies.contains_key(name));
             let mut candidate = Candidate::new(version.clone());
             candidate.dependencies = dependencies;
             candidate.optional_dependencies = optional_dependencies;
+            candidate.peer_dependencies = filtered_peer_deps;
             candidate.dist_tags = tags.clone();
             candidate.deprecated = metadata.deprecated;
             if self.prefer_store

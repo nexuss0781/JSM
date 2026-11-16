@@ -285,9 +285,9 @@
 
 ### 4.1 Peer dependencies
 
-- [ ] Resolve peer dependencies in dependent context; key virtual instances by resolved peer set and deduplicate identical contexts.
-- [ ] Implement optional peer metadata, configurable auto-install, strict-peer policy, bounded path names, and actionable warnings/errors.
-- [ ] Compare behavior against curated React, ESLint, and Babel peer-resolution cases.
+- [x] Resolve peer dependencies in dependent context; key virtual instances by resolved peer set and deduplicate identical contexts.
+- [x] Implement optional peer metadata, configurable auto-install, strict-peer policy, bounded path names, and actionable warnings/errors.
+- [x] Compare behavior against curated React, ESLint, and Babel peer-resolution cases.
 
 ### 4.2 Optional and platform-filtered dependencies
 
