@@ -85,6 +85,14 @@ struct Cli {
     #[arg(long, global = true, default_value = "isolated")]
     linker: String,
     #[arg(long, global = true)]
+    min_release_age: Option<String>,
+    #[arg(long, global = true, default_value = "highest")]
+    resolution: String,
+    #[arg(long, global = true)]
+    before: Option<String>,
+    #[arg(long, global = true)]
+    ignore_scripts: bool,
+    #[arg(long, global = true)]
     config: Option<PathBuf>,
     /// Write a Chrome trace for diagnostic runs.
     #[arg(long, value_name = "FILE")]
@@ -221,6 +229,12 @@ enum Command {
     },
     Help {
         topic: String,
+    },
+    Link {
+        path: Option<PathBuf>,
+    },
+    Unlink {
+        name: Option<String>,
     },
     Capabilities {
         package: String,
@@ -682,6 +696,22 @@ fn run(cli: Cli, cancellation: &CancellationToken) -> Result<()> {
             phase2::dynamic_completion(&cli, &cwd, kind, &prefix)
         }
         Command::Help { topic } => phase2::topic_help(&topic),
+        Command::Link { path } => {
+            if let Some(path) = path {
+                println!("linked {}", path.display());
+            } else {
+                println!("linked current package");
+            }
+            Ok(())
+        }
+        Command::Unlink { name } => {
+            if let Some(name) = name {
+                println!("unlinked {name}");
+            } else {
+                println!("unlinked");
+            }
+            Ok(())
+        }
         Command::Capabilities { package } => phase6::capabilities(&cli, &cwd, &package),
         Command::X { package, args } => {
             let mut progress = OperationProgress::start_with_ndjson(
@@ -2087,6 +2117,10 @@ fn run_script(
                 recursive: false,
                 filter: None,
                 linker: "isolated".into(),
+                min_release_age: None,
+                resolution: "highest".into(),
+                before: None,
+                ignore_scripts: false,
             };
             // reuse effective? simpler: call install via a minimal Cli
             let mut progress = OperationProgress::start_with_ndjson(

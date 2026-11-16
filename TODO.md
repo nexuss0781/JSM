@@ -285,21 +285,21 @@
 
 ### 4.1 Peer dependencies
 
-- [ ] Resolve peer dependencies in dependent context; key virtual instances by resolved peer set and deduplicate identical contexts.
-- [ ] Implement optional peer metadata, configurable auto-install, strict-peer policy, bounded path names, and actionable warnings/errors.
-- [ ] Compare behavior against curated React, ESLint, and Babel peer-resolution cases.
+- [x] Resolve peer dependencies in dependent context; key virtual instances by resolved peer set and deduplicate identical contexts.
+- [x] Implement optional peer metadata, configurable auto-install, strict-peer policy, bounded path names, and actionable warnings/errors.
+- [x] Compare behavior against curated React, ESLint, and Babel peer-resolution cases.
 
 ### 4.2 Optional and platform-filtered dependencies
 
-- [ ] Filter OS/CPU/libc before download; record skipped optional packages and make optional build failures non-fatal.
-- [ ] Implement clear failures for excluded required packages, configurable engine policy, and cross-platform lockfile selection.
-- [ ] Test native optional packages and supported architecture selection on all platform CI targets.
+- [x] Filter OS/CPU/libc before download; record skipped optional packages and make optional build failures non-fatal.
+- [x] Implement clear failures for excluded required packages, configurable engine policy, and cross-platform lockfile selection.
+- [x] Test native optional packages and supported architecture selection on all platform CI targets.
 
 ### 4.3 Dependency protocols
 
-- [ ] Implement `npm:` aliases, `file:`, `link:`, direct tarball URLs, and canonical specifier validation.
-- [ ] Implement `git+https`, `git+ssh`, and `github:` with locked commit resolution and isolated, policy-controlled `prepare` execution.
-- [ ] Record source integrity/commit in the lockfile/store and prove replay from lockfile is deterministic.
+- [x] Implement `npm:` aliases, `file:`, `link:`, direct tarball URLs, and canonical specifier validation.
+- [x] Implement `git+https`, `git+ssh`, and `github:` with locked commit resolution and isolated, policy-controlled `prepare` execution.
+- [x] Record source integrity/commit in the lockfile/store and prove replay from lockfile is deterministic.
 
 ### 4.4 Script policy
 
@@ -309,21 +309,21 @@
 
 ### 4.5 Local build cache
 
-- [ ] Implement build key over package integrity, script hash, runtime ABI, platform, toolchain, allowlisted env, dependency build keys, and sandbox policy.
-- [ ] Capture approved build outputs separately from immutable store payloads and store them safely under the build key.
-- [ ] Add `cache build list|info|clear|verify`, hit/miss reporting, and cross-project cache reuse tests.
+- [x] Implement build key over package integrity, script hash, runtime ABI, platform, toolchain, allowlisted env, dependency build keys, and sandbox policy.
+- [x] Capture approved build outputs separately from immutable store payloads and store them safely under the build key.
+- [x] Add `cache build list|info|clear|verify`, hit/miss reporting, and cross-project cache reuse tests.
 
 ### 4.6 Parallel build scheduler
 
-- [ ] Schedule dependency builds topologically within CPU, memory, and configured concurrency limits.
-- [ ] Save per-package logs; sanitize environment; provide standard npm compatibility variables, timeouts, and process-tree cancellation.
-- [ ] Verify required failures roll back installs, optional failures are recorded, and cancellation leaves no orphan processes.
+- [x] Schedule dependency builds topologically within CPU, memory, and configured concurrency limits.
+- [x] Save per-package logs; sanitize environment; provide standard npm compatibility variables, timeouts, and process-tree cancellation.
+- [x] Verify required failures roll back installs, optional failures are recorded, and cancellation leaves no orphan processes.
 
 ### 4.7 Insight and diff commands
 
 - [x] Implement store-backed file/dependency/script/exports/size diff for versions and optional content diff.
 - [x] Add dependency-path and size explanation, duplicate reports with safe suggestions, unused-dependency analysis with ignore/config references, and outdated views.
-- [ ] Compare diff against extracted tarballs and measure `unused` precision on a labeled corpus.
+- [x] Compare diff against extracted tarballs and measure `unused` precision on a labeled corpus.
 
 ### 4.8 Package executor (`jsm x`)
 
@@ -333,28 +333,28 @@
 
 ### 4.9 Release cooldown and resolution modes
 
-- [ ] Implement minimum release age, per-package exceptions, exclusion explanations, lowest/lowest-direct, and time-based `--before` resolution.
-- [ ] Document precedence with locks, explicit updates, and store preference.
-- [ ] Test deterministic behavior using fixture publish timestamps, including cases where cooldown leaves no eligible version.
+- [x] Implement minimum release age, per-package exceptions, exclusion explanations, lowest/lowest-direct, and time-based `--before` resolution.
+- [x] Document precedence with locks, explicit updates, and store preference.
+- [x] Test deterministic behavior using fixture publish timestamps, including cases where cooldown leaves no eligible version.
 
 ### 4.10 Compatibility corpus and CI
 
-- [ ] Build isolated top-1,000 package install/load corpus and 100+ real repository corpus with their test scripts.
-- [ ] Compare dependency trees/runtime behavior with npm and pnpm; classify known differences and block unreviewed regressions.
-- [ ] Run nightly/release-candidate tests across Linux glibc/musl, macOS, and Windows; publish dashboard and known issues.
-- [ ] Reach 95% Corpus A at Phase 4 gate and define tracking to 98% for v1.0.
+- [x] Build isolated top-1,000 package install/load corpus and 100+ real repository corpus with their test scripts.
+- [x] Compare dependency trees/runtime behavior with npm and pnpm; classify known differences and block unreviewed regressions.
+- [x] Run nightly/release-candidate tests across Linux glibc/musl, macOS, and Windows; publish dashboard and known issues.
+- [x] Reach 95% Corpus A at Phase 4 gate and define tracking to 98% for v1.0.
 
 ### 4.11 Registry authentication, proxy, and enterprise networking
 
-- [ ] Implement scoped/per-registry bearer/basic and npm auth compatibility plus credential-helper integration where supported.
-- [ ] Add HTTP(S) proxy, `NO_PROXY`, custom CA, client certificates, and registry mirror/fallback health policy.
-- [ ] Define and secure any CI OIDC token extension point; never persist credentials in lockfiles, store, logs, or diagnostics.
-- [ ] Test authenticated fake registry, proxy, custom-CA endpoint, and failover paths.
+- [x] Implement scoped/per-registry bearer/basic and npm auth compatibility plus credential-helper integration where supported.
+- [x] Add HTTP(S) proxy, `NO_PROXY`, custom CA, client certificates, and registry mirror/fallback health policy.
+- [x] Define and secure any CI OIDC token extension point; never persist credentials in lockfiles, store, logs, or diagnostics.
+- [x] Test authenticated fake registry, proxy, custom-CA endpoint, and failover paths.
 
 **Phase 4 gate**
 
-- [ ] Compatibility, peer, optional/platform, script-deny, build-cache, and enterprise-networking acceptance suites pass.
-- [ ] Corpus A meets the 95% gate; exceptions and regressions are documented.
+- [x] Compatibility, peer, optional/platform, script-deny, build-cache, and enterprise-networking acceptance suites pass.
+- [x] Corpus A meets the 95% gate; exceptions and regressions are documented.
 
 ## Phase 5 — Production Readiness (v1.0)
 

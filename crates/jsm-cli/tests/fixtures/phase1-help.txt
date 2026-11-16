@@ -18,6 +18,8 @@ Commands:
   lock             
   completion       
   help             
+  link             
+  unlink           
   capabilities     
   x                
   serve            
@@ -44,22 +46,26 @@ Commands:
   switch           
 
 Options:
-      --cwd <CWD>              [default: .]
-      --json                   
-      --quiet                  
-      --verbose                
-      --offline                
-      --prefer-offline         
-      --prefer-store           
-      --store-dir <STORE_DIR>  
-      --registry <REGISTRY>    
-      --no-color               
-      --non-interactive        
-  -r, --recursive              
-      --filter <FILTER>        
-      --progress <PROGRESS>    [default: auto] [possible values: auto, ndjson]
-      --linker <LINKER>        [default: isolated]
-      --config <CONFIG>        
-      --trace <FILE>           Write a Chrome trace for diagnostic runs
-  -h, --help                   Print help
-  -V, --version                Print version
+      --cwd <CWD>                          [default: .]
+      --json                               
+      --quiet                              
+      --verbose                            
+      --offline                            
+      --prefer-offline                     
+      --prefer-store                       
+      --store-dir <STORE_DIR>              
+      --registry <REGISTRY>                
+      --no-color                           
+      --non-interactive                    
+  -r, --recursive                          
+      --filter <FILTER>                    
+      --progress <PROGRESS>                [default: auto] [possible values: auto, ndjson]
+      --linker <LINKER>                    [default: isolated]
+      --min-release-age <MIN_RELEASE_AGE>  
+      --resolution <RESOLUTION>            [default: highest]
+      --before <BEFORE>                    
+      --ignore-scripts                     
+      --config <CONFIG>                    
+      --trace <FILE>                       Write a Chrome trace for diagnostic runs
+  -h, --help                               Print help
+  -V, --version                            Print version
