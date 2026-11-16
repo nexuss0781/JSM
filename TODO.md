@@ -224,334 +224,334 @@
 
 ### 3.1 Pipelined install scheduler
 
-- [x] Start fetches as soon as resolution commits a package version; connect stages with bounded channels and backpressure.
-- [x] Add critical-path prioritization and isolated network, CPU/decompression/hash, and I/O scheduling.
-- [x] Begin linking as soon as safe dependencies are ready; verify deterministic output independent of schedule; compare against phased baseline.
+- [ ] Start fetches as soon as resolution commits a package version; connect stages with bounded channels and backpressure.
+- [ ] Add critical-path prioritization and isolated network, CPU/decompression/hash, and I/O scheduling.
+- [ ] Begin linking as soon as safe dependencies are ready; verify deterministic output independent of schedule; compare against phased baseline.
 
 ### 3.2 Adaptive concurrency and hedging
 
-- [x] Implement per-host AIMD based on latency percentiles, throughput, errors, timeouts, and stream saturation.
-- [x] Add bounded hedging with loser cancellation, retry-after/rate-limit compliance, and automatic plus user-configurable concurrency.
-- [x] Simulate latency, packet loss, and 429/503 responses; show tail-latency improvement without request storms; expose controller metrics/traces.
+- [ ] Implement per-host AIMD based on latency percentiles, throughput, errors, timeouts, and stream saturation.
+- [ ] Add bounded hedging with loser cancellation, retry-after/rate-limit compliance, and automatic plus user-configurable concurrency.
+- [ ] Simulate latency, packet loss, and 429/503 responses; show tail-latency improvement without request storms; expose controller metrics/traces.
 
 ### 3.3 Skip-write extraction and fast index
 
-- [x] Maintain a lazy in-memory/on-disk blob index with Bloom-filter negative checks.
-- [x] Skip writes for existing hashes during extraction and report bytes avoided.
-- [x] Verify with I/O counters that adjacent-version upgrades only write new or changed files.
+- [ ] Maintain a lazy in-memory/on-disk blob index with Bloom-filter negative checks.
+- [ ] Skip writes for existing hashes during extraction and report bytes avoided.
+- [ ] Verify with I/O counters that adjacent-version upgrades only write new or changed files.
 
 ### 3.4 Materialization cache
 
-- [x] Define cache key from lockfile, linker mode, platform, patch set, and build keys; document all invalidation inputs.
-- [x] Cache a layout/recipe and clone the tree using available filesystem primitives; add cheap validation and store-change invalidation.
-- [x] Add LRU size bounds and `cache materialization list|clear`; benchmark 1,000-package hit against the calibrated budget.
+- [ ] Define cache key from lockfile, linker mode, platform, patch set, and build keys; document all invalidation inputs.
+- [ ] Cache a layout/recipe and clone the tree using available filesystem primitives; add cheap validation and store-change invalidation.
+- [ ] Add LRU size bounds and `cache materialization list|clear`; benchmark 1,000-package hit against the calibrated budget.
 
 ### 3.5 Platform-specific I/O optimization
 
-- [x] Probe/caches capabilities per store/project volume pair and keep portable fallback behavior.
-- [x] Implement gated Linux reflink/copy-range and optional io_uring paths, macOS clonefile/copyfile paths, and Windows block clone/hardlink/long-path paths.
-- [x] Add per-platform microbenchmarks and tests proving optimized paths do not change content or failure semantics.
+- [ ] Probe/caches capabilities per store/project volume pair and keep portable fallback behavior.
+- [ ] Implement gated Linux reflink/copy-range and optional io_uring paths, macOS clonefile/copyfile paths, and Windows block clone/hardlink/long-path paths.
+- [ ] Add per-platform microbenchmarks and tests proving optimized paths do not change content or failure semantics.
 
 ### 3.6 Store-aware resolution
 
-- [x] Add `--prefer-store` and config behavior that selects the highest eligible local version without violating ranges, explicit pins, or lockfile.
-- [x] Define offline, update, and store-preference interactions; make offline use cached metadata/store only.
-- [x] Test identical store state yields deterministic choices and report packages satisfied locally.
+- [ ] Add `--prefer-store` and config behavior that selects the highest eligible local version without violating ranges, explicit pins, or lockfile.
+- [ ] Define offline, update, and store-preference interactions; make offline use cached metadata/store only.
+- [ ] Test identical store state yields deterministic choices and report packages satisfied locally.
 
 ### 3.7 History, undo, snapshots, and switch
 
-- [x] Persist content-addressed before/after lockfile history for each successful mutation and provide configurable retention/pinning.
-- [x] Implement history, undo/redo, named snapshots, and package version switch as transactions.
-- [x] Verify exact lockfile restoration and store-only undo/redo when content is present; test add/upgrade/switch/restore sequences.
+- [ ] Persist content-addressed before/after lockfile history for each successful mutation and provide configurable retention/pinning.
+- [ ] Implement history, undo/redo, named snapshots, and package version switch as transactions.
+- [ ] Verify exact lockfile restoration and store-only undo/redo when content is present; test add/upgrade/switch/restore sequences.
 
 ### 3.8 Hoisted linker
 
-- [x] Resolve default linker decision by ADR before changing documented behavior; implement deterministic npm-compatible hoisting and conflict handling.
-- [x] Add `--linker=hoisted`, per-project configuration, exclusions, and public-hoist patterns while reusing safe store/link primitives.
-- [x] Run known flat-layout compatibility projects and ensure isolated mode remains the safe default unless the ADR says otherwise.
+- [ ] Resolve default linker decision by ADR before changing documented behavior; implement deterministic npm-compatible hoisting and conflict handling.
+- [ ] Add `--linker=hoisted`, per-project configuration, exclusions, and public-hoist patterns while reusing safe store/link primitives.
+- [ ] Run known flat-layout compatibility projects and ensure isolated mode remains the safe default unless the ADR says otherwise.
 
 ### 3.9 Conflict explanation and suggestions
 
-- [x] Render solver conflict information as readable dependency/range chains; expose structured conflict JSON and `--explain`.
-- [x] Generate candidate upgrade/downgrade/override/peer-range suggestions without presenting guesses as guaranteed fixes.
-- [x] Review 30 real conflict cases for accuracy, clarity, and actionable guidance.
+- [ ] Render solver conflict information as readable dependency/range chains; expose structured conflict JSON and `--explain`.
+- [ ] Generate candidate upgrade/downgrade/override/peer-range suggestions without presenting guesses as guaranteed fixes.
+- [ ] Review 30 real conflict cases for accuracy, clarity, and actionable guidance.
 
 **Phase 3 gate**
 
-- [x] Measured Phase 3 improvement and calibrated cold/warm/materialization budgets pass without determinism or state-safety regressions.
-- [x] Undo/redo/snapshot, linker, adaptive concurrency, and cache invalidation suites pass.
+- [ ] Measured Phase 3 improvement and calibrated cold/warm/materialization budgets pass without determinism or state-safety regressions.
+- [ ] Undo/redo/snapshot, linker, adaptive concurrency, and cache invalidation suites pass.
 
 ## Phase 4 — Real-World Compatibility
 
 ### 4.1 Peer dependencies
 
-- [x] Resolve peer dependencies in dependent context; key virtual instances by resolved peer set and deduplicate identical contexts.
-- [x] Implement optional peer metadata, configurable auto-install, strict-peer policy, bounded path names, and actionable warnings/errors.
-- [x] Compare behavior against curated React, ESLint, and Babel peer-resolution cases.
+- [ ] Resolve peer dependencies in dependent context; key virtual instances by resolved peer set and deduplicate identical contexts.
+- [ ] Implement optional peer metadata, configurable auto-install, strict-peer policy, bounded path names, and actionable warnings/errors.
+- [ ] Compare behavior against curated React, ESLint, and Babel peer-resolution cases.
 
 ### 4.2 Optional and platform-filtered dependencies
 
-- [x] Filter OS/CPU/libc before download; record skipped optional packages and make optional build failures non-fatal.
-- [x] Implement clear failures for excluded required packages, configurable engine policy, and cross-platform lockfile selection.
-- [x] Test native optional packages and supported architecture selection on all platform CI targets.
+- [ ] Filter OS/CPU/libc before download; record skipped optional packages and make optional build failures non-fatal.
+- [ ] Implement clear failures for excluded required packages, configurable engine policy, and cross-platform lockfile selection.
+- [ ] Test native optional packages and supported architecture selection on all platform CI targets.
 
 ### 4.3 Dependency protocols
 
-- [x] Implement `npm:` aliases, `file:`, `link:`, direct tarball URLs, and canonical specifier validation.
-- [x] Implement `git+https`, `git+ssh`, and `github:` with locked commit resolution and isolated, policy-controlled `prepare` execution.
-- [x] Record source integrity/commit in the lockfile/store and prove replay from lockfile is deterministic.
+- [ ] Implement `npm:` aliases, `file:`, `link:`, direct tarball URLs, and canonical specifier validation.
+- [ ] Implement `git+https`, `git+ssh`, and `github:` with locked commit resolution and isolated, policy-controlled `prepare` execution.
+- [ ] Record source integrity/commit in the lockfile/store and prove replay from lockfile is deterministic.
 
 ### 4.4 Script policy
 
-- [x] Implement default-deny dependency lifecycle scripts and configured root-script behavior/`--ignore-scripts`.
-- [x] Implement interactive/non-interactive `approve-scripts`; bind approvals to package/range and script-content hash; support documented storage choices.
-- [x] Warn with skipped scripts and remediation; test that deny mode cannot run dependency scripts and script changes invalidate prior approval.
+- [ ] Implement default-deny dependency lifecycle scripts and configured root-script behavior/`--ignore-scripts`.
+- [ ] Implement interactive/non-interactive `approve-scripts`; bind approvals to package/range and script-content hash; support documented storage choices.
+- [ ] Warn with skipped scripts and remediation; test that deny mode cannot run dependency scripts and script changes invalidate prior approval.
 
 ### 4.5 Local build cache
 
-- [x] Implement build key over package integrity, script hash, runtime ABI, platform, toolchain, allowlisted env, dependency build keys, and sandbox policy.
-- [x] Capture approved build outputs separately from immutable store payloads and store them safely under the build key.
-- [x] Add `cache build list|info|clear|verify`, hit/miss reporting, and cross-project cache reuse tests.
+- [ ] Implement build key over package integrity, script hash, runtime ABI, platform, toolchain, allowlisted env, dependency build keys, and sandbox policy.
+- [ ] Capture approved build outputs separately from immutable store payloads and store them safely under the build key.
+- [ ] Add `cache build list|info|clear|verify`, hit/miss reporting, and cross-project cache reuse tests.
 
 ### 4.6 Parallel build scheduler
 
-- [x] Schedule dependency builds topologically within CPU, memory, and configured concurrency limits.
-- [x] Save per-package logs; sanitize environment; provide standard npm compatibility variables, timeouts, and process-tree cancellation.
-- [x] Verify required failures roll back installs, optional failures are recorded, and cancellation leaves no orphan processes.
+- [ ] Schedule dependency builds topologically within CPU, memory, and configured concurrency limits.
+- [ ] Save per-package logs; sanitize environment; provide standard npm compatibility variables, timeouts, and process-tree cancellation.
+- [ ] Verify required failures roll back installs, optional failures are recorded, and cancellation leaves no orphan processes.
 
 ### 4.7 Insight and diff commands
 
-- [x] Implement store-backed file/dependency/script/exports/size diff for versions and optional content diff.
-- [x] Add dependency-path and size explanation, duplicate reports with safe suggestions, unused-dependency analysis with ignore/config references, and outdated views.
-- [x] Compare diff against extracted tarballs and measure `unused` precision on a labeled corpus.
+- [ ] Implement store-backed file/dependency/script/exports/size diff for versions and optional content diff.
+- [ ] Add dependency-path and size explanation, duplicate reports with safe suggestions, unused-dependency analysis with ignore/config references, and outdated views.
+- [ ] Compare diff against extracted tarballs and measure `unused` precision on a labeled corpus.
 
 ### 4.8 Package executor (`jsm x`)
 
-- [x] Resolve and fetch packages into the shared store and create isolated, lockfile-keyed ephemeral environments.
-- [x] Add bin disambiguation, multiple `--package` support, TTL for floating ranges, and `--refresh`.
-- [x] Enforce script policy/sandbox availability and benchmark warm invocation against the specified budget.
+- [ ] Resolve and fetch packages into the shared store and create isolated, lockfile-keyed ephemeral environments.
+- [ ] Add bin disambiguation, multiple `--package` support, TTL for floating ranges, and `--refresh`.
+- [ ] Enforce script policy/sandbox availability and benchmark warm invocation against the specified budget.
 
 ### 4.9 Release cooldown and resolution modes
 
-- [x] Implement minimum release age, per-package exceptions, exclusion explanations, lowest/lowest-direct, and time-based `--before` resolution.
-- [x] Document precedence with locks, explicit updates, and store preference.
-- [x] Test deterministic behavior using fixture publish timestamps, including cases where cooldown leaves no eligible version.
+- [ ] Implement minimum release age, per-package exceptions, exclusion explanations, lowest/lowest-direct, and time-based `--before` resolution.
+- [ ] Document precedence with locks, explicit updates, and store preference.
+- [ ] Test deterministic behavior using fixture publish timestamps, including cases where cooldown leaves no eligible version.
 
 ### 4.10 Compatibility corpus and CI
 
-- [x] Build isolated top-1,000 package install/load corpus and 100+ real repository corpus with their test scripts.
-- [x] Compare dependency trees/runtime behavior with npm and pnpm; classify known differences and block unreviewed regressions.
-- [x] Run nightly/release-candidate tests across Linux glibc/musl, macOS, and Windows; publish dashboard and known issues.
-- [x] Reach 95% Corpus A at Phase 4 gate and define tracking to 98% for v1.0.
+- [ ] Build isolated top-1,000 package install/load corpus and 100+ real repository corpus with their test scripts.
+- [ ] Compare dependency trees/runtime behavior with npm and pnpm; classify known differences and block unreviewed regressions.
+- [ ] Run nightly/release-candidate tests across Linux glibc/musl, macOS, and Windows; publish dashboard and known issues.
+- [ ] Reach 95% Corpus A at Phase 4 gate and define tracking to 98% for v1.0.
 
 ### 4.11 Registry authentication, proxy, and enterprise networking
 
-- [x] Implement scoped/per-registry bearer/basic and npm auth compatibility plus credential-helper integration where supported.
-- [x] Add HTTP(S) proxy, `NO_PROXY`, custom CA, client certificates, and registry mirror/fallback health policy.
-- [x] Define and secure any CI OIDC token extension point; never persist credentials in lockfiles, store, logs, or diagnostics.
-- [x] Test authenticated fake registry, proxy, custom-CA endpoint, and failover paths.
+- [ ] Implement scoped/per-registry bearer/basic and npm auth compatibility plus credential-helper integration where supported.
+- [ ] Add HTTP(S) proxy, `NO_PROXY`, custom CA, client certificates, and registry mirror/fallback health policy.
+- [ ] Define and secure any CI OIDC token extension point; never persist credentials in lockfiles, store, logs, or diagnostics.
+- [ ] Test authenticated fake registry, proxy, custom-CA endpoint, and failover paths.
 
 **Phase 4 gate**
 
-- [x] Compatibility, peer, optional/platform, script-deny, build-cache, and enterprise-networking acceptance suites pass.
-- [x] Corpus A meets the 95% gate; exceptions and regressions are documented.
+- [ ] Compatibility, peer, optional/platform, script-deny, build-cache, and enterprise-networking acceptance suites pass.
+- [ ] Corpus A meets the 95% gate; exceptions and regressions are documented.
 
 ## Phase 5 — Production Readiness (v1.0)
 
 ### 5.1 Workspaces and monorepos
 
-- [x] Discover workspace globs, exclusions, local packages, and supported `workspace:` ranges with publish-time rewriting.
-- [x] Implement one importer-aware lockfile, filters (including git-changed/dependency/dependent forms), and workspace-aware commands.
-- [x] Implement recursive script execution with topological ordering, parallelism, streaming, and bail policy; test 100-package fixture.
+- [ ] Discover workspace globs, exclusions, local packages, and supported `workspace:` ranges with publish-time rewriting.
+- [ ] Implement one importer-aware lockfile, filters (including git-changed/dependency/dependent forms), and workspace-aware commands.
+- [ ] Implement recursive script execution with topological ordering, parallelism, streaming, and bail policy; test 100-package fixture.
 
 ### 5.2 Catalogs, overrides, and resolutions
 
-- [x] Implement named/default catalogs and `catalog:` protocol.
-- [x] Implement package/parent/range overrides, resolutions, dependency references, unused-override warnings, and update-by-catalog.
-- [x] Document and test precedence, nested selectors, and scoped package behavior.
+- [ ] Implement named/default catalogs and `catalog:` protocol.
+- [ ] Implement package/parent/range overrides, resolutions, dependency references, unused-override warnings, and update-by-catalog.
+- [ ] Document and test precedence, nested selectors, and scoped package behavior.
 
 ### 5.3 Patching
 
-- [x] Implement safe extraction to a working copy, patch diff/commit/remove, and content-hash registration.
-- [x] Apply patches only to per-project mutable materializations; include patch hashes in lockfile/cache keys.
-- [x] Test store immutability and clear hunk-level diagnostics when patches stop applying.
+- [ ] Implement safe extraction to a working copy, patch diff/commit/remove, and content-hash registration.
+- [ ] Apply patches only to per-project mutable materializations; include patch hashes in lockfile/cache keys.
+- [ ] Test store immutability and clear hunk-level diagnostics when patches stop applying.
 
 ### 5.4 Lockfile importers and migration
 
-- [x] Implement importers for package-lock v1/v2/v3, shrinkwrap, Yarn Classic/Berry, pnpm, and Bun formats as specified.
-- [x] Implement `migrate --from`, dry-run/diff, integrity checks, precise untranslated-entry report, optional exporters, and opt-in old-lockfile removal.
-- [x] Import applicable ecosystem configuration without silently overriding user settings; test Corpus B resolution preservation target.
+- [ ] Implement importers for package-lock v1/v2/v3, shrinkwrap, Yarn Classic/Berry, pnpm, and Bun formats as specified.
+- [ ] Implement `migrate --from`, dry-run/diff, integrity checks, precise untranslated-entry report, optional exporters, and opt-in old-lockfile removal.
+- [ ] Import applicable ecosystem configuration without silently overriding user settings; test Corpus B resolution preservation target.
 
 ### 5.5 Provenance and signature verification
 
-- [x] Implement registry signature verification and key rotation/cache handling.
-- [x] Verify npm provenance/Sigstore bundles including certificate, transparency inclusion, and builder identity.
-- [x] Implement off/warn/require policy, exceptions, non-regression signal, compact lockfile status, and offline verification with cached material.
-- [x] Test valid, tampered, expired, revoked, absent, and offline cases.
+- [ ] Implement registry signature verification and key rotation/cache handling.
+- [ ] Verify npm provenance/Sigstore bundles including certificate, transparency inclusion, and builder identity.
+- [ ] Implement off/warn/require policy, exceptions, non-regression signal, compact lockfile status, and offline verification with cached material.
+- [ ] Test valid, tampered, expired, revoked, absent, and offline cases.
 
 ### 5.6 Audit and advisories
 
-- [x] Build/sync local OSV and GitHub advisory data incrementally and support offline scans.
-- [x] Implement `audit` filters, dependency paths, threshold exit behavior, justified expiring exceptions, and SARIF/JSON output.
-- [x] Test results against reference scanners on fixtures and ensure `--fix` review/application behavior is explicit.
+- [ ] Build/sync local OSV and GitHub advisory data incrementally and support offline scans.
+- [ ] Implement `audit` filters, dependency paths, threshold exit behavior, justified expiring exceptions, and SARIF/JSON output.
+- [ ] Test results against reference scanners on fixtures and ensure `--fix` review/application behavior is explicit.
 
 ### 5.7 Sandboxed script execution
 
-- [x] Resolve and document per-OS sandbox capability/default policy before enabling execution; degrade with explicit warning only where the spec allows.
-- [x] Implement Linux, macOS, and Windows least-privilege sandbox adapters with no network by default and bounded read/write paths.
-- [x] Include sandbox policy in build keys and implement explicit `--no-sandbox` opt-out with warning.
-- [x] Run escape tests for network, paths, credentials, and process limits; test common native builds on supported platforms.
+- [ ] Resolve and document per-OS sandbox capability/default policy before enabling execution; degrade with explicit warning only where the spec allows.
+- [ ] Implement Linux, macOS, and Windows least-privilege sandbox adapters with no network by default and bounded read/write paths.
+- [ ] Include sandbox policy in build keys and implement explicit `--no-sandbox` opt-out with warning.
+- [ ] Run escape tests for network, paths, credentials, and process limits; test common native builds on supported platforms.
 
 ### 5.8 Prebuilt binary resolution
 
-- [x] Implement resolution order: local cache, trusted remote cache when enabled, platform packages, recognized prebuild conventions, then controlled compilation.
-- [x] Fetch prebuilds through verified CAS pipeline; never permit arbitrary lifecycle script downloads to bypass controls.
-- [x] Test top native packages/platforms and report cache/prebuilt/compiled result.
+- [ ] Implement resolution order: local cache, trusted remote cache when enabled, platform packages, recognized prebuild conventions, then controlled compilation.
+- [ ] Fetch prebuilds through verified CAS pipeline; never permit arbitrary lifecycle script downloads to bypass controls.
+- [ ] Test top native packages/platforms and report cache/prebuilt/compiled result.
 
 ### 5.9 Script change review
 
-- [x] Persist approved script hashes and detect changes/new lifecycle scripts on package update.
-- [x] Revoke stale approvals and show reviewable script/file diffs before execution.
-- [x] Test unchanged, modified, newly added, and removed script cases.
+- [ ] Persist approved script hashes and detect changes/new lifecycle scripts on package update.
+- [ ] Revoke stale approvals and show reviewable script/file diffs before execution.
+- [ ] Test unchanged, modified, newly added, and removed script cases.
 
 ### 5.10 Update review report
 
-- [x] Implement per-package version/size/dependency/script/exports/provenance/advisory/age change report for `update --review` and interactive selection.
-- [x] Support table and versioned JSON output and reuse local store diff where possible.
-- [x] Test reports with controlled upgrade fixtures covering every reported change category.
+- [ ] Implement per-package version/size/dependency/script/exports/provenance/advisory/age change report for `update --review` and interactive selection.
+- [ ] Support table and versioned JSON output and reuse local store diff where possible.
+- [ ] Test reports with controlled upgrade fixtures covering every reported change category.
 
 ### 5.11 Store export and import
 
-- [x] Implement minimal lockfile/package store bundle with integrity manifest and optional signature; add incremental bundle support.
-- [x] Verify and merge imports idempotently and add offline install-from-bundle flow.
-- [x] Prove export/import installation succeeds in a disconnected CI fixture and tampering is rejected.
+- [ ] Implement minimal lockfile/package store bundle with integrity manifest and optional signature; add incremental bundle support.
+- [ ] Verify and merge imports idempotently and add offline install-from-bundle flow.
+- [ ] Prove export/import installation succeeds in a disconnected CI fixture and tampering is rejected.
 
 ### 5.12 Production slimming
 
-- [x] Implement production-only installs, conservative opt-in slim rules/allow-deny config, and self-contained workspace deploy output.
-- [x] Report size before/after; preserve files required by runtime exports and package semantics.
-- [x] Run runtime smoke tests for slimmed compatibility corpus outputs.
+- [ ] Implement production-only installs, conservative opt-in slim rules/allow-deny config, and self-contained workspace deploy output.
+- [ ] Report size before/after; preserve files required by runtime exports and package semantics.
+- [ ] Run runtime smoke tests for slimmed compatibility corpus outputs.
 
 ### 5.13 Release engineering
 
-- [x] Implement reproducible release builds, signed artifacts/checksums/SBOM, CI-only tagged release candidate, and supported distribution channels.
-- [x] Add verified self-update with stable/beta channels; define CLI, JSON, lockfile, and store versioning/deprecation/migration policy.
-- [x] Add `SECURITY.md`, vulnerability disclosure process, and dependency-update automation.
-- [x] Pass migration compatibility tests across supported prior formats/versions.
+- [ ] Implement reproducible release builds, signed artifacts/checksums/SBOM, CI-only tagged release candidate, and supported distribution channels.
+- [ ] Add verified self-update with stable/beta channels; define CLI, JSON, lockfile, and store versioning/deprecation/migration policy.
+- [ ] Add `SECURITY.md`, vulnerability disclosure process, and dependency-update automation.
+- [ ] Pass migration compatibility tests across supported prior formats/versions.
 
 ### 5.14 Documentation
 
-- [x] Write getting-started, generated command/config references, store/lockfile, security, troubleshooting, architecture, and contributor documentation.
-- [x] Add npm/Yarn/pnpm/Bun migration, workspace, CI, Docker, and cache recipes.
-- [x] Validate command/config examples, links, schemas, and docs snippets in CI; ensure every command and config key is documented.
+- [ ] Write getting-started, generated command/config references, store/lockfile, security, troubleshooting, architecture, and contributor documentation.
+- [ ] Add npm/Yarn/pnpm/Bun migration, workspace, CI, Docker, and cache recipes.
+- [ ] Validate command/config examples, links, schemas, and docs snippets in CI; ensure every command and config key is documented.
 
 **Phase 5 / v1.0 gate**
 
-- [x] All Phase 5 exit criteria pass; Corpus A reaches 98%; ratified Appendix D budgets pass.
-- [x] Security review, required fuzzing, crash/concurrency/platform suites, release signing, SBOM, migration checks, and documentation tests pass.
-- [x] Produce a signed release candidate from a tagged commit by CI alone; publish compatibility and benchmark evidence.
+- [ ] All Phase 5 exit criteria pass; Corpus A reaches 98%; ratified Appendix D budgets pass.
+- [ ] Security review, required fuzzing, crash/concurrency/platform suites, release signing, SBOM, migration checks, and documentation tests pass.
+- [ ] Produce a signed release candidate from a tagged commit by CI alone; publish compatibility and benchmark evidence.
 
 ## Phase 6 — Ecosystem and Scale (post-v1.0)
 
 ### 6.1 Store-as-registry (`jsm serve`)
 
-- [x] Implement npm-compatible read API with upstream fallback/cache, configurable policy, token auth, TLS, rate limits, and access logging.
-- [x] Add health/metrics endpoints and integrity-verified optional LAN/peer fetch.
-- [x] Test two clients sharing an upstream fetch and verify unauthorized clients cannot retrieve protected data.
+- [ ] Implement npm-compatible read API with upstream fallback/cache, configurable policy, token auth, TLS, rate limits, and access logging.
+- [ ] Add health/metrics endpoints and integrity-verified optional LAN/peer fetch.
+- [ ] Test two clients sharing an upstream fetch and verify unauthorized clients cannot retrieve protected data.
 
 ### 6.2 Remote build cache
 
-- [x] Implement S3-compatible, GCS, Azure Blob, HTTPS, and `jsm serve` backends with read-only/read-write roles.
-- [x] Sign and verify build-key artifacts; implement key rotation, namespace isolation, TTL, audit logs, and poisoning defenses.
-- [x] Test CI-to-developer reuse, tampered artifacts, unauthorized access, and backend failure behavior.
+- [ ] Implement S3-compatible, GCS, Azure Blob, HTTPS, and `jsm serve` backends with read-only/read-write roles.
+- [ ] Sign and verify build-key artifacts; implement key rotation, namespace isolation, TTL, audit logs, and poisoning defenses.
+- [ ] Test CI-to-developer reuse, tampered artifacts, unauthorized access, and backend failure behavior.
 
 ### 6.3 Sparse registry index
 
-- [x] Specify and version a sharded incremental compressed index with delta/ETag synchronization.
-- [x] Implement client cache and optional generation/server mode; fall back to the standard registry metadata API.
-- [x] Prove warm-index large-fixture resolution uses zero per-package network requests and remains correct after updates.
+- [ ] Specify and version a sharded incremental compressed index with delta/ETag synchronization.
+- [ ] Implement client cache and optional generation/server mode; fall back to the standard registry metadata API.
+- [ ] Prove warm-index large-fixture resolution uses zero per-package network requests and remains correct after updates.
 
 ### 6.4 Merkle verification and store sync
 
-- [x] Maintain Merkle roots/subtrees for package manifests and blobs and define signed root behavior for bundles/served stores.
-- [x] Implement fast verification and store/bundle synchronization by subtree comparison.
-- [x] Test tampering/divergence detection and meet the unchanged-store verification improvement target.
+- [ ] Maintain Merkle roots/subtrees for package manifests and blobs and define signed root behavior for bundles/served stores.
+- [ ] Implement fast verification and store/bundle synchronization by subtree comparison.
+- [ ] Test tampering/divergence detection and meet the unchanged-store verification improvement target.
 
 ### 6.5 Optional daemon (`jsmd`)
 
-- [x] Implement versioned local socket/named-pipe protocol with user-only permissions and no remote control interface.
-- [x] Add opt-in metadata warming, project watch/prefetch, optional git hooks, idle maintenance, resource limits, and daemon diagnostics.
-- [x] Verify every CLI operation has equivalent daemon-free behavior and branch checkout prefetch meets its acceptance target.
+- [ ] Implement versioned local socket/named-pipe protocol with user-only permissions and no remote control interface.
+- [ ] Add opt-in metadata warming, project watch/prefetch, optional git hooks, idle maintenance, resource limits, and daemon diagnostics.
+- [ ] Verify every CLI operation has equivalent daemon-free behavior and branch checkout prefetch meets its acceptance target.
 
 ### 6.6 Capability analysis
 
-- [x] Analyze and cache package capabilities for network, process, filesystem, environment, native loading, dynamic code, and obfuscation indicators.
-- [x] Surface changes in update/diff and implement configurable policy plus `capabilities` output.
-- [x] Measure precision/recall on benign and safe malicious-sample datasets; add false-positive controls.
+- [ ] Analyze and cache package capabilities for network, process, filesystem, environment, native loading, dynamic code, and obfuscation indicators.
+- [ ] Surface changes in update/diff and implement configurable policy plus `capabilities` output.
+- [ ] Measure precision/recall on benign and safe malicious-sample datasets; add false-positive controls.
 
 ### 6.7 Typosquat and anomaly warnings
 
-- [x] Implement popular-name edit/confusable/scope-impersonation checks and metadata anomaly hints for new dependencies.
-- [x] Bundle/update popularity data and make strictness configurable with offline behavior.
-- [x] Test known typosquat samples and quantify false positives on the popular-name corpus.
+- [ ] Implement popular-name edit/confusable/scope-impersonation checks and metadata anomaly hints for new dependencies.
+- [ ] Bundle/update popularity data and make strictness configurable with offline behavior.
+- [ ] Test known typosquat samples and quantify false positives on the popular-name corpus.
 
 ### 6.8 Zero-install script running
 
-- [x] Parse inline dependency declarations and resolve them into isolated cached ephemeral environments.
-- [x] Support optional reproducibility sidecar and configured Node/Bun/Deno runtime/TypeScript loader selection.
-- [x] Test first run with no project files and warm rerun against the specified budget.
+- [ ] Parse inline dependency declarations and resolve them into isolated cached ephemeral environments.
+- [ ] Support optional reproducibility sidecar and configured Node/Bun/Deno runtime/TypeScript loader selection.
+- [ ] Test first run with no project files and warm rerun against the specified budget.
 
 ### 6.9 Advanced deploy and container optimization
 
-- [x] Implement deterministic dependency/app layers, Docker-oriented install mode, and documented BuildKit store-cache mounts.
-- [x] Add CycloneDX/SPDX SBOM generation for deploy output.
-- [x] Benchmark reference Dockerfiles against npm/pnpm for build time and image size; publish methodology.
+- [ ] Implement deterministic dependency/app layers, Docker-oriented install mode, and documented BuildKit store-cache mounts.
+- [ ] Add CycloneDX/SPDX SBOM generation for deploy output.
+- [ ] Benchmark reference Dockerfiles against npm/pnpm for build time and image size; publish methodology.
 
 **Phase 6 gate**
 
-- [x] All Phase 6 sub-phase acceptance criteria pass; service threat models, auth/signature checks, and integration tests are reviewed.
-- [x] Serve, remote cache, sparse index, and daemon are optional and can be disabled without affecting core correctness.
+- [ ] All Phase 6 sub-phase acceptance criteria pass; service threat models, auth/signature checks, and integration tests are reviewed.
+- [ ] Serve, remote cache, sparse index, and daemon are optional and can be disabled without affecting core correctness.
 
 ## Phase 7 — Advanced Extensions (post-v1.0)
 
 ### 7.1 Chunk-level store with compression
 
-- [x] Implement content-defined chunking and zstd for eligible large files, retaining whole-file blobs for small files.
-- [x] Implement transparent reconstruction, integrity, resumable migration, rollback, and bounded cache behavior.
-- [x] Test disk savings on many package versions and keep materialization within the approved regression tolerance.
+- [ ] Implement content-defined chunking and zstd for eligible large files, retaining whole-file blobs for small files.
+- [ ] Implement transparent reconstruction, integrity, resumable migration, rollback, and bounded cache behavior.
+- [ ] Test disk savings on many package versions and keep materialization within the approved regression tolerance.
 
 ### 7.2 Interactive TUI (`jsm ui`)
 
-- [x] Implement dependency/store/update/advisory/history views, search, navigation, accessible themes, and confirmed destructive actions.
-- [x] Provide clear non-TTY fallback and snapshot tests; run usability task set.
+- [ ] Implement dependency/store/update/advisory/history views, search, navigation, accessible themes, and confirmed destructive actions.
+- [ ] Provide clear non-TTY fallback and snapshot tests; run usability task set.
 
 ### 7.3 Node runtime management
 
-- [x] Implement verified runtime install/use/list/remove/which and shared-store representation.
-- [x] Honor runtime pins and environment files; add shims/command selection and feed detected ABI into build keys.
-- [x] Test checksum/signature failures and instant switching among installed versions.
+- [ ] Implement verified runtime install/use/list/remove/which and shared-store representation.
+- [ ] Honor runtime pins and environment files; add shims/command selection and feed detected ABI into build keys.
+- [ ] Test checksum/signature failures and instant switching among installed versions.
 
 ### 7.4 Virtual linker
 
-- [x] Resolve platform feasibility and permission/security model in an ADR before implementation.
-- [x] Implement opt-in FUSE/ProjectedFS-compatible overlay with lazy materialization and tested file/watch/symlink semantics.
-- [x] Maintain isolated-linker fallback and validate representative dev server, bundler, and language-server projects.
+- [ ] Resolve platform feasibility and permission/security model in an ADR before implementation.
+- [ ] Implement opt-in FUSE/ProjectedFS-compatible overlay with lazy materialization and tested file/watch/symlink semantics.
+- [ ] Maintain isolated-linker fallback and validate representative dev server, bundler, and language-server projects.
 
 ### 7.5 Editor and tooling integrations
 
-- [x] Publish versioned schemas for config, lockfile, and manifest extensions and expose language-server-friendly diagnostics.
-- [x] Build, test, and document editor extension and CI setup/cache/audit action.
-- [x] Document Renovate/Dependabot behavior and test integrations where supported.
+- [ ] Publish versioned schemas for config, lockfile, and manifest extensions and expose language-server-friendly diagnostics.
+- [ ] Build, test, and document editor extension and CI setup/cache/audit action.
+- [ ] Document Renovate/Dependabot behavior and test integrations where supported.
 
 ### 7.6 Plugin and extension API
 
-- [x] Choose and specify WASI or out-of-process JSON-RPC contract, manifest, permissions, and versioning in an ADR.
-- [x] Implement capability enforcement, signature verification, reference plugin, and developer documentation.
-- [x] Test that a plugin can add an approved extension point but cannot bypass integrity, script policy, or sandbox controls.
+- [ ] Choose and specify WASI or out-of-process JSON-RPC contract, manifest, permissions, and versioning in an ADR.
+- [ ] Implement capability enforcement, signature verification, reference plugin, and developer documentation.
+- [ ] Test that a plugin can add an approved extension point but cannot bypass integrity, script policy, or sandbox controls.
 
 **Phase 7 gate**
 
-- [x] Every extension is independently opt-in/feature-flagged and has acceptance, compatibility, security, performance, and rollback evidence.
+- [ ] Every extension is independently opt-in/feature-flagged and has acceptance, compatibility, security, performance, and rollback evidence.
 
 ## Design decisions to record
 
