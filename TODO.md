@@ -254,9 +254,9 @@
 
 ### 3.6 Store-aware resolution
 
-- [ ] Add `--prefer-store` and config behavior that selects the highest eligible local version without violating ranges, explicit pins, or lockfile.
-- [ ] Define offline, update, and store-preference interactions; make offline use cached metadata/store only.
-- [ ] Test identical store state yields deterministic choices and report packages satisfied locally.
+- [x] Add `--prefer-store` and config behavior that selects the highest eligible local version without violating ranges, explicit pins, or lockfile.
+- [x] Define offline, update, and store-preference interactions; make offline use cached metadata/store only.
+- [x] Test identical store state yields deterministic choices and report packages satisfied locally.
 
 ### 3.7 History, undo, snapshots, and switch
 
@@ -303,9 +303,9 @@
 
 ### 4.4 Script policy
 
-- [ ] Implement default-deny dependency lifecycle scripts and configured root-script behavior/`--ignore-scripts`.
-- [ ] Implement interactive/non-interactive `approve-scripts`; bind approvals to package/range and script-content hash; support documented storage choices.
-- [ ] Warn with skipped scripts and remediation; test that deny mode cannot run dependency scripts and script changes invalidate prior approval.
+- [x] Implement default-deny dependency lifecycle scripts and configured root-script behavior/`--ignore-scripts`.
+- [x] Implement interactive/non-interactive `approve-scripts`; bind approvals to package/range and script-content hash; support documented storage choices.
+- [x] Warn with skipped scripts and remediation; test that deny mode cannot run dependency scripts and script changes invalidate prior approval.
 
 ### 4.5 Local build cache
 
@@ -327,9 +327,9 @@
 
 ### 4.8 Package executor (`jsm x`)
 
-- [ ] Resolve and fetch packages into the shared store and create isolated, lockfile-keyed ephemeral environments.
-- [ ] Add bin disambiguation, multiple `--package` support, TTL for floating ranges, and `--refresh`.
-- [ ] Enforce script policy/sandbox availability and benchmark warm invocation against the specified budget.
+- [x] Resolve and fetch packages into the shared store and create isolated, lockfile-keyed ephemeral environments.
+- [x] Add bin disambiguation, multiple `--package` support, TTL for floating ranges, and `--refresh`.
+- [x] Enforce script policy/sandbox availability and benchmark warm invocation against the specified budget.
 
 ### 4.9 Release cooldown and resolution modes
 
@@ -422,9 +422,9 @@
 
 ### 5.11 Store export and import
 
-- [ ] Implement minimal lockfile/package store bundle with integrity manifest and optional signature; add incremental bundle support.
-- [ ] Verify and merge imports idempotently and add offline install-from-bundle flow.
-- [ ] Prove export/import installation succeeds in a disconnected CI fixture and tampering is rejected.
+- [x] Implement minimal lockfile/package store bundle with integrity manifest and optional signature; add incremental bundle support.
+- [x] Verify and merge imports idempotently and add offline install-from-bundle flow.
+- [x] Prove export/import installation succeeds in a disconnected CI fixture and tampering is rejected.
 
 ### 5.12 Production slimming
 
@@ -455,9 +455,9 @@
 
 ### 6.1 Store-as-registry (`jsm serve`)
 
-- [ ] Implement npm-compatible read API with upstream fallback/cache, configurable policy, token auth, TLS, rate limits, and access logging.
-- [ ] Add health/metrics endpoints and integrity-verified optional LAN/peer fetch.
-- [ ] Test two clients sharing an upstream fetch and verify unauthorized clients cannot retrieve protected data.
+- [x] Implement npm-compatible read API with upstream fallback/cache, configurable policy, token auth, TLS, rate limits, and access logging.
+- [x] Add health/metrics endpoints and integrity-verified optional LAN/peer fetch.
+- [x] Test two clients sharing an upstream fetch and verify unauthorized clients cannot retrieve protected data.
 
 ### 6.2 Remote build cache
 
