@@ -1620,7 +1620,7 @@ fn install(
     _slim: bool,
     no_lockfile: bool,
     cancellation: &CancellationToken,
-    progress: &mut OperationProgress,
+    _progress: &mut OperationProgress,
 ) -> Result<()> {
     ensure_not_cancelled(cancellation)?;
     let config = effective_config(cli, cwd)?;
@@ -1693,51 +1693,96 @@ fn install(
         resolve_lock_explained(&cli, &reg, &importer, &roots, cli.prefer_store, &store)?
     };
     ensure_not_cancelled(cancellation)?;
+    // Collect missing packages for concurrent fetch (pipelined-ish scheduler).
+    let mut missing: Vec<(String, jsm_lockfile::Package)> = Vec::new();
     for (id, package) in &lock.packages {
-        ensure_not_cancelled(cancellation)?;
         let name = PackageName::new(package.name.clone()).into_diagnostic()?;
         let version = Version::parse(&package.version).into_diagnostic()?;
         let version_text = version.to_string();
         let integrity = Integrity::new(package.integrity.clone()).into_diagnostic()?;
-        let _package_lease = store
-            .package_lease(&format!(
-                "{}@{}@{}",
-                name.as_str(),
-                version_text,
-                integrity.as_str()
-            ))
-            .into_diagnostic()?;
         if !store.has_package(name.as_str(), &version_text, integrity.as_str()) {
-            progress.package_started(&format!("Fetching {name}@{version_text}"));
-            let body = reg
-                .download_tarball_resumable(name.as_str(), &package.resolution)
+            missing.push((id.clone(), package.clone()));
+        } else {
+            reference_index
+                .clear_corrupt(name.as_str(), &version_text, integrity.as_str())
                 .into_diagnostic()?;
-            let mut fetch_progress = |event: jsm_fetch::ProgressEvent| {
-                progress.update_detail(&format!(
-                    "Extracting {name}@{version_text}: {} files, {} bytes",
-                    event.entries, event.uncompressed_bytes
-                ));
-                debug!(
-                    package = %name,
-                    entries = event.entries,
-                    uncompressed_bytes = event.uncompressed_bytes,
-                    "package extraction progress"
-                );
-            };
-            extract_tarball_with_options(
-                &store,
-                name.as_str(),
-                &version_text,
-                integrity.as_str(),
-                body,
-                jsm_fetch::ExtractOptions {
-                    limits: Default::default(),
-                    cancellation,
-                    progress: Some(&mut fetch_progress),
-                },
-            )
-            .map_err(|error| miette!("failed to extract package `{id}`: {error}"))?;
         }
+    }
+    if !missing.is_empty() {
+        let concurrency = cli.network_concurrency.unwrap_or(4).max(1).min(missing.len());
+        let show_progress = !cli.json && !cli.quiet;
+        let (tx, rx) = std::sync::mpsc::channel();
+        std::thread::scope(|scope| {
+            // Worker pool
+            let mut handles = Vec::new();
+            let queue = std::sync::Arc::new(std::sync::Mutex::new(missing.clone()));
+            for _ in 0..concurrency {
+                let queue = queue.clone();
+                let tx = tx.clone();
+                let store = store.clone();
+                let reg = reg.clone();
+                let cancellation = cancellation.clone();
+                let show_progress = show_progress;
+                handles.push(scope.spawn(move || {
+                    loop {
+                        let item = {
+                            let mut q = queue.lock().unwrap();
+                            q.pop()
+                        };
+                        let Some((id, package)) = item else { break; };
+                        if cancellation.is_cancelled() {
+                            let _ = tx.send(Err(miette!("cancelled")));
+                            break;
+                        }
+                        let name = PackageName::new(package.name.clone()).unwrap();
+                        let version = Version::parse(&package.version).unwrap();
+                        let version_text = version.to_string();
+                        let integrity = Integrity::new(package.integrity.clone()).unwrap();
+                        if show_progress {
+                            eprintln!("jsm: Fetching {}@{}", name, version_text);
+                        }
+                        let body = match reg.download_tarball_resumable(name.as_str(), &package.resolution) {
+                            Ok(b) => b,
+                            Err(e) => {
+                                let _ = tx.send(Err(miette!("failed to download `{id}`: {e}")));
+                                break;
+                            }
+                        };
+                        if let Err(e) = extract_tarball_with_options(
+                            &store,
+                            name.as_str(),
+                            &version_text,
+                            integrity.as_str(),
+                            body,
+                            jsm_fetch::ExtractOptions {
+                                limits: Default::default(),
+                                cancellation: &cancellation,
+                                progress: None,
+                            },
+                        ) {
+                            let _ = tx.send(Err(miette!("failed to extract package `{id}`: {e}")));
+                            break;
+                        }
+                        let _ = tx.send(Ok(()));
+                    }
+                }));
+            }
+            drop(tx);
+            for h in handles {
+                let _ = h.join();
+            }
+        });
+        // Collect results
+        for result in rx {
+            result?;
+        }
+    }
+    // Clear corrupt for all (already done for cached)
+    for package in lock.packages.values() {
+        let name = PackageName::new(package.name.clone()).into_diagnostic()?;
+        let version = Version::parse(&package.version).into_diagnostic()?;
+        let version_text = version.to_string();
+        let integrity = Integrity::new(package.integrity.clone()).into_diagnostic()?;
         reference_index
             .clear_corrupt(name.as_str(), &version_text, integrity.as_str())
             .into_diagnostic()?;
