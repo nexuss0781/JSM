@@ -14,9 +14,11 @@
 
 ---
 
-## Unchecked Items (Grouped by Feature Area)
+## Unchecked Items (5 Groups)
 
-### 1. Build System & Caching
+### 1. Build, Cache & Native Compilation
+**Covers:** Build keys, local/remote build cache, prebuilt binaries, parallel scheduler, cross-project reuse, CI-to-developer artifact sharing, backend configs (S3/GCS/Azure), signing/rotation, poisoning defenses.
+
 - [ ] Implement build key over package integrity, script hash, runtime ABI, platform, toolchain, allowlisted env, dependency build keys, and sandbox policy
 - [ ] Capture approved build outputs separately from immutable store payloads and store them safely under the build key
 - [ ] Add `cache build list|info|clear|verify`, hit/miss reporting, and cross-project cache reuse tests
@@ -26,13 +28,13 @@
 - [ ] Implement S3-compatible, GCS, Azure Blob, HTTPS, and `jsm serve` backends with read-only/read-write roles
 - [ ] Sign and verify build-key artifacts; implement key rotation, namespace isolation, TTL, audit logs, and poisoning defenses
 - [ ] Test CI-to-developer reuse, tampered artifacts, unauthorized access, and backend failure behavior
-
-### 2. Parallel Build Scheduler
 - [ ] Schedule dependency builds topologically within CPU, memory, and configured concurrency limits
 - [ ] Save per-package logs; sanitize environment; provide standard npm compatibility variables, timeouts, and process-tree cancellation
 - [ ] Verify required failures roll back installs, optional failures are recorded, and cancellation leaves no orphan processes
 
-### 3. Sandbox & Script Security
+### 2. Sandbox, Scripts & Supply-Chain Security
+**Covers:** OS sandbox adapters (Linux/macOS/Windows), escape tests, policy in build keys, default-deny lifecycle scripts, `approve-scripts` workflow, script hash binding, revocation on change, diff/review, provenance verification, Sigstore bundles, registry signatures, OSV/GitHub advisory sync, audit CLI, SARIF/JSON output, `--fix` behavior, tamper/expired/revoked tests.
+
 - [ ] Resolve and document per-OS sandbox capability/default policy before enabling execution; degrade with explicit warning only where the spec allows
 - [ ] Implement Linux, macOS, and Windows least-privilege sandbox adapters with no network by default and bounded read/write paths
 - [ ] Include sandbox policy in build keys and implement explicit `--no-sandbox` opt-out with warning
@@ -43,59 +45,6 @@
 - [ ] Persist approved script hashes and detect changes/new lifecycle scripts on package update
 - [ ] Revoke stale approvals and show reviewable script/file diffs before execution
 - [ ] Test unchanged, modified, newly added, and removed script cases
-
-### 4. Package Insight & Diff Commands
-- [ ] Implement store-backed file/dependency/script/exports/size diff for versions and optional content diff
-- [ ] Add dependency-path and size explanation, duplicate reports with safe suggestions, unused-dependency analysis with ignore/config references, and outdated views
-- [ ] Compare diff against extracted tarballs and measure `unused` precision on a labeled corpus
-- [ ] Implement per-package version/size/dependency/script/exports/provenance/advisory/age change report for `update --review` and interactive selection
-- [ ] Support table and versioned JSON output and reuse local store diff where possible
-- [ ] Test reports with controlled upgrade fixtures covering every reported change category
-
-### 5. Package Executor (`jsm x`) & Zero-Install
-- [ ] Resolve and fetch packages into the shared store and create isolated, lockfile-keyed ephemeral environments
-- [ ] Add bin disambiguation, multiple `--package` support, TTL for floating ranges, and `--refresh`
-- [ ] Enforce script policy/sandbox availability and benchmark warm invocation against the specified budget
-- [ ] Parse inline dependency declarations and resolve them into isolated cached ephemeral environments
-- [ ] Support optional reproducibility sidecar and configured Node/Bun/Deno runtime/TypeScript loader selection
-- [ ] Test first run with no project files and warm rerun against the specified budget
-
-### 6. Release & Resolution Policies
-- [ ] Implement minimum release age, per-package exceptions, exclusion explanations, lowest/lowest-direct, and time-based `--before` resolution
-- [ ] Document precedence with locks, explicit updates, and store preference
-- [ ] Test deterministic behavior using fixture publish timestamps, including cases where cooldown leaves no eligible version
-
-### 7. Compatibility Corpus & CI
-- [ ] Build isolated top-1,000 package install/load corpus and 100+ real repository corpus with their test scripts
-- [ ] Compare dependency trees/runtime behavior with npm and pnpm; classify known differences and block unreviewed regressions
-- [ ] Run nightly/release-candidate tests across Linux glibc/musl, macOS, and Windows; publish dashboard and known issues
-- [ ] Reach 95% Corpus A at Phase 4 gate and define tracking to 98% for v1.0
-
-### 8. Enterprise Networking & Registry Auth
-- [ ] Implement scoped/per-registry bearer/basic and npm auth compatibility plus credential-helper integration where supported
-- [ ] Add HTTP(S) proxy, `NO_PROXY`, custom CA, client certificates, and registry mirror/fallback health policy
-- [ ] Define and secure any CI OIDC token extension point; never persist credentials in lockfiles, store, logs, or diagnostics
-- [ ] Test authenticated fake registry, proxy, custom-CA endpoint, and failover paths
-
-### 9. Workspaces & Monorepo
-- [ ] Discover workspace globs, exclusions, local packages, and supported `workspace:` ranges with publish-time rewriting
-- [ ] Implement one importer-aware lockfile, filters (including git-changed/dependency/dependent forms), and workspace-aware commands
-- [ ] Implement recursive script execution with topological ordering, parallelism, streaming, and bail policy; test 100-package fixture
-- [ ] Implement named/default catalogs and `catalog:` protocol
-- [ ] Implement package/parent/range overrides, resolutions, dependency references, unused-override warnings, and update-by-catalog
-- [ ] Document and test precedence, nested selectors, and scoped package behavior
-
-### 10. Patching
-- [ ] Implement safe extraction to a working copy, patch diff/commit/remove, and content-hash registration
-- [ ] Apply patches only to per-project mutable materializations; include patch hashes in lockfile/cache keys
-- [ ] Test store immutability and clear hunk-level diagnostics when patches stop applying
-
-### 11. Lockfile Migration
-- [ ] Implement importers for package-lock v1/v2/v3, shrinkwrap, Yarn Classic/Berry, pnpm, and Bun formats as specified
-- [ ] Implement `migrate --from`, dry-run/diff, integrity checks, precise untranslated-entry report, optional exporters, and opt-in old-lockfile removal
-- [ ] Import applicable ecosystem configuration without silently overriding user settings; test Corpus B resolution preservation target
-
-### 12. Supply Chain Security (Provenance, Audit)
 - [ ] Implement registry signature verification and key rotation/cache handling
 - [ ] Verify npm provenance/Sigstore bundles including certificate, transparency inclusion, and builder identity
 - [ ] Implement off/warn/require policy, exceptions, non-regression signal, compact lockfile status, and offline verification with cached material
@@ -104,18 +53,37 @@
 - [ ] Implement `audit` filters, dependency paths, threshold exit behavior, justified expiring exceptions, and SARIF/JSON output
 - [ ] Test results against reference scanners on fixtures and ensure `--fix` review/application behavior is explicit
 
-### 13. Store Export/Import & Production Slimming
-- [ ] Implement minimal lockfile/package store bundle with integrity manifest and optional signature; add incremental bundle support
-- [ ] Verify and merge imports idempotently and add offline install-from-bundle flow
-- [ ] Prove export/import installation succeeds in a disconnected CI fixture and tampering is rejected
-- [ ] Implement production-only installs, conservative opt-in slim rules/allow-deny config, and self-contained workspace deploy output
-- [ ] Report size before/after; preserve files required by runtime exports and package semantics
-- [ ] Run runtime smoke tests for slimmed compatibility corpus outputs
-- [ ] Implement deterministic dependency/app layers, Docker-oriented install mode, and documented BuildKit store-cache mounts
-- [ ] Add CycloneDX/SPDX SBOM generation for deploy output
-- [ ] Benchmark reference Dockerfiles against npm/pnpm for build time and image size; publish methodology
+### 3. Package Insight, Diff & Executor
+**Covers:** `diff` (file/dep/script/exports/size), `dupes`, `unused`, `outdated`, `why --size`, update review report, `jsm x` ephemeral envs, bin disambiguation, TTL/refresh, zero-install inline deps, reproducibility sidecar, runtime/TS loader selection, benchmarks.
 
-### 14. Release Engineering & Documentation
+- [ ] Implement store-backed file/dependency/script/exports/size diff for versions and optional content diff
+- [ ] Add dependency-path and size explanation, duplicate reports with safe suggestions, unused-dependency analysis with ignore/config references, and outdated views
+- [ ] Compare diff against extracted tarballs and measure `unused` precision on a labeled corpus
+- [ ] Implement per-package version/size/dependency/script/exports/provenance/advisory/age change report for `update --review` and interactive selection
+- [ ] Support table and versioned JSON output and reuse local store diff where possible
+- [ ] Test reports with controlled upgrade fixtures covering every reported change category
+- [ ] Resolve and fetch packages into the shared store and create isolated, lockfile-keyed ephemeral environments
+- [ ] Add bin disambiguation, multiple `--package` support, TTL for floating ranges, and `--refresh`
+- [ ] Enforce script policy/sandbox availability and benchmark warm invocation against the specified budget
+- [ ] Parse inline dependency declarations and resolve them into isolated cached ephemeral environments
+- [ ] Support optional reproducibility sidecar and configured Node/Bun/Deno runtime/TypeScript loader selection
+- [ ] Test first run with no project files and warm rerun against the specified budget
+
+### 4. Workspaces, Migration & Release Engineering
+**Covers:** Workspace discovery/filters, `workspace:` protocol, recursive runs with topo ordering, catalogs/overrides/resolutions, patch extraction/diff/application, lockfile importers (npm/Yarn/pnpm/Bun), migrate CLI, dry-run/diff, integrity checks, provenance/audit/docs/release engineering, SBOM, self-update, versioning/migration, SECURITY.md, dependency automation, signed artifacts, distribution channels, migration compat tests, command/config references, examples/links/schemas validation, migration/ws/CI/Docker/cache recipes.
+
+- [ ] Discover workspace globs, exclusions, local packages, and supported `workspace:` ranges with publish-time rewriting
+- [ ] Implement one importer-aware lockfile, filters (including git-changed/dependency/dependent forms), and workspace-aware commands
+- [ ] Implement recursive script execution with topological ordering, parallelism, streaming, and bail policy; test 100-package fixture
+- [ ] Implement named/default catalogs and `catalog:` protocol
+- [ ] Implement package/parent/range overrides, resolutions, dependency references, unused-override warnings, and update-by-catalog
+- [ ] Document and test precedence, nested selectors, and scoped package behavior
+- [ ] Implement safe extraction to a working copy, patch diff/commit/remove, and content-hash registration
+- [ ] Apply patches only to per-project mutable materializations; include patch hashes in lockfile/cache keys
+- [ ] Test store immutability and clear hunk-level diagnostics when patches stop applying
+- [ ] Implement importers for package-lock v1/v2/v3, shrinkwrap, Yarn Classic/Berry, pnpm, and Bun formats as specified
+- [ ] Implement `migrate --from`, dry-run/diff, integrity checks, precise untranslated-entry report, optional exporters, and opt-in old-lockfile removal
+- [ ] Import applicable ecosystem configuration without silently overriding user settings; test Corpus B resolution preservation target
 - [ ] Implement reproducible release builds, signed artifacts/checksums/SBOM, CI-only tagged release candidate, and supported distribution channels
 - [ ] Add verified self-update with stable/beta channels; define CLI, JSON, lockfile, and store versioning/deprecation/migration policy
 - [ ] Add `SECURITY.md`, vulnerability disclosure process, and dependency-update automation
@@ -124,33 +92,27 @@
 - [ ] Add npm/Yarn/pnpm/Bun migration, workspace, CI, Docker, and cache recipes
 - [ ] Validate command/config examples, links, schemas, and docs snippets in CI; ensure every command and config key is documented
 
-### 15. Registry-as-a-Service (`jsm serve`)
+### 5. Registry Services, Daemon & Advanced Extensions
+**Covers:** `jsm serve` (npm API, auth/TLS/rate-limits, health/metrics, LAN peer fetch), sparse registry index (sharded incremental, delta/ETag, fallback), Merkle sync (roots/subtrees, signed roots, fast verify, tamper detection), daemon (local socket, metadata warming, watch/prefetch, git hooks, idle maintenance, resource limits, parity), capabilities (network/process/fs/env/native/dynamic-code/obfuscation, update/diff surface, precision/recall), typosquat (edit/confusable/scope-impersonation, popularity bundle, false-positive rate), Phase 7: chunk store (FastCDC/zstd, migration/rollback), TUI (ratatui, views, themes, fallback), runtime manager (verified downloads, pins/.nvmrc, ABI→build keys), virtual linker (FUSE/ProjectedFS, lazy materialization, fallback), editor/CI integrations (schemas, diagnostics, VS Code, GitHub Actions), plugin API (WASI/JSON-RPC, manifest/perms, signatures, enforcement).
+
 - [ ] Implement npm-compatible read API with upstream fallback/cache, configurable policy, token auth, TLS, rate limits, and access logging
 - [ ] Add health/metrics endpoints and integrity-verified optional LAN/peer fetch
 - [ ] Test two clients sharing an upstream fetch and verify unauthorized clients cannot retrieve protected data
-
-### 16. Sparse Registry Index & Merkle Sync
 - [ ] Specify and version a sharded incremental compressed index with delta/ETag synchronization
 - [ ] Implement client cache and optional generation/server mode; fall back to the standard registry metadata API
 - [ ] Prove warm-index large-fixture resolution uses zero per-package network requests and remains correct after updates
 - [ ] Maintain Merkle roots/subtrees for package manifests and blobs and define signed root behavior for bundles/served stores
 - [ ] Implement fast verification and store/bundle synchronization by subtree comparison
 - [ ] Test tampering/divergence detection and meet the unchanged-store verification improvement target
-
-### 16. Optional Daemon (`jsmd`)
 - [ ] Implement versioned local socket/named-pipe protocol with user-only permissions and no remote control interface
 - [ ] Add opt-in metadata warming, project watch/prefetch, optional git hooks, idle maintenance, resource limits, and daemon diagnostics
 - [ ] Verify every CLI operation has equivalent daemon-free behavior and branch checkout prefetch meets its acceptance target
-
-### 17. Capability Analysis & Typosquat
 - [ ] Analyze and cache package capabilities for network, process, filesystem, environment, native loading, dynamic code, and obfuscation indicators
 - [ ] Surface changes in update/diff and implement configurable policy plus `capabilities` output
 - [ ] Measure precision/recall on benign and safe malicious-sample datasets; add false-positive controls
 - [ ] Implement popular-name edit/confusable/scope-impersonation checks and metadata anomaly hints for new dependencies
 - [ ] Bundle/update popularity data and make strictness configurable with offline behavior
 - [ ] Test known typosquat samples and quantify false positives on the popular-name corpus
-
-### 17. Advanced Extensions (Phase 7)
 - [ ] Implement content-defined chunking and zstd for eligible large files, retaining whole-file blobs for small files
 - [ ] Implement transparent reconstruction, integrity, resumable migration, rollback, and bounded cache behavior
 - [ ] Test disk savings on many package versions and keep materialization within the approved regression tolerance
