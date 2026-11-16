@@ -386,7 +386,7 @@ pub(super) fn store_command(
                         .insert(name.to_owned(), range.to_owned());
                     roots.push(DependencySpec::new(package, spec));
                 }
-                super::resolve_lock(&remote, &importer, &roots)?
+                super::resolve_lock(&remote, &importer, &roots, false, &store)?
             };
             let _lease = store.maintenance_lease(true).into_diagnostic()?;
             prefetch_lock(&remote, &store, &registry, &lock, cancellation)?;

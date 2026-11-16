@@ -67,6 +67,8 @@ struct Cli {
     #[arg(long, global = true)]
     prefer_offline: bool,
     #[arg(long, global = true)]
+    prefer_store: bool,
+    #[arg(long, global = true)]
     store_dir: Option<PathBuf>,
     #[arg(long, global = true)]
     registry: Option<String>,
@@ -654,12 +656,12 @@ fn run(cli: Cli, cancellation: &CancellationToken) -> Result<()> {
         Command::Serve { port } => phase6::serve(&cli, port),
         Command::Cache { command } => match command {
             CacheCommand::Build { command } => match command {
-                CacheSubcommand::List => phase6::cache_build_list(&cli),
-                CacheSubcommand::Clear => phase6::cache_build_clear(&cli),
+                CacheSubcommand::List => phase6::cache_build_list(&cli, &cwd),
+                CacheSubcommand::Clear => phase6::cache_build_clear(&cli, &cwd),
             },
             CacheCommand::Materialization { command } => match command {
-                CacheSubcommand::List => phase6::cache_materialization_list(&cli),
-                CacheSubcommand::Clear => phase6::cache_materialization_clear(&cli),
+                CacheSubcommand::List => phase6::cache_materialization_list(&cli, &cwd),
+                CacheSubcommand::Clear => phase6::cache_materialization_clear(&cli, &cwd),
             },
         },
         Command::Ui => phase7::ui(&cli),
@@ -1097,6 +1099,8 @@ fn to_registry_auth(a: Credential) -> jsm_registry::Auth {
 #[derive(Clone)]
 struct RegistryProvider {
     registry: Registry,
+    store: Option<Store>,
+    prefer_store: bool,
 }
 
 impl Provider for RegistryProvider {
@@ -1154,11 +1158,17 @@ impl Provider for RegistryProvider {
                 }
             }
             optional_dependencies.retain(|name, _| !dependencies.contains_key(name));
-            let mut candidate = Candidate::new(version);
+            let mut candidate = Candidate::new(version.clone());
             candidate.dependencies = dependencies;
             candidate.optional_dependencies = optional_dependencies;
             candidate.dist_tags = tags.clone();
             candidate.deprecated = metadata.deprecated;
+            if self.prefer_store
+                && let Some(store) = &self.store
+                && let Some(integrity) = &metadata.dist.integrity
+            {
+                candidate.in_store = store.has_package(package.as_str(), &version.to_string(), integrity);
+            }
             out.push(candidate);
         }
         Ok(out)
@@ -1255,7 +1265,13 @@ fn manifest_importer(m: &Value, prod: bool) -> Result<(Importer, Vec<DependencyS
     Ok((importer, roots))
 }
 
-fn resolve_lock(reg: &Registry, importer: &Importer, roots: &[DependencySpec]) -> Result<Lockfile> {
+fn resolve_lock(
+    reg: &Registry,
+    importer: &Importer,
+    roots: &[DependencySpec],
+    prefer_store: bool,
+    store: &Store,
+) -> Result<Lockfile> {
     let optional_roots = importer
         .optional_dependencies
         .iter()
@@ -1268,6 +1284,8 @@ fn resolve_lock(reg: &Registry, importer: &Importer, roots: &[DependencySpec]) -
         .collect::<Result<Vec<_>>>()?;
     let resolution = Resolver::new(RegistryProvider {
         registry: reg.clone(),
+        store: Some(store.clone()),
+        prefer_store,
     })
     .resolve_with_optional::<RegistryError>(roots, &optional_roots)
     .into_diagnostic()?;
@@ -1448,7 +1466,7 @@ fn install(
     let lock_path = cwd.join("jsm.lock");
     let reg = registry(&config, cli, cwd)?;
     let lock = if no_lockfile {
-        resolve_lock(&reg, &importer, &roots)?
+        resolve_lock(&reg, &importer, &roots, cli.prefer_store, &store)?
     } else if lock_path.exists() {
         let existing = Lockfile::read(&lock_path).map_err(|error| CommandExit {
             code: 6,
@@ -1467,7 +1485,7 @@ fn install(
                 }
                 .into());
             }
-            resolve_lock(&reg, &importer, &roots)?
+            resolve_lock(&reg, &importer, &roots, cli.prefer_store, &store)?
         } else if existing.lockfile_version == jsm_lockfile::LEGACY_LOCKFILE_VERSION {
             if frozen {
                 existing
@@ -1477,7 +1495,7 @@ fn install(
                         message: error.to_string(),
                     })?
             } else {
-                resolve_lock(&reg, &importer, &roots)?
+                resolve_lock(&reg, &importer, &roots, cli.prefer_store, &store)?
             }
         } else {
             existing
@@ -1490,7 +1508,7 @@ fn install(
             }
             .into());
         }
-        resolve_lock(&reg, &importer, &roots)?
+        resolve_lock(&reg, &importer, &roots, cli.prefer_store, &store)?
     };
     ensure_not_cancelled(cancellation)?;
     for (id, package) in &lock.packages {

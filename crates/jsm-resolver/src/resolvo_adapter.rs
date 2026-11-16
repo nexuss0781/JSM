@@ -426,9 +426,14 @@ where
         solvables.sort_by(|left, right| {
             let left = &self.pool.resolve_solvable(*left).record.0;
             let right = &self.pool.resolve_solvable(*right).record.0;
-            left.deprecated
-                .is_some()
-                .cmp(&right.deprecated.is_some())
+            right
+                .in_store
+                .cmp(&left.in_store)
+                .then_with(|| {
+                    left.deprecated
+                        .is_some()
+                        .cmp(&right.deprecated.is_some())
+                })
                 .then_with(|| right.version.cmp(&left.version))
                 .then_with(|| format!("{left:?}").cmp(&format!("{right:?}")))
         });

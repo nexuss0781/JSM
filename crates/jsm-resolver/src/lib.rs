@@ -24,6 +24,8 @@ pub struct Candidate {
     pub dist_tags: BTreeMap<DistTag, Version>,
     /// A deprecation message. Deprecated versions remain usable but are a soft preference.
     pub deprecated: Option<String>,
+    /// Whether this candidate is already present in the local store. Used for store-aware resolution.
+    pub in_store: bool,
 }
 
 impl Candidate {
@@ -34,15 +36,20 @@ impl Candidate {
             optional_dependencies: BTreeMap::new(),
             dist_tags: BTreeMap::new(),
             deprecated: None,
+            in_store: false,
         }
     }
 }
 
 fn sort_candidates(candidates: &mut [Candidate]) {
     candidates.sort_by(|a, b| {
-        a.deprecated
-            .is_some()
-            .cmp(&b.deprecated.is_some())
+        b.in_store
+            .cmp(&a.in_store)
+            .then_with(|| {
+                a.deprecated
+                    .is_some()
+                    .cmp(&b.deprecated.is_some())
+            })
             .then_with(|| b.version.cmp(&a.version))
             .then_with(|| format!("{:?}", a).cmp(&format!("{:?}", b)))
     });
@@ -303,9 +310,13 @@ impl<P> Resolver<P> {
                         source,
                     })?;
             cs.sort_by(|a, b| {
-                a.deprecated
-                    .is_some()
-                    .cmp(&b.deprecated.is_some())
+                b.in_store
+                    .cmp(&a.in_store)
+                    .then_with(|| {
+                        a.deprecated
+                            .is_some()
+                            .cmp(&b.deprecated.is_some())
+                    })
                     .then_with(|| b.version.cmp(&a.version))
                     .then_with(|| format!("{:?}", a).cmp(&format!("{:?}", b)))
             });

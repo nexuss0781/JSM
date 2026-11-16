@@ -29,7 +29,7 @@ pub fn serve(cli: &Cli, port: u16) -> Result<()> {
     Ok(())
 }
 
-pub fn cache_build_list(cli: &Cli) -> Result<()> {
+pub fn cache_build_list(cli: &Cli, _cwd: &Path) -> Result<()> {
     if cli.json {
         emit_json("cache", serde_json::json!({"command":"cache","type":"build","entries":[]}));
     } else if !cli.quiet {
@@ -38,7 +38,7 @@ pub fn cache_build_list(cli: &Cli) -> Result<()> {
     Ok(())
 }
 
-pub fn cache_build_clear(cli: &Cli) -> Result<()> {
+pub fn cache_build_clear(cli: &Cli, _cwd: &Path) -> Result<()> {
     if cli.json {
         emit_json("cache", serde_json::json!({"command":"cache","type":"build","cleared":true}));
     } else if !cli.quiet {
@@ -47,16 +47,30 @@ pub fn cache_build_clear(cli: &Cli) -> Result<()> {
     Ok(())
 }
 
-pub fn cache_materialization_list(cli: &Cli) -> Result<()> {
+pub fn cache_materialization_list(cli: &Cli, cwd: &Path) -> Result<()> {
+    let store = Store::open_for_project(cwd, cli.store_dir.as_deref()).into_diagnostic()?;
+    let dir = store.root().join("materialization");
+    let mut entries = Vec::new();
+    if let Ok(read) = fs::read_dir(&dir) {
+        for entry in read.flatten() {
+            entries.push(entry.file_name().to_string_lossy().to_string());
+        }
+    }
     if cli.json {
-        emit_json("cache", serde_json::json!({"command":"cache","type":"materialization","entries":[]}));
+        emit_json("cache", serde_json::json!({"command":"cache","type":"materialization","entries":entries}));
     } else if !cli.quiet {
-        println!("no materialization cache entries");
+        for e in &entries {
+            println!("{e}");
+        }
     }
     Ok(())
 }
 
-pub fn cache_materialization_clear(cli: &Cli) -> Result<()> {
+pub fn cache_materialization_clear(cli: &Cli, cwd: &Path) -> Result<()> {
+    let store = Store::open_for_project(cwd, cli.store_dir.as_deref()).into_diagnostic()?;
+    let dir = store.root().join("materialization");
+    let _ = fs::remove_dir_all(&dir);
+    let _ = fs::create_dir_all(&dir);
     if cli.json {
         emit_json("cache", serde_json::json!({"command":"cache","type":"materialization","cleared":true}));
     } else if !cli.quiet {

@@ -49,6 +49,7 @@ Options:
       --verbose                
       --offline                
       --prefer-offline         
+      --prefer-store           
       --store-dir <STORE_DIR>  
       --registry <REGISTRY>    
       --no-color               
