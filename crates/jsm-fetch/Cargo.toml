@@ -12,6 +12,7 @@ path = "src/lib.rs"
 flate2.workspace = true
 jsm-security = { path = "../jsm-security" }
 jsm-store = { path = "../jsm-store" }
+serde_json.workspace = true
 sha2.workspace = true
 tar.workspace = true
 thiserror.workspace = true

@@ -19,16 +19,16 @@
 ### 1. Build, Cache & Native Compilation
 **Covers:** Build keys, local/remote build cache, prebuilt binaries, parallel scheduler, cross-project reuse, CI-to-developer artifact sharing, backend configs (S3/GCS/Azure), signing/rotation, poisoning defenses.
 
-- [ ] Implement build key over package integrity, script hash, runtime ABI, platform, toolchain, allowlisted env, dependency build keys, and sandbox policy
-- [ ] Capture approved build outputs separately from immutable store payloads and store them safely under the build key
+- [x] Implement build key over package integrity, script hash, runtime ABI, platform, toolchain, allowlisted env, dependency build keys, and sandbox policy
+- [x] Capture approved build outputs separately from immutable store payloads and store them safely under the build key
 - [ ] Add `cache build list|info|clear|verify`, hit/miss reporting, and cross-project cache reuse tests
-- [ ] Implement resolution order: local cache, trusted remote cache when enabled, platform packages, recognized prebuild conventions, then controlled compilation
+- [x] Implement resolution order: local cache, trusted remote cache when enabled, platform packages, recognized prebuild conventions, then controlled compilation
 - [ ] Fetch prebuilds through verified CAS pipeline; never permit arbitrary lifecycle script downloads to bypass controls
 - [ ] Test top native packages/platforms and report cache/prebuilt/compiled result
 - [ ] Implement S3-compatible, GCS, Azure Blob, HTTPS, and `jsm serve` backends with read-only/read-write roles
 - [ ] Sign and verify build-key artifacts; implement key rotation, namespace isolation, TTL, audit logs, and poisoning defenses
 - [ ] Test CI-to-developer reuse, tampered artifacts, unauthorized access, and backend failure behavior
-- [ ] Schedule dependency builds topologically within CPU, memory, and configured concurrency limits
+- [x] Schedule dependency builds topologically within CPU, memory, and configured concurrency limits
 - [ ] Save per-package logs; sanitize environment; provide standard npm compatibility variables, timeouts, and process-tree cancellation
 - [ ] Verify required failures roll back installs, optional failures are recorded, and cancellation leaves no orphan processes
 

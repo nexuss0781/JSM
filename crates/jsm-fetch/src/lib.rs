@@ -5,7 +5,7 @@
 //! manifest (the package commit point) is published only after the complete
 //! compressed stream has passed SRI verification.
 use flate2::read::MultiGzDecoder;
-use jsm_security::{SafetyError, validate_path, validate_symlink, verify_sha512_digest};
+use jsm_security::{SafetyError, validate_path, validate_symlink, verify_sha512_digest, sha512_sri};
 use jsm_store::{ManifestEntry, PackageManifest, StagedBlob, Store, StoreError};
 use sha2::{Digest, Sha512};
 use std::collections::HashSet;
@@ -178,6 +178,7 @@ pub fn extract_tarball_with_options<R: Read>(
     let mut total_file_bytes = 0u64;
     let mut entry_count = 0usize;
     let mut has_package_json = false;
+    let mut package_json_content: Option<Vec<u8>> = None;
 
     for item in archive.entries()? {
         if cancellation.is_cancelled() {
@@ -253,20 +254,24 @@ pub fn extract_tarball_with_options<R: Read>(
             return Err(FetchError::Limit("total file size".into()));
         }
         let mut counted = CountedReader::new(&mut entry);
-        let staged = match store.stage_blob_stream(&mut counted) {
-            Ok(staged) => staged,
-            Err(_error) if cancellation.is_cancelled() => return Err(FetchError::Cancelled),
-            Err(error) => return Err(error.into()),
-        };
-        let hash = staged.hash.clone();
-        if counted.bytes != declared {
+        // Read all content first for validation and potential package.json extraction
+        let mut content = Vec::new();
+        io::copy(&mut counted, &mut content)?;
+        
+        if (content.len() as u64) != declared {
             return Err(FetchError::Limit(
                 "truncated or oversized archive entry".into(),
             ));
         }
+        
+        let _hash = sha512_sri(&content);
         if path == "package.json" {
             has_package_json = true;
+            package_json_content = Some(content.clone());
         }
+        
+        let staged = store.stage_blob_stream(&mut std::io::Cursor::new(&content))?;
+        let hash = staged.hash.clone();
         let mode = entry.header().mode().unwrap_or(0);
         entries.push(ManifestEntry {
             path,
@@ -318,7 +323,8 @@ pub fn extract_tarball_with_options<R: Read>(
         version: version.into(),
         integrity: expected_integrity.into(),
         entries,
-        package_json: None,
+        package_json: package_json_content
+            .and_then(|content| serde_json::from_slice(&content).ok()),
     };
     store.put_package_manifest(&manifest)?;
     Ok(manifest)

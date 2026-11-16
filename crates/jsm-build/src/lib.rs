@@ -8,17 +8,17 @@
 
 use jsm_core::{Integrity, PackageName, Version};
 use jsm_security::{SandboxPolicy, SandboxError, Sandbox};
-use jsm_store::{Store, PackageManifest, StagedBlob};
+use jsm_store::{Store, PackageManifest};
 use serde::{Deserialize, Serialize};
 use sha2::{Digest, Sha256};
-use std::collections::{BTreeMap, BTreeSet, HashMap};
+use std::collections::{BTreeMap, BTreeSet};
 use std::path::{Path, PathBuf};
-use std::process::{Command, Stdio};
+use std::process::Command;
 use std::sync::{Arc, Mutex};
 use std::time::{Duration, SystemTime, UNIX_EPOCH};
 use thiserror::Error;
 use tokio::sync::Semaphore;
-use tracing::{debug, info, warn};
+use tracing::info;
 
 pub const CRATE_NAME: &str = "jsm-build";
 
@@ -54,6 +54,7 @@ pub struct BuildPlatform {
 
 impl BuildKey {
     /// Compute a build key for a package.
+    #[allow(clippy::too_many_arguments)]
     pub fn compute(
         package_integrity: &Integrity,
         script_hash: &str,
@@ -117,6 +118,7 @@ pub struct BuildResult {
 
 /// Local build cache storing build results by build key.
 pub struct BuildCache {
+    #[allow(dead_code)]
     store: Store,
     cache_dir: PathBuf,
     index: Arc<Mutex<BuildCacheIndex>>,
@@ -129,7 +131,7 @@ struct BuildCacheIndex {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
-struct BuildCacheEntry {
+pub struct BuildCacheEntry {
     build_key: BuildKey,
     result: BuildResult,
     size_bytes: u64,
@@ -338,30 +340,30 @@ pub fn compute_toolchain_fingerprint() -> String {
     let mut parts = Vec::new();
     
     // Try to get compiler versions
-    if let Ok(output) = Command::new("cc").arg("--version").output() {
-        if let Ok(version) = String::from_utf8(output.stdout) {
-            parts.push(version.lines().next().unwrap_or("").to_string());
-        }
+    if let Ok(output) = Command::new("cc").arg("--version").output()
+        && let Ok(version) = String::from_utf8(output.stdout)
+    {
+        parts.push(version.lines().next().unwrap_or("").to_string());
     }
     
-    if let Ok(output) = Command::new("c++").arg("--version").output() {
-        if let Ok(version) = String::from_utf8(output.stdout) {
-            parts.push(version.lines().next().unwrap_or("").to_string());
-        }
+    if let Ok(output) = Command::new("c++").arg("--version").output()
+        && let Ok(version) = String::from_utf8(output.stdout)
+    {
+        parts.push(version.lines().next().unwrap_or("").to_string());
     }
     
     // Node-gyp version
-    if let Ok(output) = Command::new("node-gyp").arg("--version").output() {
-        if let Ok(version) = String::from_utf8(output.stdout) {
-            parts.push(format!("node-gyp:{}", version.trim()));
-        }
+    if let Ok(output) = Command::new("node-gyp").arg("--version").output()
+        && let Ok(version) = String::from_utf8(output.stdout)
+    {
+        parts.push(format!("node-gyp:{}", version.trim()));
     }
     
     // Python version (used by node-gyp)
-    if let Ok(output) = Command::new("python3").arg("--version").output() {
-        if let Ok(version) = String::from_utf8(output.stdout) {
-            parts.push(version.trim().to_string());
-        }
+    if let Ok(output) = Command::new("python3").arg("--version").output()
+        && let Ok(version) = String::from_utf8(output.stdout)
+    {
+        parts.push(version.trim().to_string());
     }
     
     let combined = parts.join("|");
@@ -372,19 +374,19 @@ pub fn compute_toolchain_fingerprint() -> String {
 /// Detect Node ABI version for the current Node.js installation.
 pub fn detect_node_abi() -> String {
     // Try to get from node directly
-    if let Ok(output) = Command::new("node").args(["-p", "process.versions.modules"]).output() {
-        if let Ok(version) = String::from_utf8(output.stdout) {
-            return version.trim().to_string();
-        }
+    if let Ok(output) = Command::new("node").args(["-p", "process.versions.modules"]).output()
+        && let Ok(version) = String::from_utf8(output.stdout)
+    {
+        return version.trim().to_string();
     }
     
     // Fallback: try to infer from node version
-    if let Ok(output) = Command::new("node").arg("--version").output() {
-        if let Ok(version) = String::from_utf8(output.stdout) {
-            let v = version.trim().trim_start_matches('v');
-            // Simple mapping - in reality this would use a proper ABI table
-            return format!("abi-{}", v);
-        }
+    if let Ok(output) = Command::new("node").arg("--version").output()
+        && let Ok(version) = String::from_utf8(output.stdout)
+    {
+        let v = version.trim().trim_start_matches('v');
+        // Simple mapping - in reality this would use a proper ABI table
+        return format!("abi-{}", v);
     }
     
     "unknown".to_string()
@@ -393,6 +395,7 @@ pub fn detect_node_abi() -> String {
 /// Parallel build scheduler with topological ordering.
 pub struct BuildScheduler {
     /// Maximum concurrent builds
+    #[allow(dead_code)]
     max_concurrency: usize,
     /// Semaphore for limiting concurrency
     semaphore: Arc<Semaphore>,
@@ -472,7 +475,7 @@ impl BuildScheduler {
         let start = SystemTime::now();
         
         // Execute build in sandbox
-        let result = self.execute_build(&task).await?;
+        let result = self.execute_build(task).await?;
         
         let duration = start.elapsed().unwrap_or(Duration::from_secs(0)).as_millis() as u64;
         
@@ -595,7 +598,7 @@ impl BuildGraph {
         let mut adj: BTreeMap<PackageName, Vec<PackageName>> = BTreeMap::new();
         
         // Initialize
-        for (node, deps) in &self.nodes {
+        for node in self.nodes.keys() {
             in_degree.insert(node.clone(), 0);
             adj.entry(node.clone()).or_default();
         }
@@ -680,11 +683,11 @@ impl PrebuiltResolver {
     /// Try to resolve a prebuilt binary for a package.
     /// Returns the build key if found, None otherwise.
     pub fn resolve(
-        package_name: &PackageName,
-        version: &Version,
-        integrity: &Integrity,
-        node_abi: &str,
-        platform: &BuildPlatform,
+        _package_name: &PackageName,
+        _version: &Version,
+        _integrity: &Integrity,
+        _node_abi: &str,
+        _platform: &BuildPlatform,
     ) -> Option<BuildKey> {
         // Check known prebuild patterns
         // This would query npm registry for prebuild metadata
@@ -693,7 +696,7 @@ impl PrebuiltResolver {
     }
     
     /// Check if a package has prebuilt binaries available.
-    pub fn has_prebuilt(package_name: &PackageName, version: &Version) -> bool {
+    pub fn has_prebuilt(_package_name: &PackageName, _version: &Version) -> bool {
         // Would check registry for prebuild metadata
         false
     }
@@ -706,7 +709,9 @@ mod tests {
     
     #[test]
     fn test_build_key_computation() {
-        let integrity = Integrity::new("sha512-abc123".to_string()).unwrap();
+        // Use a valid 64-byte sha512 hash in base64 (64 bytes = 88 base64 chars)
+        // This is sha512 of "test"
+        let integrity = Integrity::new("sha512-7iaw3Ur350mqGo7jwQrpkj9hiYB3Lkc/iBml1JQODbJ6wYX4oOHV+E+IvIh/1nsUNzLDBMxfqa2Ob1f1ACio/w==".to_string()).unwrap();
         let platform = BuildPlatform {
             os: "linux".to_string(),
             cpu: "x64".to_string(),
@@ -724,7 +729,7 @@ mod tests {
             &SandboxPolicy::default(),
         );
         
-        assert_eq!(key.package_integrity, "sha512-abc123");
+        assert_eq!(key.package_integrity, "sha512-7iaw3Ur350mqGo7jwQrpkj9hiYB3Lkc/iBml1JQODbJ6wYX4oOHV+E+IvIh/1nsUNzLDBMxfqa2Ob1f1ACio/w==");
         assert_eq!(key.node_abi, "108");
         assert!(!key.cache_key().is_empty());
     }

@@ -1176,6 +1176,7 @@ dependencies = [
  "jsm-security",
  "jsm-store",
  "jsm-testkit",
+ "serde_json",
  "sha2",
  "tar",
  "tempfile",

@@ -1745,7 +1745,6 @@ fn install(
                 let store = store.clone();
                 let reg = reg.clone();
                 let cancellation = cancellation.clone();
-                let show_progress = show_progress;
                 handles.push(scope.spawn(move || {
                     loop {
                         let item = {

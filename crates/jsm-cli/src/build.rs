@@ -1,19 +1,14 @@
 use super::*;
 use jsm_build::{
     BuildCache, BuildKey, BuildPlatform, BuildScheduler, BuildTask, BuildScriptConfig,
-    compute_script_hash, compute_toolchain_fingerprint, detect_node_abi,
 };
-use jsm_core::{DependencySpec, Integrity, PackageName, Spec};
+use jsm_core::{Integrity, PackageName};
 use jsm_lockfile::{Lockfile, Package};
 use jsm_security::SandboxPolicy;
 use jsm_store::Store;
-use sha2::{Digest, Sha256};
 use std::collections::{BTreeMap, BTreeSet};
 use std::sync::Arc;
 use std::time::Duration;
-use tokio::sync::Semaphore;
-use tracing::{debug, info, warn};
-use hex;
 
 pub fn build_command(
     cli: &Cli,
@@ -21,11 +16,11 @@ pub fn build_command(
     package: Option<String>,
     all: bool,
     dry_run: bool,
-    cancellation: &CancellationToken,
-    progress: &mut OperationProgress,
+    _cancellation: &CancellationToken,
+    _progress: &mut OperationProgress,
 ) -> Result<()> {
     let store = Store::open_for_project(cwd, cli.store_dir.as_deref()).into_diagnostic()?;
-    let reference_registry = store.reference_registry().into_diagnostic()?;
+    let _reference_registry = store.reference_registry().into_diagnostic()?;
     let lock_path = cwd.join("jsm.lock");
     
     if !lock_path.exists() {
@@ -113,7 +108,7 @@ pub fn build_command(
 
 fn collect_all_native_packages(store: &Store, lock: &Lockfile) -> Result<Vec<BuildTask>> {
     let mut tasks = Vec::new();
-    for (_, pkg) in &lock.packages {
+    for pkg in lock.packages.values() {
         if has_native_code(store, pkg) {
             tasks.push(create_build_task(store, pkg)?);
         }
@@ -123,7 +118,7 @@ fn collect_all_native_packages(store: &Store, lock: &Lockfile) -> Result<Vec<Bui
 
 fn collect_named_package(store: &Store, lock: &Lockfile, name: &str) -> Result<Vec<BuildTask>> {
     let mut tasks = Vec::new();
-    for (_, pkg) in &lock.packages {
+    for pkg in lock.packages.values() {
         if pkg.name == name && has_native_code(store, pkg) {
             tasks.push(create_build_task(store, pkg)?);
         }
@@ -150,10 +145,10 @@ fn collect_project_native_packages(store: &Store, lock: &Lockfile, cwd: &Path) -
     
     let mut tasks = Vec::new();
     for name in dep_names {
-        if let Some(pkg) = lock.packages.values().find(|p| p.name == name) {
-            if has_native_code(&store, pkg) {
-                tasks.push(create_build_task(&store, pkg)?);
-            }
+        if let Some(pkg) = lock.packages.values().find(|p| p.name == name)
+            && has_native_code(store, pkg)
+        {
+            tasks.push(create_build_task(store, pkg)?);
         }
     }
     Ok(tasks)
@@ -161,19 +156,21 @@ fn collect_project_native_packages(store: &Store, lock: &Lockfile, cwd: &Path) -
 
 fn has_native_code(store: &Store, pkg: &Package) -> bool {
     // Get package manifest to check for native build scripts
-    if let Ok(Some(manifest)) = store.get_package_manifest(&pkg.name, &pkg.version, &pkg.integrity) {
-        if let Some(pkg_json) = &manifest.package_json {
-            if let Some(scripts) = pkg_json.get("scripts").and_then(|s| s.as_object()) {
-                for name in scripts.keys() {
-                    if name == "install" || name == "preinstall" || name == "build" || name == "prepare" {
-                        return true;
-                    }
-                }
-            }
-            // Check for gypfile or binding.gyp
-            if pkg_json.get("gypfile").is_some() || pkg_json.get("binding").is_some() {
+    let Some(manifest) = store.get_package_manifest(&pkg.name, &pkg.version, &pkg.integrity).ok().flatten() else {
+        return false;
+    };
+    let Some(pkg_json) = &manifest.package_json else {
+        return false;
+    };
+    if let Some(scripts) = pkg_json.get("scripts").and_then(|s| s.as_object()) {
+        for name in scripts.keys() {
+            if name == "install" || name == "preinstall" || name == "build" || name == "prepare" {
                 return true;
             }
+        }
+        // Check for gypfile or binding.gyp
+        if pkg_json.get("gypfile").is_some() || pkg_json.get("binding").is_some() {
+            return true;
         }
     }
     false
@@ -233,21 +230,20 @@ fn compute_script_hash_from_lockfile(store: &Store, pkg: &Package) -> String {
     use sha2::{Digest, Sha256};
     let mut hasher = Sha256::new();
     
-    if let Ok(Some(manifest)) = store.get_package_manifest(&pkg.name, &pkg.version, &pkg.integrity) {
-        if let Some(pkg_json) = &manifest.package_json {
-            if let Some(scripts) = pkg_json.get("scripts").and_then(|s| s.as_object()) {
-                let mut names: Vec<_> = scripts.keys().collect();
-                names.sort();
-                for name in names {
-                    if let Some(script) = scripts.get(name).and_then(|s| s.as_str()) {
-                        hasher.update(name.as_bytes());
-                        hasher.update(b":");
-                        hasher.update(script.as_bytes());
-                        hasher.update(b"\n");
-                    }
-                }
-            }
+    if let Ok(Some(manifest)) = store.get_package_manifest(&pkg.name, &pkg.version, &pkg.integrity)
+    && let Some(pkg_json) = &manifest.package_json
+    && let Some(scripts) = pkg_json.get("scripts").and_then(|s| s.as_object())
+{
+    let mut names: Vec<_> = scripts.keys().collect();
+    names.sort();
+    for name in names {
+        if let Some(script) = scripts.get(name).and_then(|s| s.as_str()) {
+            hasher.update(name.as_bytes());
+            hasher.update(b":");
+            hasher.update(script.as_bytes());
+            hasher.update(b"\n");
         }
     }
+}
     hex::encode(hasher.finalize())
 }
