@@ -21,7 +21,7 @@
 
 - [x] Implement build key over package integrity, script hash, runtime ABI, platform, toolchain, allowlisted env, dependency build keys, and sandbox policy
 - [x] Capture approved build outputs separately from immutable store payloads and store them safely under the build key
-- [ ] Add `cache build list|info|clear|verify`, hit/miss reporting, and cross-project cache reuse tests
+- [x] Add `cache build list|info|clear|verify`, hit/miss reporting, and cross-project cache reuse tests
 - [x] Implement resolution order: local cache, trusted remote cache when enabled, platform packages, recognized prebuild conventions, then controlled compilation
 - [ ] Fetch prebuilds through verified CAS pipeline; never permit arbitrary lifecycle script downloads to bypass controls
 - [ ] Test top native packages/platforms and report cache/prebuilt/compiled result
